@@ -360,6 +360,22 @@
   .xp-btn:hover{border-color:var(--muted)}
   .xp-btn.main{background:#0C1D38;border-color:#0C1D38;color:#fff;font-weight:600}
   .xp-nav{display:flex;justify-content:space-between;gap:8px}
+  .xp-push{display:grid;grid-template-columns:minmax(0,1fr) 84px 46px;gap:10px;align-items:center;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:8px 2px;cursor:pointer;text-align:left;font-size:13.5px}
+  .xp-push:hover{background:var(--chip)}
+  .xp-push .t{min-width:0}
+  .xp-push .t b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .xp-push .t small{display:block;color:var(--muted);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .xp-push .pc{font:600 13px var(--mono);text-align:right}
+  .xp-push .rk{font:500 11px var(--mono);color:var(--muted);margin-right:6px}
+  .xp-seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;align-self:flex-start}
+  .xp-seg button{border:0;background:var(--panel);padding:5px 12px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+  .xp-seg button[aria-pressed="true"]{background:#0C1D38;color:#fff}
+  .xp-tags{display:flex;flex-wrap:wrap;gap:6px}
+  .xp-tag{border:1px dashed color-mix(in srgb,var(--nok) 55%,var(--line));background:none;border-radius:999px;padding:4px 10px;font-size:12.5px;cursor:pointer;color:var(--fg)}
+  .xp-tag:hover{background:var(--chip)}
+  .xp-h.sm{font-size:32px;line-height:1.05}
+  .xp-row.clk{cursor:pointer;border-radius:6px}
+  .xp-row.clk:hover{background:var(--chip)}
   .xp-hint{margin:0;font-size:13px;color:var(--muted);border-left:3px solid #C68A2B;padding:6px 10px;background:var(--panel);border-radius:0 8px 8px 0}
   @media (max-width:860px){
     .xp{position:absolute;inset:0;overflow-y:auto;display:flex;flex-direction:column}
@@ -463,13 +479,14 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   <main class="stage" id="stage"><div class="loading" id="loading">Loading</div>
     <div class="xp" id="xp" hidden>
       <div class="xp-find"><div class="box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
-        <input id="xp-q" type="search" placeholder="Find a villa, building or cluster (e.g. R2-14)" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="xp-sug" aria-label="Find a villa, building or cluster"></div>
+        <input id="xp-q" type="search" placeholder="Find a villa, building, cluster or activity" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="xp-sug" aria-label="Find a villa, building or cluster"></div>
         <div class="xp-sug" id="xp-sug" role="listbox" hidden></div></div>
       <div class="xp-map">
         <div class="xp-chips" id="xp-chips" role="toolbar" aria-label="Clusters"></div>
         <div class="xp-canvas"><svg id="xp-svg" role="img" aria-label="Site map. Tap a cluster or villa."></svg>
           <button class="xp-fit" id="xp-fit" type="button" hidden>Whole site</button>
-          <div class="xp-key" aria-hidden="true"><b>Progress</b><span><i style="background:var(--p4)"></i>85–100%</span><span><i style="background:linear-gradient(90deg,var(--p2l),var(--p2))"></i>40–84%</span><span><i style="background:var(--p1)"></i>below 40%</span></div>
+          <div class="xp-key" id="xp-key-p" aria-hidden="true"><b>Progress</b><span><i style="background:var(--p4)"></i>85–100%</span><span><i style="background:linear-gradient(90deg,var(--p2l),var(--p2))"></i>40–84%</span><span><i style="background:var(--p1)"></i>below 40%</span></div>
+          <div class="xp-key" id="xp-key-s" aria-hidden="true" hidden><b id="xp-key-t">Activity</b><span><i style="background:var(--ok)"></i>done</span><span><i style="background:var(--warn)"></i>in progress</span><span><i style="background:var(--nok)"></i>not started</span><span><i style="background:#B9C2C6"></i>not in scope</span></div>
         </div>
       </div>
       <div class="xp-panel" id="xp-panel" aria-live="polite"></div>
@@ -775,7 +792,13 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       return { id, x, y, villas: vs, n: vs.length, total: avg(vs, (v) => v.total), fin: avg(vs, (v) => v.fin), mep: avg(vs, (v) => v.mep) };
     });
     [...clusters].sort((a, b) => b.total - a.total).forEach((c, i) => { c.rank = i + 1; });
-    return { E, villas, V, pos, bpos, bprog, clusters, C: Object.fromEntries(clusters.map((c) => [c.id, c])) };
+    // activities: villas (tracker activities + structure items), buildings (their own list)
+    const VA = E.acts.map((a, i) => ({ g: a[0], n: a[1], get: (v) => [v.codes[i], v.pcts[i]] }));
+    const vxNames = []; Object.values(E.vx).forEach((L) => L.forEach(([n]) => { if (!vxNames.includes(n)) vxNames.push(n); }));
+    vxNames.forEach((n) => VA.push({ g: 'Structure', n, get: (v) => { const r = (E.vx[v.id] || []).find((x) => x[0] === n); return r ? [r[1], null] : ['X', null]; } }));
+    const BA = []; const bkey = {};
+    Object.values(E.bs).forEach((L) => L.forEach((r) => { const k = r[0] + '|' + r[1]; if (!(k in bkey)) { bkey[k] = BA.length; BA.push({ g: r[0], n: r[1], get: (b) => { const x = (E.bs[b] || []).find((y) => y[0] === r[0] && y[1] === r[1]); return x ? [x[2], x[3]] : ['X', null]; } }); } }));
+    return { E, villas, V, pos, bpos, bprog, clusters, C: Object.fromEntries(clusters.map((c) => [c.id, c])), VA, BA };
   }
 
   function hull(pts) {
@@ -868,10 +891,11 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
 
   function xpSelect(sel, keepZoom) {
     xpSel = sel; $('xp-sug').hidden = true; $('xp-q').setAttribute('aria-expanded', 'false');
-    const cl = !sel ? null : sel.k === 'c' ? sel.id : sel.k === 'v' ? X.V[sel.id].cl : null;
+    const cl = !sel ? null : sel.k === 'c' ? sel.id : sel.k === 'v' ? X.V[sel.id].cl : sel.k === 'a' ? (sel.cl || null) : null;
     execCluster(cl);
     if (!keepZoom) {
-      if (!sel) xpZoom(null);
+      if (!sel || (sel.k === 'a' && !sel.cl)) xpZoom(null);
+      else if (sel.k === 'a') xpZoom(box(X.C[sel.cl].villas.map((v) => X.pos[v.id]).filter(Boolean).map((p) => [p.x, p.y]), 220, 1450));
       else if (sel.k === 'c') xpZoom(box(X.C[sel.id].villas.map((v) => X.pos[v.id]).filter(Boolean).map((p) => [p.x, p.y]), 220, 1450));
       else { const p = sel.k === 'v' ? X.pos[sel.id] : X.bpos[sel.id]; if (p) xpZoom(box([[p.x, p.y]], 300, 1300)); }
     }
@@ -884,10 +908,19 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function xpRender() {
     if (!X) return;
     const sel = xpSel, svg = $('xp-svg');
-    const selC = !sel ? null : sel.k === 'c' ? sel.id : sel.k === 'v' ? X.V[sel.id].cl : null;
+    const selC = !sel ? null : sel.k === 'c' ? sel.id : sel.k === 'v' ? X.V[sel.id].cl : sel.k === 'a' ? (sel.cl || null) : null;
+    const act = sel && sel.k === 'a' ? actsOf(sel.s)[sel.i] : null;
     svg.querySelectorAll('.hull').forEach((g) => g.classList.toggle('on', g.dataset.c === selC));
-    svg.querySelectorAll('.v').forEach((g) => g.classList.toggle('dim', !!selC && g.dataset.c !== selC));
-    svg.querySelectorAll('.bg').forEach((g) => g.classList.toggle('dim', !!sel && !(sel.k === 'b' && sel.id === g.dataset.b)));
+    svg.querySelectorAll('.v').forEach((g) => {
+      g.classList.toggle('dim', (!!selC && g.dataset.c !== selC) || (!!act && sel.s === 'b'));
+      const d = g.querySelector('.dot'); d.setAttribute('fill', act && sel.s === 'v' ? SCOL[act.get(X.V[g.dataset.v])[0]] : tone(X.V[g.dataset.v].total));
+    });
+    svg.querySelectorAll('.bg').forEach((g) => {
+      g.classList.toggle('dim', !!sel && !(sel.k === 'b' && sel.id === g.dataset.b) && !(act && sel.s === 'b'));
+      g.querySelector('rect').setAttribute('fill', act && sel.s === 'b' ? SCOL[act.get(g.dataset.b)[0]] : tone(X.bprog(g.dataset.b)));
+    });
+    $('xp-key-p').hidden = !!act; $('xp-key-s').hidden = !act; if (act) $('xp-key-t').textContent = label(act);
+    svg.querySelectorAll('.ctag').forEach((g) => { const c = X.C[g.dataset.c]; const v = act && sel.s === 'v' ? aStats('v', sel.i, c.villas).avg : c.total; g.querySelector('.p').textContent = pc(v); });
     svg.querySelectorAll('.ring').forEach((r) => r.remove());
     if (sel && (sel.k === 'v' || sel.k === 'b')) {
       const p = sel.k === 'v' ? X.pos[sel.id] : X.bpos[sel.id];
@@ -895,7 +928,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     }
     $('xp-chips').querySelectorAll('.xchip').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.c || null) === selC)));
     const pn = $('xp-panel'); pn.replaceChildren();
-    if (!sel) panelSite(pn); else if (sel.k === 'c') panelCluster(pn, X.C[sel.id]); else if (sel.k === 'v') panelVilla(pn, X.V[sel.id]); else panelBuilding(pn, sel.id);
+    if (!sel) panelSite(pn); else if (sel.k === 'c') panelCluster(pn, X.C[sel.id]); else if (sel.k === 'v') panelVilla(pn, X.V[sel.id]); else if (sel.k === 'a') panelActivity(pn, sel); else panelBuilding(pn, sel.id);
   }
 
   function kpis(list) {
@@ -912,11 +945,91 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   const canPrint = () => !isWebView && typeof window.print === 'function';
   function printCard() { document.body.classList.add('print-xp'); const shut = [...document.querySelectorAll('#xp-panel details:not([open])')]; shut.forEach((d) => { d.open = true; }); const done = () => { document.body.classList.remove('print-xp'); shut.forEach((d) => { d.open = false; }); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); setTimeout(() => { window.print(); setTimeout(done, 1500); }, 60); }
 
+  const SCOL = { C: 'var(--ok)', P: 'var(--warn)', N: 'var(--nok)', X: '#B9C2C6' }, SNAME = { C: 'Done', P: 'In progress', N: 'Not started', X: 'Not in scope' };
+  const actsOf = (s) => s === 'b' ? X.BA : X.VA;
+  // activity name with its trade when the name alone is ambiguous (Board, Stairs, 1st fix…)
+  const GENERIC = ['Finishes', 'Other', 'Structure', 'Aluminium exterior', 'MEP', 'Buildings'];
+  const label = (a) => GENERIC.includes(a.g) || a.n.toLowerCase().startsWith(a.g.toLowerCase()) ? a.n : a.g + ' · ' + a.n;
+  const membersOf = (s, cl) => s === 'b' ? Object.keys(X.bpos) : (cl ? X.C[cl].villas : X.villas);
+  const idOf = (s, m) => s === 'b' ? m : m.id;
+  function aStats(s, i, members) {
+    const a = actsOf(s)[i]; let c = 0, p = 0, n = 0, sum = 0;
+    for (const m of members) { const [k, q] = a.get(m); if (k === 'C') { c++; sum += 1; } else if (k === 'P') { p++; sum += (q || 0) / 100; } else if (k === 'N') n++; }
+    const tot = c + p + n; return { i, a, c, p, n, tot, avg: tot ? sum / tot : 1 };
+  }
+  // started on site but furthest from finished come first; activities not started anywhere are listed apart
+  function pushLists(s, members) {
+    const all = actsOf(s).map((_, i) => aStats(s, i, members)).filter((x) => x.tot && x.c < x.tot);
+    const started = all.filter((x) => x.c + x.p > 0).sort((a, b) => a.avg - b.avg || b.tot - b.c - (a.tot - a.c));
+    const idle = all.filter((x) => x.c + x.p === 0);
+    return { started, idle };
+  }
+  function pushRow(x, rank, sel) {
+    const b = el('button', 'xp-push'); b.type = 'button'; const t = el('span', 't'); const nm = el('b'); nm.append(el('span', 'rk', String(rank).padStart(2, '0')), label(x.a));
+    t.append(nm, el('small', null, x.a.g + ' · ' + x.c + ' of ' + x.tot + ' done' + (x.p ? ' · ' + x.p + ' in progress' : '')));
+    const st = el('span', 'stk'); const i1 = el('i'); i1.style.width = x.c / x.tot * 100 + '%'; i1.style.background = 'var(--ok)'; const i2 = el('i'); i2.style.width = x.p / x.tot * 100 + '%'; i2.style.background = 'var(--warn)'; st.append(i1, i2);
+    const pv = el('span', 'pc', pc(x.avg)); pv.style.color = tone(x.avg);
+    b.append(t, st, pv); b.title = x.c + ' done · ' + x.p + ' in progress · ' + x.n + ' not started · tap to see it on the map';
+    b.addEventListener('click', () => xpSelect(sel)); return b;
+  }
+  let pushScope = 'v';
+  function pushSection(cl, limit) {
+    const s = sec(cl ? 'Needs the most push in ' + cl : 'Activities needing the most push', 'started, least finished');
+    if (!cl) {
+      const seg = el('div', 'xp-seg'); [['v', 'Villas'], ['b', 'Buildings']].forEach(([k, l]) => { const b = el('button', null, l); b.type = 'button'; b.setAttribute('aria-pressed', String(pushScope === k)); b.addEventListener('click', () => { pushScope = k; xpRender(); }); seg.append(b); });
+      s.append(seg);
+    }
+    const sc = cl ? 'v' : pushScope, { started, idle } = pushLists(sc, membersOf(sc, cl));
+    if (!started.length) s.append(el('p', 'xp-sub', 'Every started activity is finished here.'));
+    started.slice(0, limit).forEach((x, k) => s.append(pushRow(x, k + 1, { k: 'a', s: sc, i: x.i, cl })));
+    if (idle.length) {
+      const h = el('div', 'xp-grp', 'Not started on any ' + (sc === 'b' ? 'building' : 'villa') + (cl ? ' in this cluster' : '') + ' yet'); s.append(h);
+      const w = el('div', 'xp-tags'); idle.forEach((x) => { const b = el('button', 'xp-tag', label(x.a)); b.type = 'button'; b.title = x.a.g; b.addEventListener('click', () => xpSelect({ k: 'a', s: sc, i: x.i, cl })); w.append(b); }); s.append(w);
+    }
+    return s;
+  }
+
+  function panelActivity(pn, sel) {
+    const sc = sel.s, a = actsOf(sc)[sel.i], members = membersOf(sc, sel.cl), x = aStats(sc, sel.i, members);
+    const where = sc === 'b' ? 'buildings' : sel.cl ? 'villas in cluster ' + sel.cl : 'villas';
+    pn.append(printHead(label(a) + (sel.cl ? ' · ' + sel.cl : '')), back(sel.cl ? 'Cluster ' + sel.cl : 'Whole site', sel.cl ? { k: 'c', id: sel.cl } : null));
+    const hd = head('Activity · ' + a.g + ' · ' + where, label(a), 'Status ' + X.E.status + ' · the map shows this activity for every ' + (sc === 'b' ? 'building' : 'villa')); hd.querySelector('.xp-h').classList.add('sm'); pn.append(hd);
+    const k = el('div', 'xp-kpis');
+    [['Done', x.c, 'var(--ok)'], ['In progress', x.p, 'var(--warn)'], ['Not started', x.n, 'var(--nok)']].forEach(([l, n, col]) => {
+      const d = el('div', 'xp-kpi'); const tr = el('div', 'tr'); const i = el('i'); i.style.width = (x.tot ? n / x.tot * 100 : 0) + '%'; i.style.background = col; tr.append(i);
+      const b = el('b', null, String(n)); b.append(el('small', null, ' / ' + x.tot)); b.lastChild.style.cssText = 'font:500 13px var(--mono);color:var(--muted)'; d.append(el('span', null, l), b, tr); k.append(d);
+    });
+    pn.append(k);
+    pn.append(el('p', 'xp-hint', 'Overall ' + pc(x.avg) + ' complete across ' + x.tot + ' ' + (sc === 'b' ? 'buildings' : 'villas') + ' (in-progress units count at their stage %).'));
+    if (sc === 'v' && !sel.cl) {
+      const s = sec('By cluster', 'least finished first');
+      X.clusters.map((c) => ({ c, st: aStats('v', sel.i, c.villas) })).filter((r) => r.st.tot).sort((p, q) => p.st.avg - q.st.avg).forEach(({ c, st }) => {
+        const b = el('button', 'xp-push'); b.type = 'button'; const t = el('span', 't'); t.append(el('b', null, c.id), el('small', null, st.c + ' of ' + st.tot + ' done' + (st.p ? ' · ' + st.p + ' in progress' : '')));
+        const bar = el('span', 'stk'); const i1 = el('i'); i1.style.width = st.c / st.tot * 100 + '%'; i1.style.background = 'var(--ok)'; const i2 = el('i'); i2.style.width = st.p / st.tot * 100 + '%'; i2.style.background = 'var(--warn)'; bar.append(i1, i2);
+        const pv = el('span', 'pc', pc(st.avg)); pv.style.color = tone(st.avg); b.append(t, bar, pv);
+        b.addEventListener('click', () => xpSelect({ k: 'a', s: 'v', i: sel.i, cl: c.id })); s.append(b);
+      });
+      pn.append(s);
+    }
+    const lists = { P: [], N: [] };
+    members.forEach((m) => { const [kk, q] = a.get(m); if (kk === 'P' || kk === 'N') lists[kk].push({ id: idOf(sc, m), q }); });
+    lists.P.sort((p, q) => (p.q || 0) - (q.q || 0)); lists.N.sort((p, q) => p.id.localeCompare(q.id, 'en', { numeric: true }));
+    [['N', 'Not started'], ['P', 'In progress']].forEach(([kk, title]) => {
+      if (!lists[kk].length) return;
+      const s = sec(title + ' (' + lists[kk].length + ')', kk === 'P' ? 'lowest stage first' : 'tap for the ' + (sc === 'b' ? 'building' : 'villa'));
+      const g = el('div', 'xp-vg');
+      lists[kk].forEach(({ id, q }) => { const b = el('button', 'xp-vb'); b.type = 'button'; const l = el('span'); const i = el('i'); i.style.background = SCOL[kk]; l.append(i, id); b.append(l, el('small', null, kk === 'P' && q != null ? q + '%' : '')); b.addEventListener('click', () => xpSelect({ k: sc === 'b' ? 'b' : 'v', id })); g.append(b); });
+      s.append(g); pn.append(s);
+    });
+    pn.append(actions([sc === 'v' && sel.cl ? btn('Show in Executive Summary →', 'main', () => openExecVillas(sel.cl)) : null, canPrint() && btn('Print this card', '', printCard)]));
+  }
+
   function panelSite(pn) {
     const vs = X.villas;
     pn.append(head('Site explorer · status ' + X.E.status, 'Whole site', vs.length + ' villas in ' + X.clusters.length + ' clusters, ' + Object.keys(X.bpos).length + ' buildings'));
     pn.append(kpis([['Total', avg(vs, (v) => v.total)], ['Finishes', avg(vs, (v) => v.fin)], ['MEP', avg(vs, (v) => v.mep)]]));
-    pn.append(el('p', 'xp-hint', 'Tap a cluster or villa on the map, or search above. Choosing a cluster also filters the villa grid in the Executive Summary.'));
+    pn.append(el('p', 'xp-hint', 'Tap a cluster, villa or activity to see it on the map, or search above. Choosing a cluster also filters the villa grid in the Executive Summary.'));
+    pn.append(pushSection(null, 8));
     const s = sec('Clusters', 'average of their villas');
     [...X.clusters].sort((a, b) => a.rank - b.rank).forEach((c) => {
       const b = el('button', 'xp-cl'); b.type = 'button'; const bar = el('span', 'bar'); const i = el('i'); i.style.width = c.total * 100 + '%'; i.style.background = tone(c.total); bar.append(i);
@@ -930,13 +1043,14 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   }
   function villaBtn(v) { const b = el('button', 'xp-vb'); b.type = 'button'; const l = el('span'); const i = el('i'); i.style.background = tone(v.total); l.append(i, v.id); b.append(l, el('small', null, pc(v.total))); b.addEventListener('click', () => xpSelect({ k: 'v', id: v.id })); return b; }
 
-  function actRows(villas) {
+  function actRows(villas, cl) {
     const acts = X.E.acts, wrap = el('div'); let lastG = '';
     acts.forEach((a, i) => {
       let c = 0, p = 0, n = 0; for (const v of villas) { const k = v.codes[i]; if (k === 'C') c++; else if (k === 'P') p++; else if (k === 'N') n++; }
       const tot = c + p + n; if (!tot) return;
       if (a[0] !== lastG) { wrap.append(el('div', 'xp-grp', a[0])); lastG = a[0]; }
-      const r = el('div', 'xp-row'); const t = el('span', 't', a[1]); t.title = a[0] + ' · ' + a[1];
+      const r = el('div', 'xp-row clk'); r.tabIndex = 0; r.setAttribute('role', 'button'); r.addEventListener('click', () => xpSelect({ k: 'a', s: 'v', i, cl })); r.addEventListener('keydown', (e) => { if (e.key === 'Enter') xpSelect({ k: 'a', s: 'v', i, cl }); });
+      const t = el('span', 't', a[1]); t.title = a[0] + ' · ' + a[1] + ' · tap to see it on the map';
       const st = el('span', 'stk'); const i1 = el('i'); i1.style.width = c / tot * 100 + '%'; i1.style.background = 'var(--ok)'; const i2 = el('i'); i2.style.width = p / tot * 100 + '%'; i2.style.background = 'var(--warn)'; st.append(i1, i2);
       st.title = c + ' done · ' + p + ' in progress · ' + n + ' not started';
       r.append(t, st, el('span', 'n', c + '/' + tot)); wrap.append(r);
@@ -949,7 +1063,8 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     pn.append(head('Cluster · rank ' + c.rank + ' of ' + X.clusters.length, c.id, c.n + ' villas · average of its villas, status ' + X.E.status));
     pn.append(kpis([['Total', c.total], ['Finishes', c.fin], ['MEP', c.mep]]));
     const vs = sec('Villas', 'tap for details'); const g = el('div', 'xp-vg'); c.villas.slice().sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true })).forEach((v) => g.append(villaBtn(v))); vs.append(g); pn.append(vs);
-    const s = sec('Activities in this cluster', 'villas done of ' + c.n); s.append(actRows(c.villas)); pn.append(s);
+    pn.append(pushSection(c.id, 5));
+    const s = sec('All activities in this cluster', 'villas done of ' + c.n); s.append(actRows(c.villas, c.id)); pn.append(s);
     pn.append(actions([btn('Show in Executive Summary →', 'main', () => openExecVillas(c.id)), canPrint() && btn('Print this card', '', printCard)]));
   }
 
@@ -1014,7 +1129,8 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     X.villas.filter((v) => hit(v.id)).forEach((v) => out.push({ k: 'v', id: v.id, sub: 'Villa · cluster ' + v.cl, v: v.total, s: score(v.id) }));
     Object.keys(X.bpos).filter(hit).forEach((id) => out.push({ k: 'b', id, sub: 'Building', v: X.bprog(id), s: score(id) }));
     X.clusters.filter((c) => hit(c.id) || keyOf('cluster' + c.id).includes(k)).forEach((c) => out.push({ k: 'c', id: c.id, sub: 'Cluster · ' + c.n + ' villas', v: c.total, s: score(c.id) }));
-    return out.sort((a, b) => a.s - b.s || a.id.localeCompare(b.id, 'en', { numeric: true })).slice(0, 8);
+    if (k.length >= 3) X.VA.forEach((a, i) => { if (keyOf(a.n).includes(k) || keyOf(a.g + a.n).includes(k)) { const st = aStats('v', i, X.villas); if (st.tot) out.push({ k: 'a', s: 'v', i, id: label(a), sub: 'Activity · ' + a.g + ' · villas', v: st.avg, s2: keyOf(a.n) === k ? 2.5 : 3 }); } });
+    return out.sort((a, b) => (a.s2 || a.s) - (b.s2 || b.s) || a.id.localeCompare(b.id, 'en', { numeric: true })).slice(0, 10);
   }
   function drawSug() {
     const box = $('xp-sug'), q = $('xp-q').value.trim(); sugList = searchItems(q);
@@ -1029,7 +1145,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => pickSug(it)); box.append(b);
     });
   }
-  function pickSug(it) { $('xp-q').value = it.id; $('xp-q').blur(); xpSelect({ k: it.k, id: it.id }); }
+  function pickSug(it) { $('xp-q').value = it.id; $('xp-q').blur(); xpSelect(it.k === 'a' ? { k: 'a', s: it.s, i: it.i, cl: null } : { k: it.k, id: it.id }); }
   $('xp-q').addEventListener('input', () => { sugIdx = 0; drawSug(); });
   $('xp-q').addEventListener('focus', () => { if ($('xp-q').value.trim()) drawSug(); });
   $('xp-q').addEventListener('blur', () => setTimeout(() => { $('xp-sug').hidden = true; $('xp-q').setAttribute('aria-expanded', 'false'); }, 120));
@@ -1086,7 +1202,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       list.forEach((p) => m.append(mItem('PDF', p.title + ' · full report', 'Status ' + p.status + ' · ' + p.pages + ' pages · ' + (p.size / 1048576).toFixed(1) + ' MB', (b, st) => downloadPdf(p, b, st))));
     }
     if (current === 'explorer' && xpSel && canPrint()) {
-      const nm = xpSel.k === 'c' ? 'Cluster ' + xpSel.id : xpSel.k === 'v' ? 'Villa ' + xpSel.id : 'Building ' + xpSel.id;
+      const nm = xpSel.k === 'c' ? 'Cluster ' + xpSel.id : xpSel.k === 'v' ? 'Villa ' + xpSel.id : xpSel.k === 'a' ? label(actsOf(xpSel.s)[xpSel.i]) : 'Building ' + xpSel.id;
       m.append(mItem('CARD', 'Print this card', nm + ' · choose “Save as PDF”', () => { closeMenu(); printCard(); }, true));
     }
     m.hidden = false; $('pdf-open').setAttribute('aria-expanded', 'true');
