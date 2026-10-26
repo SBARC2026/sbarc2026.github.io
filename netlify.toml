@@ -1,0 +1,3 @@
+# Netlify publishes the ready-made site in /site. Nothing is built on Netlify.
+[build]
+  publish = "site"

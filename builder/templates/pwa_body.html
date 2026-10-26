@@ -1,0 +1,28 @@
+<script>
+(() => {
+  // offline support (only when served from a web server)
+  if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
+    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
+  }
+  const box = document.getElementById('inst'), btn = document.getElementById('inst-b'), txt = document.getElementById('inst-t');
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone || !/^https?:$/.test(location.protocol)) return;
+  let deferred = null;
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); deferred = e;
+    txt.textContent = 'Use SBARC as an app on this device.'; btn.hidden = false; box.hidden = false;
+  });
+  btn.addEventListener('click', async () => {
+    if (!deferred) return;
+    deferred.prompt();
+    try { await deferred.userChoice; } catch (e) { /* dismissed */ }
+    deferred = null; box.hidden = true;
+  });
+  window.addEventListener('appinstalled', () => { box.hidden = true; });
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) {
+    txt.textContent = 'To install on iPhone or iPad: tap Share, then “Add to Home Screen”.';
+    btn.hidden = true; box.hidden = false;
+  }
+})();
+</script>

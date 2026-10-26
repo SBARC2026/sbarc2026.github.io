@@ -1,0 +1,72 @@
+<script>
+window.dash = (() => {
+  const RAW = window.__DATA__ || {};
+  const datasets = {};
+  const cols = (d) => (Array.isArray(d) && d.length && d[0] && typeof d[0] === 'object') ? Object.keys(d[0]) : [];
+  const mk = (d) => ({ status: 'ok', data: d, rows: d, value: d, columns: cols(d), meta: [], refreshing: false });
+  Object.keys(RAW).forEach((k) => { datasets[k] = mk(RAW[k]); });
+  const calcs = [], listeners = [];
+  let params = Object.assign({}, window.__PARAMS__ || {});
+  const colors = Array.from({ length: 8 }, (_, i) => 'var(--series-' + (i + 1) + ')');
+  let queued = false;
+  function pick(rows, el) {
+    if (!Array.isArray(rows)) return rows;
+    const w = el.getAttribute('data-where'), r = el.getAttribute('data-row');
+    if (w) {
+      const conds = w.split('&').map((p) => p.split('=').map(decodeURIComponent));
+      return rows.find((row) => conds.every(([k, v]) => String(row[k]) === v));
+    }
+    if (r != null) return rows[Number(r)];
+    return rows[0];
+  }
+  function fillMarks() {
+    document.querySelectorAll('[data-source][data-field]').forEach((el) => {
+      const id = el.getAttribute('data-source');
+      if (id.indexOf(' ') >= 0 || el.hasAttribute('data-fmt')) return;
+      const ds = datasets[id];
+      if (!ds || ds.status !== 'ok') return;
+      const auto = el.hasAttribute('data-auto');
+      if (!auto && el.textContent.trim() !== '—') return;
+      const row = pick(ds.data, el);
+      if (!row || typeof row !== 'object') return;
+      const v = row[el.getAttribute('data-field')];
+      if (v == null) return;
+      el.setAttribute('data-auto', '');
+      el.textContent = typeof v === 'number' ? v.toLocaleString('en') : String(v);
+    });
+    document.querySelectorAll('.dash-skeleton[data-source]').forEach((el) => {
+      const ids = el.getAttribute('data-source').split(/\s+/);
+      if (ids.every((i) => datasets[i] && datasets[i].status === 'ok')) el.classList.remove('dash-skeleton');
+    });
+  }
+  const notify = () => { if (queued) return; queued = true; requestAnimationFrame(() => { queued = false; listeners.forEach((fn) => { try { fn(); } catch (e) { console.error(e); } }); fillMarks(); }); };
+  document.addEventListener('DOMContentLoaded', () => { notify(); setTimeout(fillMarks, 50); });
+  const data = (id) => datasets[id] || { status: 'missing', data: [], rows: [], columns: [], meta: [] };
+  function run() {
+    let moved = true;
+    while (moved) {
+      moved = false;
+      for (const c of calcs) {
+        if (datasets[c.id]) continue;
+        const ins = c.inputs.map((i) => datasets[i]);
+        if (ins.every((x) => x && x.status === 'ok')) {
+          try { datasets[c.id] = mk(c.fn(...ins.map((x) => x.data))); } catch (e) { console.error(e); datasets[c.id] = { status: 'error', data: [], rows: [], columns: [], meta: [] }; }
+          moved = true;
+        }
+      }
+    }
+  }
+  function calc(id, o) { calcs.push(Object.assign({ id }, o)); run(); notify(); }
+  let rz; window.addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(notify, 120); });
+  return {
+    data, calc, colors,
+    loader: () => {},
+    params: () => Object.assign({}, params),
+    setParams: (o) => { Object.assign(params, o); notify(); },
+    resetParams: () => { params = Object.assign({}, window.__PARAMS__ || {}); notify(); },
+    onData: (fn) => { listeners.push(fn); try { fn(); } catch (e) { console.error(e); } },
+    refresh: () => {},
+    setLink: () => {},
+  };
+})();
+</script>

@@ -1,0 +1,13 @@
+<style>
+  #full,#u-drop,#u-files,#u-eml,#inst{display:none!important}
+  .send{grid-template-columns:1fr!important}
+</style>
+<script>
+(() => {
+  const set = (sel, t) => { const el = document.querySelector(sel); if (el) el.textContent = t; };
+  set('#u-mail b', 'Open email');
+  set('#u-mail span', 'Your email app opens with the update written in. Attach your Excel sheet there, then send.');
+  set('.sh-head p', 'Fill in the details, then attach your Excel sheet in the email that opens.');
+  const b = document.getElementById('u-mail'); if (b) b.classList.add('main');
+})();
+</script>

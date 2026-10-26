@@ -1,0 +1,4 @@
+# Readable dashboard figures are downloaded here before each build. Never commit them.
+builder/_data/
+__pycache__/
+*.pyc
