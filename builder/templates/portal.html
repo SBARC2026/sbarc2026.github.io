@@ -240,6 +240,169 @@
   .to button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer}
   .done{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:11px;background:color-mix(in srgb,#1E7A4C 10%,var(--panel));border:1px solid color-mix(in srgb,#1E7A4C 35%,transparent);font-size:13.5px}
   .done ol{margin:4px 0 0;padding-left:18px}
+
+  /* ================= SITE EXPLORER ================= */
+  :root{--p1:#C24A33;--p2:#C9851E;--p2l:#F0DDB6;--p4:#2D7A4C;--ok:#2D7A4C;--warn:#C9851E;--nok:#B13F2B;--paper:#FBFAF6}
+  :root[data-theme="dark"]{--ok:#62C48A;--warn:#E3AA4E;--nok:#F07D66;--paper:#1A242B}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ok:#62C48A;--warn:#E3AA4E;--nok:#F07D66;--paper:#1A242B}}
+  .xp{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,420px);grid-template-rows:auto minmax(0,1fr);
+    grid-template-areas:"map find" "map panel";background:var(--bg)}
+  .xp-map{grid-area:map;position:relative;display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--line)}
+  .xp-chips{display:flex;gap:6px;padding:10px 14px;overflow-x:auto;scrollbar-width:thin;border-bottom:1px solid var(--line);background:var(--panel)}
+  .xchip{flex:none;appearance:none;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;white-space:nowrap}
+  .xchip i{width:9px;height:9px;border-radius:50%;flex:none}
+  .xchip small{font:500 11.5px var(--mono);color:var(--muted)}
+  .xchip:hover{border-color:var(--muted)}
+  .xchip[aria-pressed="true"]{background:#0C1D38;border-color:#0C1D38;color:#fff}
+  .xchip[aria-pressed="true"] small{color:#C9D4E3}
+  .xp-canvas{position:relative;flex:1;min-height:0;background:var(--paper);overflow:hidden}
+  #xp-svg{position:absolute;inset:0;width:100%;height:100%;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+  #xp-svg .plan{opacity:.55}
+  :root[data-theme="dark"] #xp-svg .plan{opacity:.22;filter:invert(1) hue-rotate(180deg)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #xp-svg .plan{opacity:.22;filter:invert(1) hue-rotate(180deg)}}
+  #xp-svg .bnd{fill:none;stroke:#C68A2B;stroke-width:9;stroke-linejoin:round;opacity:.85}
+  #xp-svg .hull path{fill:rgba(12,29,56,.06);stroke:rgba(12,29,56,.18);stroke-width:3;stroke-linejoin:round;cursor:pointer;transition:fill .2s,stroke .2s}
+  #xp-svg .hull:hover path{fill:rgba(198,138,43,.12)}
+  #xp-svg .hull.on path{fill:rgba(198,138,43,.15);stroke:#C68A2B;stroke-width:9;stroke-dasharray:28 14}
+  :root[data-theme="dark"] #xp-svg .hull path{fill:rgba(255,255,255,.05);stroke:rgba(255,255,255,.16)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) #xp-svg .hull path{fill:rgba(255,255,255,.05);stroke:rgba(255,255,255,.16)}}
+  :root #xp-svg .hull.on path{fill:rgba(198,138,43,.16);stroke:#C68A2B}
+  #xp-svg g:focus{outline:none}
+  #xp-svg .v:focus-visible .dot{stroke:#C68A2B;stroke-width:9}
+  #xp-svg .v{cursor:pointer}
+  #xp-svg .v .hit{fill:transparent}
+  #xp-svg .v .dot{stroke:#fff;stroke-width:5;transition:opacity .2s}
+  #xp-svg .v:hover .dot{stroke:#0C1D38;stroke-width:7}
+  #xp-svg .vlab{font:600 24px var(--mono);fill:var(--fg);paint-order:stroke;stroke:var(--paper);stroke-width:7px;pointer-events:none;display:none}
+  #xp-svg.zoomed .vlab{display:block}
+  #xp-svg .dim .dot,#xp-svg .dim rect{opacity:.28}
+  #xp-svg .dim .vlab{opacity:.45}
+  #xp-svg .bg{cursor:pointer}
+  #xp-svg .bg rect{stroke:#fff;stroke-width:4}
+  #xp-svg .bg text{font:700 26px var(--mono);fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  #xp-svg .ctag{cursor:pointer}
+  #xp-svg .ctag rect{fill:#0C1D38;stroke:#E8C27A;stroke-width:3.5}
+  #xp-svg .ctag text{fill:#fff;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  #xp-svg .ctag .n{font:700 30px var(--disp);font-stretch:80%}
+  #xp-svg .ctag .p{font:600 22px var(--mono);fill:#E8C27A}
+  #xp-svg.zoomed .ctag{display:none}
+  #xp-svg .ring{fill:none;stroke:#0C1D38;stroke-width:7;pointer-events:none}
+  @media (prefers-reduced-motion:no-preference){#xp-svg .ring{animation:xpPulse 1.6s ease-in-out infinite}}
+  @keyframes xpPulse{50%{stroke-width:14;opacity:.55}}
+  .xp-key{position:absolute;left:12px;bottom:12px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;max-width:calc(100% - 24px);
+    background:color-mix(in srgb,var(--panel) 92%,transparent);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-size:12px;color:var(--muted)}
+  .xp-key b{font:600 10.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--fg)}
+  .xp-key span{display:inline-flex;align-items:center;gap:5px}
+  .xp-key i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .xp-fit{position:absolute;right:12px;top:12px;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 12px;font-size:12.5px;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+  .xp-find{grid-area:find;position:relative;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+  .xp-find .box{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:0 10px}
+  .xp-find .box:focus-within{border-color:#C68A2B;box-shadow:0 0 0 3px color-mix(in srgb,#C68A2B 18%,transparent)}
+  .xp-find svg{color:var(--muted);flex:none}
+  .xp-find input{flex:1;min-width:0;border:0;background:none;padding:11px 0;font-size:15.5px;outline:none}
+  .xp-sug{position:absolute;left:16px;right:16px;top:calc(100% - 6px);z-index:5;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 34px rgba(0,0,0,.16);overflow:hidden}
+  .xp-sug button{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;width:100%;border:0;background:none;padding:9px 12px;text-align:left;cursor:pointer;font-size:14px}
+  .xp-sug button[aria-selected="true"],.xp-sug button:hover{background:var(--chip)}
+  .xp-sug b{font:600 13.5px var(--mono)}
+  .xp-sug span{color:var(--muted);font-size:12.5px}
+  .xp-sug em{font:600 12.5px var(--mono);font-style:normal}
+  .xp-sug .none{padding:12px;color:var(--muted);font-size:13.5px}
+  .xp-panel{grid-area:panel;overflow-y:auto;padding:18px 18px 28px;display:flex;flex-direction:column;gap:18px;min-height:0}
+  .xp-back{align-self:flex-start;border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:5px 12px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+  .xp-back:hover{color:var(--fg);border-color:var(--muted)}
+  .xp-eb{font:500 11px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .xp-h{margin:2px 0 0;font:800 40px/1 var(--disp);font-stretch:72%;letter-spacing:.005em}
+  .xp-sub{margin:4px 0 0;color:var(--muted);font-size:13.5px}
+  .xp-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .xp-kpi{border:1px solid var(--line);background:var(--panel);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+  .xp-kpi span{font-size:12px;color:var(--muted)}
+  .xp-kpi b{font:800 28px/1 var(--disp);font-stretch:76%}
+  .xp-kpi .tr{height:5px;border-radius:3px;background:var(--chip);overflow:hidden}
+  .xp-kpi .tr i{display:block;height:100%;border-radius:3px}
+  .xp-sec{display:flex;flex-direction:column;gap:8px}
+  .xp-sec h3{margin:0;display:flex;align-items:baseline;justify-content:space-between;gap:10px;font:600 11.5px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .xp-sec h3 small{font:500 12px var(--body);letter-spacing:0;text-transform:none}
+  .xp-row{display:grid;grid-template-columns:minmax(0,1fr) 92px 50px;gap:10px;align-items:center;font-size:13.5px;padding:3px 0}
+  .xp-row .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .xp-row .t small{color:var(--muted);font-size:11.5px;margin-right:4px}
+  .xp-row .n{font:500 12px var(--mono);color:var(--muted);text-align:right;white-space:nowrap}
+  .stk{display:flex;height:8px;border-radius:4px;overflow:hidden;background:color-mix(in srgb,var(--nok) 22%,var(--chip))}
+  .stk i{display:block;height:100%}
+  .xp-grp{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+  .xp-cl{display:grid;grid-template-columns:22px 52px minmax(0,1fr) 44px;gap:10px;align-items:center;width:100%;border:0;border-bottom:1px solid var(--line);background:none;padding:8px 2px;cursor:pointer;text-align:left;font-size:13.5px}
+  .xp-cl:hover{background:var(--chip)}
+  .xp-cl .rk{font:500 11.5px var(--mono);color:var(--muted)}
+  .xp-cl b{font:600 13.5px var(--mono)}
+  .xp-cl .bar{height:8px;border-radius:4px;background:var(--chip);overflow:hidden}
+  .xp-cl .bar i{display:block;height:100%}
+  .xp-cl .pc{font:600 13px var(--mono);text-align:right}
+  .xp-vg{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+  .xp-vb{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:7px 9px;cursor:pointer;font:600 12.5px var(--mono);justify-content:space-between}
+  .xp-vb:hover{border-color:var(--muted)}
+  .xp-vb i{width:9px;height:9px;border-radius:50%;flex:none}
+  .xp-vb span{display:inline-flex;align-items:center;gap:6px}
+  .xp-vb small{font-weight:500;color:var(--muted)}
+  .xp-act{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .xp-act .t small{display:block;color:var(--muted);font-size:11.5px}
+  .pill{font:600 11.5px var(--mono);padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .pill.P{background:color-mix(in srgb,var(--warn) 20%,transparent);color:color-mix(in srgb,var(--warn) 70%,var(--fg))}
+  .pill.N{background:color-mix(in srgb,var(--nok) 16%,transparent);color:color-mix(in srgb,var(--nok) 75%,var(--fg))}
+  .pill.C{background:color-mix(in srgb,var(--ok) 16%,transparent);color:color-mix(in srgb,var(--ok) 75%,var(--fg))}
+  .xp-sum{display:flex;gap:6px;flex-wrap:wrap}
+  .xp-done{display:flex;flex-wrap:wrap;gap:6px}
+  .xp-done span{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:3px 9px;color:var(--muted)}
+  details.xp-sec summary{cursor:pointer;list-style:none}
+  details.xp-sec summary::-webkit-details-marker{display:none}
+  details.xp-sec summary h3::after{content:"Show";font:500 12px var(--body);letter-spacing:0;text-transform:none;color:var(--accent)}
+  details.xp-sec[open] summary h3::after{content:"Hide"}
+  .xp-acts{display:flex;gap:8px;flex-wrap:wrap}
+  .xp-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:9px 13px;font-size:13.5px;cursor:pointer}
+  .xp-btn:hover{border-color:var(--muted)}
+  .xp-btn.main{background:#0C1D38;border-color:#0C1D38;color:#fff;font-weight:600}
+  .xp-nav{display:flex;justify-content:space-between;gap:8px}
+  .xp-hint{margin:0;font-size:13px;color:var(--muted);border-left:3px solid #C68A2B;padding:6px 10px;background:var(--panel);border-radius:0 8px 8px 0}
+  @media (max-width:860px){
+    .xp{position:absolute;inset:0;overflow-y:auto;display:flex;flex-direction:column}
+    .xp-find{position:sticky;top:0;z-index:6}
+    .xp-map{border-right:0;flex:none}
+    .xp-canvas{flex:none;height:min(56vh,480px)}
+    .xp-panel{overflow:visible;flex:none}
+    .xp-key{font-size:11px;gap:3px 9px}
+  }
+
+  /* ================= PDF MENU ================= */
+  .tools{position:relative}
+  .menu{position:absolute;right:0;top:calc(100% + 2px);z-index:40;width:min(360px,calc(100vw - 24px));background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 22px 60px rgba(0,0,0,.22);padding:8px;display:flex;flex-direction:column;gap:2px}
+  .menu h4{margin:6px 8px 4px;font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .mi{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;border:0;background:none;border-radius:10px;padding:9px 8px;text-align:left;cursor:pointer;width:100%}
+  .mi:hover{background:var(--chip)}
+  .mi:disabled{cursor:progress;opacity:.8}
+  .mi .ic{width:36px;height:42px;border-radius:6px;background:#B13F2B;color:#fff;display:grid;place-items:end center;padding-bottom:6px;font:700 9.5px var(--mono);letter-spacing:.06em;position:relative}
+  .mi .ic::before{content:"";position:absolute;right:0;top:0;border-style:solid;border-width:0 10px 10px 0;border-color:transparent var(--panel) rgba(255,255,255,.35) transparent}
+  .mi .ic.pr{background:#0C1D38}
+  .mi b{display:block;font-size:14px}
+  .mi span{display:block;font-size:12px;color:var(--muted)}
+  .mi .st{font:500 12px var(--mono);color:var(--muted);white-space:nowrap}
+  .mi .spin{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--line);border-top-color:#C68A2B;animation:spin .8s linear infinite;display:inline-block}
+  .menu .note{margin:4px 8px 6px;font-size:12.5px;color:var(--muted)}
+  .menu .err{margin:2px 8px 6px;font-size:12.5px;color:#B13F2B}
+  @media (max-width:760px){ .tb-btn .lbl{display:none} .tb-btn{padding:7px 10px} .tab{padding:10px 10px 11px} }
+  @media (max-width:520px){ .tab .full{display:none} .tab .short{display:inline!important} }
+
+  /* ================= PRINT (explorer card) ================= */
+  @media print{
+    body.print-xp{background:#fff}
+    body.print-xp .gate,body.print-xp .bar,body.print-xp .stage>iframe,body.print-xp .loading,body.print-xp .modal,body.print-xp .xp-find,
+    body.print-xp .xp-chips,body.print-xp .xp-fit,body.print-xp .xp-back,body.print-xp .xp-acts,body.print-xp .xp-nav,body.print-xp .menu{display:none!important}
+    body.print-xp .app,body.print-xp .stage,body.print-xp .xp{position:static!important;display:block!important;overflow:visible!important;height:auto!important}
+    body.print-xp .xp-map{border:0}
+    body.print-xp .xp-canvas{height:110mm!important;flex:none;border:1px solid #ccc;border-radius:8px}
+    body.print-xp .xp-panel{overflow:visible;padding:14px 0 0}
+    body.print-xp details.xp-sec summary h3::after{content:""}
+    body.print-xp .xp-print-head{display:flex!important}
+  }
+  .xp-print-head{display:none;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0C1D38;padding-bottom:6px;margin-bottom:10px;font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -289,12 +452,29 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboards"></nav>
     <div class="tools">
       <button class="tb-btn primary" id="up-open" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>Send update</button>
+      <button class="tb-btn" id="find-open" type="button" aria-label="Find a villa"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Find villa</span></button>
+      <button class="tb-btn" id="pdf-open" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Download PDF"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span class="lbl">PDF</span></button>
+      <div class="menu" id="pdf-menu" hidden role="menu" aria-label="Download PDF"></div>
       <button class="tb-btn wide" id="theme" type="button">Theme: auto</button>
       <button class="tb-btn wide" id="full" type="button">Full screen</button>
-      <button class="tb-btn" id="lockbtn" type="button" aria-label="Lock"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Lock</button>
+      <button class="tb-btn" id="lockbtn" type="button" aria-label="Lock"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="lbl">Lock</span></button>
     </div>
   </header>
-  <main class="stage" id="stage"><div class="loading" id="loading">Loading</div></main>
+  <main class="stage" id="stage"><div class="loading" id="loading">Loading</div>
+    <div class="xp" id="xp" hidden>
+      <div class="xp-find"><div class="box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="xp-q" type="search" placeholder="Find a villa, building or cluster (e.g. R2-14)" autocomplete="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="xp-sug" aria-label="Find a villa, building or cluster"></div>
+        <div class="xp-sug" id="xp-sug" role="listbox" hidden></div></div>
+      <div class="xp-map">
+        <div class="xp-chips" id="xp-chips" role="toolbar" aria-label="Clusters"></div>
+        <div class="xp-canvas"><svg id="xp-svg" role="img" aria-label="Site map. Tap a cluster or villa."></svg>
+          <button class="xp-fit" id="xp-fit" type="button" hidden>Whole site</button>
+          <div class="xp-key" aria-hidden="true"><b>Progress</b><span><i style="background:var(--p4)"></i>85–100%</span><span><i style="background:linear-gradient(90deg,var(--p2l),var(--p2))"></i>40–84%</span><span><i style="background:var(--p1)"></i>below 40%</span></div>
+        </div>
+      </div>
+      <div class="xp-panel" id="xp-panel" aria-live="polite"></div>
+    </div>
+  </main>
 </section>
 
 <!-- ============ UPLOAD DIALOG ============ -->
@@ -341,7 +521,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   const PROJECTS = /*PROJECTS*/[];
   const $ = (id) => document.getElementById(id);
   const norm = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  let session = null, current = null, theme = '';
+  let session = null, current = null, theme = '', secret = '';
   const frames = {};
 
   // ---------- entrance ----------
@@ -391,7 +571,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       const slow = !(window.crypto && crypto.subtle && window.isSecureContext !== false);
       if (slow) $('g-msg').textContent = 'Unlocking on this device can take up to 30 seconds…';
       let data = null;
-      for (const t of tries) { data = await decrypt(p.vault, t); if (data) break; }
+      for (const t of tries) { data = await decrypt(p.vault, t); if (data) { secret = t; break; } }
       $('g-msg').textContent = '';
       if (!data) { busy(false); $('g-pass').select(); return fail('That password is not right. Check it and try again.', $('g-pass')); }
       session = data; enter();
@@ -409,16 +589,19 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('pname').textContent = session.project;
     const tabs = $('tabs'); tabs.replaceChildren();
     session.dashboards.forEach((d) => {
-      const b = document.createElement('button'); b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.textContent = d.title;
+      const b = document.createElement('button'); b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer' };
+      const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh);
       b.addEventListener('click', () => show(d.id)); tabs.append(b);
     });
     $('u-to').textContent = session.upload.email;
+    $('find-open').hidden = !session.explorer;
     show(session.dashboards[0].id);
   }
 
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
-    session = null; current = null; $('up').hidden = true;
+    session = null; current = null; secret = ''; $('up').hidden = true;
+    xpReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -431,11 +614,13 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     current = id;
     document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.id === id)));
     Object.keys(frames).forEach((k) => { frames[k].hidden = k !== id; });
+    $('xp').hidden = id !== 'explorer';
+    if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
     if (!frames[id]) {
       $('loading').hidden = false;
       const f = document.createElement('iframe');
       f.title = (session.dashboards.find((d) => d.id === id) || {}).title || id;
-      f.addEventListener('load', () => { applyTheme(f.contentDocument); if (current === id) $('loading').hidden = true; });
+      f.addEventListener('load', () => { applyTheme(f.contentDocument); if (current === id) $('loading').hidden = true; frameReady(id, f); });
       f.srcdoc = session.frames[id];
       frames[id] = f; $('stage').append(f);
     } else $('loading').hidden = true;
@@ -564,6 +749,376 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => { $('u-copy').textContent = 'Copied'; setTimeout(() => { $('u-copy').textContent = 'Copy address'; }, 1500); })
       .catch(() => { const r = document.createRange(); r.selectNodeContents($('u-to')); const s = getSelection(); s.removeAllRanges(); s.addRange(r); });
   });
+
+
+  // ---------- site explorer ----------
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (t, c, txt) => { const e = document.createElement(t); if (c) e.className = c; if (txt != null) e.textContent = txt; return e; };
+  const sv = (t, a) => { const e = document.createElementNS(NS, t); for (const k in (a || {})) e.setAttribute(k, a[k]); return e; };
+  const pc = (v) => (v == null || isNaN(v)) ? '–' : Math.round(v * 100) + '%';
+  const tone = (v) => v >= 0.85 ? 'var(--p4)' : v >= 0.4 ? `color-mix(in srgb, var(--p2) ${Math.round(45 + (v - 0.4) / 0.45 * 55)}%, var(--p2l))` : 'var(--p1)';
+  const keyOf = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const avg = (a, f) => a.length ? a.reduce((s, x) => s + f(x), 0) / a.length : 0;
+  const frac = (c, p) => c === 'C' ? 1 : c === 'P' ? (p || 0) / 100 : 0;
+  const isWebView = /; wv\)/.test(navigator.userAgent);
+  let X = null, xpSel = null, xpVB = null, xpAnim = 0, pendingCluster;
+
+  function xpModel() {
+    const E = session.explorer;
+    const villas = Object.keys(E.villas).map((id) => { const r = E.villas[id]; return { id, cl: r[0], type: r[1], fin: r[2], mep: r[3], total: r[4], codes: r[5], pcts: r[6] }; });
+    const V = Object.fromEntries(villas.map((v) => [v.id, v]));
+    const pos = Object.fromEntries(E.pos.map(([id, x, y, cl]) => [id, { x, y, cl }]));
+    const bpos = Object.fromEntries(E.bpos.map(([id, x, y]) => [id, { x, y }]));
+    const bprog = (b) => { const L = E.bs[b] || []; return L.length ? avg(L, (r) => frac(r[2], r[3])) : 0; };
+    const clusters = E.cpos.map(([id, x, y]) => {
+      const vs = villas.filter((v) => v.cl === id);
+      return { id, x, y, villas: vs, n: vs.length, total: avg(vs, (v) => v.total), fin: avg(vs, (v) => v.fin), mep: avg(vs, (v) => v.mep) };
+    });
+    [...clusters].sort((a, b) => b.total - a.total).forEach((c, i) => { c.rank = i + 1; });
+    return { E, villas, V, pos, bpos, bprog, clusters, C: Object.fromEntries(clusters.map((c) => [c.id, c])) };
+  }
+
+  function hull(pts) {
+    const p = [...pts].sort((a, b) => a[0] - b[0] || a[1] - b[1]); if (p.length < 3) return p;
+    const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const lo = [], up = [];
+    for (const q of p) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+    for (const q of p.slice().reverse()) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  }
+
+  function xpOpen() {
+    if (!session || !session.explorer) return;
+    if (!X) { X = xpModel(); xpDraw(); }
+    xpRender();
+  }
+  function xpReset() { X = null; xpSel = null; xpVB = null; $('xp-svg').replaceChildren(); $('xp-panel').replaceChildren(); $('xp-chips').replaceChildren(); $('xp-q').value = ''; $('xp-sug').hidden = true; $('xp').hidden = true; }
+
+  function xpDraw() {
+    const svg = $('xp-svg'), E = X.E; svg.replaceChildren();
+    xpVB = E.vb.slice(); svg.setAttribute('viewBox', xpVB.join(' '));
+    const defs = sv('defs'); const cp = sv('clipPath', { id: 'xp-clip' }); cp.append(sv('path', { d: E.boundary })); defs.append(cp); svg.append(defs);
+    const plan = document.querySelector('.gate .art image.plan');
+    if (plan) { const im = sv('image', { class: 'plan', x: plan.getAttribute('x'), y: plan.getAttribute('y'), width: plan.getAttribute('width'), height: plan.getAttribute('height'), preserveAspectRatio: 'none', 'clip-path': 'url(#xp-clip)' }); im.setAttribute('href', plan.getAttribute('href')); svg.append(im); }
+    svg.append(sv('path', { class: 'bnd', d: E.boundary }));
+    const gh = sv('g');
+    for (const c of X.clusters) {
+      const pts = c.villas.map((v) => X.pos[v.id]).filter(Boolean).map((p) => [p.x, p.y]); if (!pts.length) continue;
+      const ring = []; pts.forEach(([x, y]) => { for (let a = 0; a < 360; a += 20) ring.push([x + 70 * Math.cos(a * Math.PI / 180), y + 70 * Math.sin(a * Math.PI / 180)]); });
+      const h = hull(ring); const d = 'M' + h.map((q) => q[0].toFixed(0) + ' ' + q[1].toFixed(0)).join(' L') + ' Z';
+      const g = sv('g', { class: 'hull', 'data-c': c.id }); g.append(sv('path', { d }));
+      const t = sv('title'); t.textContent = 'Cluster ' + c.id + ' · ' + pc(c.total); g.append(t);
+      g.addEventListener('click', () => xpSelect({ k: 'c', id: c.id })); gh.append(g);
+    }
+    svg.append(gh);
+    const gb = sv('g');
+    for (const [id, p] of Object.entries(X.bpos)) {
+      const g = sv('g', { class: 'bg', 'data-b': id, tabindex: '0', role: 'button', 'aria-label': 'Building ' + id });
+      g.append(sv('rect', { x: p.x - 46, y: p.y - 26, width: 92, height: 52, rx: 12, fill: tone(X.bprog(id)) }));
+      const tx = sv('text', { x: p.x, y: p.y + 1 }); tx.textContent = id; g.append(tx);
+      const t = sv('title'); t.textContent = 'Building ' + id + ' · ' + pc(X.bprog(id)); g.append(t);
+      g.addEventListener('click', (e) => { e.stopPropagation(); xpSelect({ k: 'b', id }); });
+      g.addEventListener('keydown', (e) => { if (e.key === 'Enter') xpSelect({ k: 'b', id }); });
+      gb.append(g);
+    }
+    svg.append(gb);
+    const gv = sv('g');
+    for (const v of X.villas) {
+      const p = X.pos[v.id]; if (!p) continue;
+      const g = sv('g', { class: 'v', 'data-v': v.id, 'data-c': v.cl, tabindex: '0', role: 'button', 'aria-label': 'Villa ' + v.id + ', ' + pc(v.total) });
+      g.append(sv('circle', { class: 'hit', cx: p.x, cy: p.y, r: 40 }), sv('circle', { class: 'dot', cx: p.x, cy: p.y, r: 23, fill: tone(v.total) }));
+      const lab = sv('text', { class: 'vlab', x: p.x + 30, y: p.y + 8 }); lab.textContent = v.id; g.append(lab);
+      const t = sv('title'); t.textContent = 'Villa ' + v.id + ' · ' + pc(v.total); g.append(t);
+      g.addEventListener('click', (e) => { e.stopPropagation(); xpSelect({ k: 'v', id: v.id }); });
+      g.addEventListener('keydown', (e) => { if (e.key === 'Enter') xpSelect({ k: 'v', id: v.id }); });
+      gv.append(g);
+    }
+    svg.append(gv);
+    const gt = sv('g');
+    for (const c of X.clusters) {
+      const g = sv('g', { class: 'ctag', 'data-c': c.id }); g.append(sv('rect', { x: c.x - 70, y: c.y - 42, width: 140, height: 80, rx: 16 }));
+      const n = sv('text', { class: 'n', x: c.x, y: c.y - 14 }); n.textContent = c.id;
+      const q = sv('text', { class: 'p', x: c.x, y: c.y + 18 }); q.textContent = pc(c.total); g.append(n, q);
+      g.addEventListener('click', (e) => { e.stopPropagation(); xpSelect({ k: 'c', id: c.id }); }); gt.append(g);
+    }
+    svg.append(gt);
+    const chips = $('xp-chips'); chips.replaceChildren();
+    const all = el('button', 'xchip', 'Whole site'); all.type = 'button'; all.dataset.c = ''; all.addEventListener('click', () => xpSelect(null)); chips.append(all);
+    for (const c of X.clusters) {
+      const b = el('button', 'xchip'); b.type = 'button'; b.dataset.c = c.id; const i = el('i'); i.style.background = tone(c.total);
+      b.append(i, c.id, el('small', null, pc(c.total))); b.addEventListener('click', () => xpSelect({ k: 'c', id: c.id })); chips.append(b);
+    }
+  }
+
+  function xpZoom(target) {
+    const svg = $('xp-svg'), from = xpVB.slice(), to = target || X.E.vb.slice();
+    svg.classList.toggle('zoomed', !!target); $('xp-fit').hidden = !target;
+    cancelAnimationFrame(xpAnim);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { xpVB = to; svg.setAttribute('viewBox', to.join(' ')); return; }
+    const t0 = performance.now(), D = 520, ease = (t) => 1 - Math.pow(1 - t, 3);
+    const step = (now) => { const k = ease(Math.min(1, (now - t0) / D)); xpVB = from.map((a, i) => a + (to[i] - a) * k); svg.setAttribute('viewBox', xpVB.join(' ')); if (k < 1) xpAnim = requestAnimationFrame(step); };
+    xpAnim = requestAnimationFrame(step);
+  }
+  function box(pts, pad, minW) {
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
+    let x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+    const w = Math.max(x1 - x0, minW), h = Math.max(y1 - y0, minW * 0.7), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    return [cx - w / 2, cy - h / 2, w, h];
+  }
+
+  function xpSelect(sel, keepZoom) {
+    xpSel = sel; $('xp-sug').hidden = true; $('xp-q').setAttribute('aria-expanded', 'false');
+    const cl = !sel ? null : sel.k === 'c' ? sel.id : sel.k === 'v' ? X.V[sel.id].cl : null;
+    execCluster(cl);
+    if (!keepZoom) {
+      if (!sel) xpZoom(null);
+      else if (sel.k === 'c') xpZoom(box(X.C[sel.id].villas.map((v) => X.pos[v.id]).filter(Boolean).map((p) => [p.x, p.y]), 220, 1450));
+      else { const p = sel.k === 'v' ? X.pos[sel.id] : X.bpos[sel.id]; if (p) xpZoom(box([[p.x, p.y]], 300, 1300)); }
+    }
+    xpRender();
+    const pn = $('xp-panel'); pn.scrollTop = 0;
+    // phones: a pick made further down the card brings the new card's top into view
+    if (window.matchMedia('(max-width:860px)').matches) { const xp = $('xp'), top = pn.offsetTop - $('xp').querySelector('.xp-find').offsetHeight - 4; if (xp.scrollTop > top) xp.scrollTo({ top, behavior: 'smooth' }); }
+  }
+
+  function xpRender() {
+    if (!X) return;
+    const sel = xpSel, svg = $('xp-svg');
+    const selC = !sel ? null : sel.k === 'c' ? sel.id : sel.k === 'v' ? X.V[sel.id].cl : null;
+    svg.querySelectorAll('.hull').forEach((g) => g.classList.toggle('on', g.dataset.c === selC));
+    svg.querySelectorAll('.v').forEach((g) => g.classList.toggle('dim', !!selC && g.dataset.c !== selC));
+    svg.querySelectorAll('.bg').forEach((g) => g.classList.toggle('dim', !!sel && !(sel.k === 'b' && sel.id === g.dataset.b)));
+    svg.querySelectorAll('.ring').forEach((r) => r.remove());
+    if (sel && (sel.k === 'v' || sel.k === 'b')) {
+      const p = sel.k === 'v' ? X.pos[sel.id] : X.bpos[sel.id];
+      if (p) svg.append(sel.k === 'v' ? sv('circle', { class: 'ring', cx: p.x, cy: p.y, r: 38 }) : sv('rect', { class: 'ring', x: p.x - 60, y: p.y - 40, width: 120, height: 80, rx: 18 }));
+    }
+    $('xp-chips').querySelectorAll('.xchip').forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.c || null) === selC)));
+    const pn = $('xp-panel'); pn.replaceChildren();
+    if (!sel) panelSite(pn); else if (sel.k === 'c') panelCluster(pn, X.C[sel.id]); else if (sel.k === 'v') panelVilla(pn, X.V[sel.id]); else panelBuilding(pn, sel.id);
+  }
+
+  function kpis(list) {
+    const k = el('div', 'xp-kpis');
+    for (const [lab, v, col] of list) { const d = el('div', 'xp-kpi'); const tr = el('div', 'tr'); const i = el('i'); i.style.width = Math.max(0, Math.min(100, v * 100)) + '%'; i.style.background = col || tone(v); tr.append(i); d.append(el('span', null, lab), el('b', null, pc(v)), tr); k.append(d); }
+    return k;
+  }
+  function head(eb, h, sub) { const d = el('div'); d.append(el('div', 'xp-eb', eb), el('h2', 'xp-h', h)); if (sub) d.append(el('p', 'xp-sub', sub)); return d; }
+  function sec(title, note) { const s = el('section', 'xp-sec'); const h = el('h3'); h.append(title); if (note) h.append(el('small', null, note)); s.append(h); return s; }
+  function back(label, sel) { const b = el('button', 'xp-back', '← ' + label); b.type = 'button'; b.addEventListener('click', () => xpSelect(sel)); return b; }
+  function printHead(t) { const d = el('div', 'xp-print-head'); d.append(el('span', null, 'SBARC · ' + t), el('span', null, 'Status ' + X.E.status)); return d; }
+  function actions(btns) { const d = el('div', 'xp-acts'); btns.forEach((b) => b && d.append(b)); return d; }
+  function btn(label, cls, fn) { const b = el('button', 'xp-btn' + (cls ? ' ' + cls : ''), label); b.type = 'button'; b.addEventListener('click', fn); return b; }
+  const canPrint = () => !isWebView && typeof window.print === 'function';
+  function printCard() { document.body.classList.add('print-xp'); const shut = [...document.querySelectorAll('#xp-panel details:not([open])')]; shut.forEach((d) => { d.open = true; }); const done = () => { document.body.classList.remove('print-xp'); shut.forEach((d) => { d.open = false; }); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); setTimeout(() => { window.print(); setTimeout(done, 1500); }, 60); }
+
+  function panelSite(pn) {
+    const vs = X.villas;
+    pn.append(head('Site explorer · status ' + X.E.status, 'Whole site', vs.length + ' villas in ' + X.clusters.length + ' clusters, ' + Object.keys(X.bpos).length + ' buildings'));
+    pn.append(kpis([['Total', avg(vs, (v) => v.total)], ['Finishes', avg(vs, (v) => v.fin)], ['MEP', avg(vs, (v) => v.mep)]]));
+    pn.append(el('p', 'xp-hint', 'Tap a cluster or villa on the map, or search above. Choosing a cluster also filters the villa grid in the Executive Summary.'));
+    const s = sec('Clusters', 'average of their villas');
+    [...X.clusters].sort((a, b) => a.rank - b.rank).forEach((c) => {
+      const b = el('button', 'xp-cl'); b.type = 'button'; const bar = el('span', 'bar'); const i = el('i'); i.style.width = c.total * 100 + '%'; i.style.background = tone(c.total); bar.append(i);
+      b.append(el('span', 'rk', String(c.rank).padStart(2, '0')), el('b', null, c.id), bar, el('span', 'pc', pc(c.total)));
+      b.title = c.n + ' villas · finishes ' + pc(c.fin) + ' · MEP ' + pc(c.mep);
+      b.addEventListener('click', () => xpSelect({ k: 'c', id: c.id })); s.append(b);
+    });
+    pn.append(s);
+    const low = sec('Villas needing the most push', 'lowest total progress');
+    const g = el('div', 'xp-vg'); [...vs].sort((a, b) => a.total - b.total).slice(0, 8).forEach((v) => g.append(villaBtn(v))); low.append(g); pn.append(low);
+  }
+  function villaBtn(v) { const b = el('button', 'xp-vb'); b.type = 'button'; const l = el('span'); const i = el('i'); i.style.background = tone(v.total); l.append(i, v.id); b.append(l, el('small', null, pc(v.total))); b.addEventListener('click', () => xpSelect({ k: 'v', id: v.id })); return b; }
+
+  function actRows(villas) {
+    const acts = X.E.acts, wrap = el('div'); let lastG = '';
+    acts.forEach((a, i) => {
+      let c = 0, p = 0, n = 0; for (const v of villas) { const k = v.codes[i]; if (k === 'C') c++; else if (k === 'P') p++; else if (k === 'N') n++; }
+      const tot = c + p + n; if (!tot) return;
+      if (a[0] !== lastG) { wrap.append(el('div', 'xp-grp', a[0])); lastG = a[0]; }
+      const r = el('div', 'xp-row'); const t = el('span', 't', a[1]); t.title = a[0] + ' · ' + a[1];
+      const st = el('span', 'stk'); const i1 = el('i'); i1.style.width = c / tot * 100 + '%'; i1.style.background = 'var(--ok)'; const i2 = el('i'); i2.style.width = p / tot * 100 + '%'; i2.style.background = 'var(--warn)'; st.append(i1, i2);
+      st.title = c + ' done · ' + p + ' in progress · ' + n + ' not started';
+      r.append(t, st, el('span', 'n', c + '/' + tot)); wrap.append(r);
+    });
+    return wrap;
+  }
+
+  function panelCluster(pn, c) {
+    pn.append(printHead('Cluster ' + c.id), back('Whole site', null));
+    pn.append(head('Cluster · rank ' + c.rank + ' of ' + X.clusters.length, c.id, c.n + ' villas · average of its villas, status ' + X.E.status));
+    pn.append(kpis([['Total', c.total], ['Finishes', c.fin], ['MEP', c.mep]]));
+    const vs = sec('Villas', 'tap for details'); const g = el('div', 'xp-vg'); c.villas.slice().sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true })).forEach((v) => g.append(villaBtn(v))); vs.append(g); pn.append(vs);
+    const s = sec('Activities in this cluster', 'villas done of ' + c.n); s.append(actRows(c.villas)); pn.append(s);
+    pn.append(actions([btn('Show in Executive Summary →', 'main', () => openExecVillas(c.id)), canPrint() && btn('Print this card', '', printCard)]));
+  }
+
+  function remainingOf(v) {
+    const out = [], done = [];
+    X.E.acts.forEach((a, i) => { const k = v.codes[i]; if (k === 'X') return; const it = { g: a[0], n: a[1], k, p: v.pcts[i] }; (k === 'C' ? done : out).push(it); });
+    (X.E.vx[v.id] || []).forEach(([n, k]) => { if (k === 'X') return; const it = { g: 'Structure', n, k, p: null }; (k === 'C' ? done : out).push(it); });
+    out.sort((a, b) => (a.k === b.k ? (b.p || 0) - (a.p || 0) : a.k === 'P' ? -1 : 1));
+    return { out, done };
+  }
+  function actList(items) {
+    const w = el('div');
+    items.forEach((a) => { const r = el('div', 'xp-act'); const t = el('span', 't'); t.append(el('small', null, a.g), a.n); r.append(t, el('span', 'pill ' + a.k, a.k === 'P' ? (a.p != null ? a.p + '%' : 'In progress') : a.k === 'N' ? 'Not started' : 'Done')); w.append(r); });
+    return w;
+  }
+  function doneBlock(items) {
+    const d = el('details', 'xp-sec'); const sm = el('summary'); const h = el('h3'); h.append('Completed (' + items.length + ')'); sm.append(h); d.append(sm);
+    const w = el('div', 'xp-done'); items.forEach((a) => w.append(el('span', null, a.n))); d.append(w); return d;
+  }
+
+  function panelVilla(pn, v) {
+    const c = X.C[v.cl];
+    pn.append(printHead('Villa ' + v.id), back('Cluster ' + v.cl, { k: 'c', id: v.cl }));
+    pn.append(head('Villa · type ' + (v.type || '–') + ' · cluster ' + v.cl, v.id, 'Status ' + X.E.status));
+    pn.append(kpis([['Total', v.total], ['Finishes', v.fin], ['MEP', v.mep]]));
+    const { out, done } = remainingOf(v);
+    const sum = el('div', 'xp-sum');
+    sum.append(el('span', 'pill C', done.length + ' done'), el('span', 'pill P', out.filter((a) => a.k === 'P').length + ' in progress'), el('span', 'pill N', out.filter((a) => a.k === 'N').length + ' not started'));
+    pn.append(sum);
+    const s = sec('Remaining activities (' + out.length + ')', 'in progress first');
+    s.append(out.length ? actList(out) : el('p', 'xp-sub', 'Nothing remaining in the tracked activities.')); pn.append(s);
+    if (done.length) pn.append(doneBlock(done));
+    const list = c.villas.slice().sort((a, b) => a.id.localeCompare(b.id, 'en', { numeric: true })); const i = list.findIndex((x) => x.id === v.id);
+    const nav = el('div', 'xp-nav');
+    if (list.length > 1) { const pv = list[(i - 1 + list.length) % list.length], nx = list[(i + 1) % list.length]; nav.append(btn('← ' + pv.id, '', () => xpSelect({ k: 'v', id: pv.id })), btn(nx.id + ' →', '', () => xpSelect({ k: 'v', id: nx.id }))); }
+    pn.append(nav);
+    pn.append(actions([canPrint() && btn('Print this card', '', printCard)]));
+  }
+
+  function panelBuilding(pn, id) {
+    const L = X.E.bs[id] || [];
+    pn.append(printHead('Building ' + id), back('Whole site', null));
+    pn.append(head('Building', id, 'Status ' + X.E.status));
+    const k = el('div', 'xp-kpis'); const d = el('div', 'xp-kpi'); const tr = el('div', 'tr'); const i = el('i'); const v = X.bprog(id); i.style.width = v * 100 + '%'; i.style.background = tone(v); tr.append(i);
+    d.append(el('span', null, 'Progress'), el('b', null, pc(v)), tr); k.append(d);
+    const cnt = (c) => L.filter((r) => r[2] === c).length;
+    [['Done', cnt('C')], ['In progress', cnt('P')]].forEach(([l, n]) => { const e = el('div', 'xp-kpi'); e.append(el('span', null, l), el('b', null, String(n) + ' / ' + L.length)); k.append(e); });
+    pn.append(k);
+    const out = L.filter((r) => r[2] === 'P' || r[2] === 'N').map((r) => ({ g: r[0], n: r[1], k: r[2], p: r[3] })).sort((a, b) => (a.k === b.k ? (b.p || 0) - (a.p || 0) : a.k === 'P' ? -1 : 1));
+    const s = sec('Remaining activities (' + out.length + ')', 'in progress first'); s.append(out.length ? actList(out) : el('p', 'xp-sub', 'Nothing remaining in the tracked activities.')); pn.append(s);
+    const done = L.filter((r) => r[2] === 'C').map((r) => ({ n: r[1] })); if (done.length) pn.append(doneBlock(done));
+    pn.append(actions([canPrint() && btn('Print this card', '', printCard)]));
+  }
+
+  // search
+  let sugIdx = 0, sugList = [];
+  function searchItems(q) {
+    const k = keyOf(q); if (!k || !X) return [];
+    const hit = (id) => keyOf(id).includes(k) || keyOf(id).replace(/^0+/, '').includes(k);
+    const score = (id) => keyOf(id) === k ? 0 : keyOf(id).startsWith(k) ? 1 : 2;
+    const out = [];
+    X.villas.filter((v) => hit(v.id)).forEach((v) => out.push({ k: 'v', id: v.id, sub: 'Villa · cluster ' + v.cl, v: v.total, s: score(v.id) }));
+    Object.keys(X.bpos).filter(hit).forEach((id) => out.push({ k: 'b', id, sub: 'Building', v: X.bprog(id), s: score(id) }));
+    X.clusters.filter((c) => hit(c.id) || keyOf('cluster' + c.id).includes(k)).forEach((c) => out.push({ k: 'c', id: c.id, sub: 'Cluster · ' + c.n + ' villas', v: c.total, s: score(c.id) }));
+    return out.sort((a, b) => a.s - b.s || a.id.localeCompare(b.id, 'en', { numeric: true })).slice(0, 8);
+  }
+  function drawSug() {
+    const box = $('xp-sug'), q = $('xp-q').value.trim(); sugList = searchItems(q);
+    if (!q) { box.hidden = true; $('xp-q').setAttribute('aria-expanded', 'false'); return; }
+    box.replaceChildren(); box.hidden = false; $('xp-q').setAttribute('aria-expanded', 'true');
+    if (!sugList.length) { box.append(el('div', 'none', 'No villa, building or cluster matches “' + q + '”.')); return; }
+    sugIdx = Math.min(sugIdx, sugList.length - 1);
+    sugList.forEach((it, i) => {
+      const b = el('button'); b.type = 'button'; b.setAttribute('role', 'option'); b.setAttribute('aria-selected', String(i === sugIdx));
+      const pv = el('em', null, pc(it.v)); pv.style.color = tone(it.v);
+      b.append(el('b', null, it.id), el('span', null, it.sub), pv);
+      b.addEventListener('mousedown', (e) => e.preventDefault()); b.addEventListener('click', () => pickSug(it)); box.append(b);
+    });
+  }
+  function pickSug(it) { $('xp-q').value = it.id; $('xp-q').blur(); xpSelect({ k: it.k, id: it.id }); }
+  $('xp-q').addEventListener('input', () => { sugIdx = 0; drawSug(); });
+  $('xp-q').addEventListener('focus', () => { if ($('xp-q').value.trim()) drawSug(); });
+  $('xp-q').addEventListener('blur', () => setTimeout(() => { $('xp-sug').hidden = true; $('xp-q').setAttribute('aria-expanded', 'false'); }, 120));
+  $('xp-q').addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (!sugList.length) return; sugIdx = (sugIdx + (e.key === 'ArrowDown' ? 1 : -1) + sugList.length) % sugList.length; drawSug(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (sugList[sugIdx]) pickSug(sugList[sugIdx]); }
+    else if (e.key === 'Escape') { $('xp-sug').hidden = true; }
+  });
+  $('xp-fit').addEventListener('click', () => xpSelect(null));
+  function openFind() { if (!session || !session.explorer) return; show('explorer'); setTimeout(() => { $('xp-q').focus(); $('xp-q').select(); }, 30); }
+  $('find-open').addEventListener('click', openFind);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === '/' && session && !$('app').hidden && $('up').hidden && !/^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName)) { e.preventDefault(); openFind(); }
+  });
+
+  // Executive Summary sync: the chosen cluster filters its villa grid too
+  function execCluster(cl) {
+    pendingCluster = cl;
+    const f = frames.exec; try { if (f && f.contentWindow && f.contentWindow.dash) f.contentWindow.dash.setParams({ cluster: cl }); } catch (e) { /* frame not ready */ }
+  }
+  let execGoPending = false;
+  function frameReady(id, f) {
+    if (id !== 'exec') return;
+    try {
+      if (pendingCluster !== undefined) f.contentWindow.dash.setParams({ cluster: pendingCluster });
+      if (execGoPending) { execGoPending = false; setTimeout(() => { try { f.contentWindow.go('villas'); } catch (e) { /* older page */ } }, 450); }
+    } catch (e) { /* not ready */ }
+  }
+  function openExecVillas(cl) {
+    execCluster(cl);
+    const loaded = !!frames.exec && frames.exec.contentWindow && frames.exec.contentWindow.go;
+    show('exec');
+    if (loaded) { try { frames.exec.contentWindow.go('villas'); } catch (e) { /* ignore */ } } else execGoPending = true;
+  }
+
+  // ---------- PDF menu ----------
+  const pdfCache = {};
+  const LIVE = 'http://sbarc2026.netlify.app/';
+  function closeMenu() { $('pdf-menu').hidden = true; $('pdf-open').setAttribute('aria-expanded', 'false'); }
+  function mItem(icon, title, sub, fn, pr) {
+    const b = el('button', 'mi'); b.type = 'button'; b.setAttribute('role', 'menuitem');
+    const ic = el('span', 'ic' + (pr ? ' pr' : ''), icon); const t = el('span'); t.append(el('b', null, title), el('span', null, sub));
+    const st = el('span', 'st'); b.append(ic, t, st); b.addEventListener('click', () => fn(b, st)); return b;
+  }
+  function openMenu() {
+    const m = $('pdf-menu'); m.replaceChildren(); m.append(el('h4', null, 'Download PDF'));
+    const list = (session && session.pdfs) || [];
+    if (isWebView) {
+      m.append(el('p', 'note', 'PDF files open in your phone’s browser. Sign in there with the same password, then tap PDF.'));
+      m.append(mItem('WEB', 'Open SBARC in the browser', 'Downloads work there', () => { location.href = LIVE; closeMenu(); }, true));
+    } else if (!list.length || location.protocol === 'file:') {
+      m.append(el('p', 'note', 'The full-report PDFs are on the online portal. Open it with an internet connection to download them.'));
+    } else {
+      list.forEach((p) => m.append(mItem('PDF', p.title + ' · full report', 'Status ' + p.status + ' · ' + p.pages + ' pages · ' + (p.size / 1048576).toFixed(1) + ' MB', (b, st) => downloadPdf(p, b, st))));
+    }
+    if (current === 'explorer' && xpSel && canPrint()) {
+      const nm = xpSel.k === 'c' ? 'Cluster ' + xpSel.id : xpSel.k === 'v' ? 'Villa ' + xpSel.id : 'Building ' + xpSel.id;
+      m.append(mItem('CARD', 'Print this card', nm + ' · choose “Save as PDF”', () => { closeMenu(); printCard(); }, true));
+    }
+    m.hidden = false; $('pdf-open').setAttribute('aria-expanded', 'true');
+  }
+  $('pdf-open').addEventListener('click', (e) => { e.stopPropagation(); if ($('pdf-menu').hidden) openMenu(); else closeMenu(); });
+  document.addEventListener('click', (e) => { if (e.isTrusted && !$('pdf-menu').hidden && !$('pdf-menu').contains(e.target)) closeMenu(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+  async function pdfBytes(p) {
+    const r = await fetch(p.file + '?v=' + p.v); if (!r.ok) throw new Error('http ' + r.status);
+    const buf = new Uint8Array(await r.arrayBuffer());
+    if (String.fromCharCode(...buf.slice(0, 4)) !== 'SBP1') throw new Error('format');
+    const salt = buf.slice(4, 20), iv = buf.slice(20, 36), iter = new DataView(buf.buffer, buf.byteOffset + 36, 4).getUint32(0), ct = buf.slice(40);
+    const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), 'PBKDF2', false, ['deriveKey']);
+    const key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, base, { name: 'AES-CBC', length: 256 }, false, ['decrypt']);
+    const pt = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-CBC', iv }, key, ct));
+    if (new TextDecoder().decode(pt.slice(0, 7)) !== 'SBARC1:') throw new Error('key');
+    return pt.slice(7);
+  }
+  async function downloadPdf(p, b, st) {
+    const m = $('pdf-menu'); m.querySelectorAll('.err').forEach((x) => x.remove());
+    b.disabled = true; st.replaceChildren(el('span', 'spin'));
+    try {
+      if (!pdfCache[p.v]) pdfCache[p.v] = URL.createObjectURL(new Blob([await pdfBytes(p)], { type: 'application/pdf' }));
+      const a = document.createElement('a'); a.href = pdfCache[p.v]; a.download = 'SBARC ' + p.title + ' ' + p.status + '.pdf';
+      document.body.append(a); a.click(); a.remove();
+      st.textContent = 'Saved ✓';
+    } catch (e) {
+      st.textContent = ''; const er = el('p', 'err', navigator.onLine === false ? 'No internet connection. Connect and try again.' : 'The PDF could not be downloaded. Reload the page and try again.'); m.append(er);
+    }
+    b.disabled = false;
+  }
 
   $('g-project').focus();
 })();

@@ -9,6 +9,8 @@ builder/_data/<dash>/ is filled from the two Claude dashboards before building (
 It holds the readable figures, so it is never committed (.gitignore). Only the encrypted site is.
 """
 import base64, glob, hashlib, json, mimetypes, os, re, shutil, subprocess, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import pdfs
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 B = os.path.join(ROOT, 'builder')
@@ -161,6 +163,33 @@ def logos_row():
     L = [('kharafi', 'Mohammed Abdulmohsin Al-Kharafi &amp; Sons'), ('gcd', 'Gulf Coast Development'), ('sterling', 'Sterling Ark')]
     return '<div class="logos">' + ''.join(f'<span class="lg lg-{n}"><img src="data:image/png;base64,{b64(f"{B}/logos/{n}.png")}" alt="{a}"></span>' for n, a in L) + '</div>'
 
+def blob_rows(dash, name):
+    return json.loads(rd(blob_path(dash, blob_id(datasets(dash)[name]['source']['url']))))
+
+def explorer_data(status):
+    """Compact villa / building / cluster data for the Site explorer tab (encrypted with the rest)."""
+    g = site_geometry()
+    site = [r for r in blob_rows('exec', 'layouts') if r.get('kind') == 'site'][0]
+    acts, idx, per = [], {}, {}
+    code = {'Done': 'C', 'In progress': 'P', 'Not started': 'N', 'Not in scope': 'X'}
+    for r in blob_rows('exec', 'villa_activities'):
+        k = (r['group'], r['activity'])
+        if k not in idx: idx[k] = len(acts); acts.append(list(k))
+        per.setdefault(r['villa'], {})[idx[k]] = (code.get(r['status'], 'N'), r.get('pct'))
+    villas = {}
+    for v in blob_rows('exec', 'villas'):
+        a = per.get(v['villa'], {})
+        villas[v['villa']] = [v['cluster'], v.get('type', ''), round(v['finishes'], 4), round(v['mep'], 4), round(v['total'], 4),
+                              ''.join(a.get(i, ('X', None))[0] for i in range(len(acts))),
+                              [a.get(i, ('X', None))[1] if a.get(i, ('X', None))[0] == 'P' else None for i in range(len(acts))]]
+    def js(t):
+        try: return json.loads(t or '{}')
+        except ValueError: return {}
+    return {'status': status, 'vb': [round(x) for x in g['vb']], 'boundary': g['boundary'],
+            'pos': [[n, round(x), round(y), c] for n, x, y, c in g['villas']], 'bpos': [[n, round(x), round(y)] for n, x, y in g['buildings']],
+            'cpos': [[n, round(x), round(y)] for n, x, y in g['clusters']], 'acts': acts, 'villas': villas,
+            'vx': js(site.get('vextra')), 'bs': js(site.get('bstat'))}
+
 def dmy(iso):
     return f'{iso[8:10]}-{iso[5:7]}-{iso[0:4]}'
 
@@ -169,7 +198,12 @@ def dates():
     m = re.search(r'Status date (\d\d-\d\d-\d{4})', ex.get('villas', {}).get('description', ''))
     stamps = [(meta.get('updated') or {}).get('at', '') for d in DASHBOARDS for meta in datasets(d['id']).values()]
     latest = max(s for s in stamps if s) if any(stamps) else ''
-    return (m.group(1) if m else dmy(latest)), dmy(latest)
+    status = m.group(1) if m else dmy(latest)
+    try:  # Management Tracking: latest reported week end
+        p02b = dmy(max(r['week_end'] for r in blob_rows('p02b', 'actuals') if r.get('week_end')))
+    except Exception:
+        p02b = dmy(max((meta.get('updated') or {}).get('at', '') for meta in datasets('p02b').values()))
+    return status, dmy(latest), p02b
 
 ANDROID_TWEAK = '<script>if(/; wv\\)/.test(navigator.userAgent))document.write(' + json.dumps(rd(f'{T}/android_body.html')).replace('</', '<\\/') + ');</script>'
 
@@ -181,9 +215,15 @@ def build():
     miss = needs()
     if miss:
         print(json.dumps(miss, indent=1)); raise SystemExit(f'{len(miss)} data file(s) missing; download them first (see UPDATE.md).')
-    status, issued = dates()
+    status, issued, status_p02b = dates()
     frames = {d['id']: dash_frame(d['id']) for d in DASHBOARDS}
-    payload = {'project': 'SBARC', 'dashboards': [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS], 'frames': frames, 'upload': {'email': EMAIL}}
+    geo = site_geometry()
+    pdf_list = pdfs.build_pdfs(frames, {'fontcss': FONTCSS, 'logos': logos_row(), 'art': pdfs.cover_art(geo), 'issued': issued,
+                                        'status': {'exec': status, 'p02b': status_p02b}},
+                               SITE, os.path.join(B, '_data'), os.environ['SBARC_PASSWORD'], os.path.join(B, 'encrypt.js'))
+    tabs = [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS] + [{'id': 'explorer', 'title': 'Site explorer', 'native': True}]
+    payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': frames, 'upload': {'email': EMAIL},
+               'explorer': explorer_data(status), 'pdfs': pdf_list}
     tmp = os.path.join(B, '_data', 'payload.json')
     with open(tmp, 'w', encoding='utf-8') as f: json.dump(payload, f, ensure_ascii=False, separators=(',', ':'))
     vault_p = os.path.join(B, '_data', 'vault.json')

@@ -23,9 +23,13 @@ Then run `python3 builder/build.py --needs`. It prints every data file still mis
 out_dir `<root>/<out_dir>`. Repeat `--needs` until it prints `[]` (it can add the site-plan image after the first round).
 
 ## 3. Build
+`pip install --break-system-packages -q pypdf` (needed for the PDF menu), then
 `SBARC_PASSWORD='<password from the task prompt>' SBARC_UPDATE_EMAIL='<email from the task prompt>' python3 builder/build.py`
 
 The build is deterministic: unchanged figures give a byte-identical `site/`.
+It also renders the two full-report PDFs (about a minute) into `site/pdf/`, encrypted with the portal password,
+but only when the figures changed. If it prints `WARNING: PDFs not rebuilt`, the site is still fine: the previous
+PDFs stay in place with their own status date. Mention the warning in the report.
 
 ## 4. Publish only if something changed
 ```
