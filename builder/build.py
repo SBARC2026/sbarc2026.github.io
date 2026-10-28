@@ -221,9 +221,10 @@ def build():
     pdf_list = pdfs.build_pdfs(frames, {'fontcss': FONTCSS, 'logos': logos_row(), 'art': pdfs.cover_art(geo), 'issued': issued,
                                         'status': {'exec': status, 'p02b': status_p02b}},
                                SITE, os.path.join(B, '_data'), os.environ['SBARC_PASSWORD'], os.path.join(B, 'encrypt.js'))
-    tabs = [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS] + [{'id': 'explorer', 'title': 'Site explorer', 'native': True}]
-    payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': frames, 'upload': {'email': EMAIL},
-               'explorer': explorer_data(status), 'pdfs': pdf_list}
+    # Site explorer tab removed at the owner's request (28-10-2026). To bring it back, add
+    # {'id': 'explorer', 'title': 'Site explorer', 'native': True} to tabs and 'explorer': explorer_data(status) to the payload.
+    tabs = [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS]
+    payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     tmp = os.path.join(B, '_data', 'payload.json')
     with open(tmp, 'w', encoding='utf-8') as f: json.dump(payload, f, ensure_ascii=False, separators=(',', ':'))
     vault_p = os.path.join(B, '_data', 'vault.json')
