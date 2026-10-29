@@ -26,19 +26,19 @@ out_dir `<root>/<out_dir>`. Repeat `--needs` until it prints `[]` (it can add th
 `pip install --break-system-packages -q pypdf` (needed for the PDF menu), then
 `SBARC_PASSWORD='<password from the task prompt>' SBARC_UPDATE_EMAIL='<email from the task prompt>' python3 builder/build.py`
 
-The build is deterministic: unchanged figures give a byte-identical `site/`.
-It also renders the two full-report PDFs (about a minute) into `site/pdf/`, encrypted with the portal password,
+The build is deterministic: unchanged figures give a byte-identical `docs/`.
+It also renders the two full-report PDFs (about a minute) into `docs/pdf/`, encrypted with the portal password,
 but only when the figures changed. If it prints `WARNING: PDFs not rebuilt`, the site is still fine: the previous
 PDFs stay in place with their own status date. Mention the warning in the report.
 
 ## 4. Publish only if something changed
 ```
-git add site
+git add docs
 git diff --cached --quiet && echo "No change in the dashboards; nothing to publish." && exit 0
-git commit -m "Update dashboards: $(python3 -c 'import json;v=json.load(open("site/version.json"));print("status",v["status"],"· data",v["data_updated"])')"
+git commit -m "Update dashboards: $(python3 -c 'import json;v=json.load(open("docs/version.json"));print("status",v["status"],"· data",v["data_updated"])')"
 git push origin HEAD:main
 ```
-Netlify republishes https://sbarc2026.netlify.app within about a minute of the push.
+GitHub Pages republishes https://asayedhalim91-sudo.github.io/SBARC2026/ within a few minutes of the push.
 
 ## 5. Report
 One or two lines: published or no change, the status date, and any dashboard that failed to download.

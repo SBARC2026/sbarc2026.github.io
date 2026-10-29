@@ -5,7 +5,7 @@ Usage:
   SBARC_PASSWORD=... python3 builder/build.py          # build site/ from builder/_data
   python3 builder/build.py --needs                     # list data files still to download (JSON)
 
-builder/_data/<dash>/ is filled from the two Claude dashboards before building (see UPDATE.md).
+Output goes to docs/, which GitHub Pages publishes. builder/_data/<dash>/ is filled from the two Claude dashboards before building (see UPDATE.md).
 It holds the readable figures, so it is never committed (.gitignore). Only the encrypted site is.
 """
 import base64, glob, hashlib, json, mimetypes, os, re, shutil, subprocess, sys
@@ -15,7 +15,7 @@ import pdfs
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 B = os.path.join(ROOT, 'builder')
 DATA = os.path.join(B, '_data')
-SITE = os.path.join(ROOT, 'site')
+SITE = os.path.join(ROOT, 'docs')  # published by GitHub Pages (main branch, /docs)
 T = os.path.join(B, 'templates')
 
 DASHBOARDS = [
@@ -267,6 +267,7 @@ def build():
         shutil.copy(f'{B}/icons/{name}', f'{SITE}/icons/{name}')
     version = hashlib.sha256(t.encode()).hexdigest()[:12]
     with open(f'{SITE}/sw.js', 'w') as f: f.write(rd(f'{T}/sw.js.tpl').replace('__VERSION__', version))
+    open(f'{SITE}/.nojekyll', 'w').close()  # serve every file as-is (no Jekyll)
     with open(f'{SITE}/version.json', 'w') as f: json.dump({'status': status, 'data_updated': issued, 'build': version}, f)
     print(f'site built: status {status}, data updated {issued}, version {version}, index {len(t.encode()) // 1024} KB')
 
