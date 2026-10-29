@@ -1363,6 +1363,9 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
         Object.values(act).forEach((a) => { if (a.er == null) a.er = a.e0; });
         const items = {}; g('remaining_work').forEach((r) => { (items[r.activity] = items[r.activity] || []).push({ id: r.id, detail: r.detail, rem: Number(r.remaining) }); });
         Object.values(items).forEach((L) => { const s = L.reduce((t, x) => t + x.rem, 0); L.forEach((x) => { x.share = s ? x.rem / s : 0; }); L.sort((x, y) => y.rem - x.rem); });
+        // monthly split of each activity's target over its items, as the dashboard plans it (MEP 3rd fix: installation, then touch-up, then testing & commissioning)
+        const dtm = {}; (g('detail_targets') || []).forEach((r) => { dtm[r.id] = { Oct: r.oct, Nov: r.nov, Dec: r.dec, Jan: r.jan }; });
+        Object.values(items).forEach((L) => L.forEach((x) => { x.month = dtm[x.id] || null; }));
         WK = { wa: g('weekly_activities'), weeks, la, T, act, items };
       } catch (e) { $('wk-in').replaceChildren(el('div', 'wk-empty', 'The weekly targets could not be loaded. Open Management Tracking once, then come back to this tab.')); return; }
       const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
@@ -1386,6 +1389,8 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       const gapU = gapWeeks.reduce((s, x) => { const rr = WK.wa.find((y) => y.activity === r.activity && y.month === x.month); return s + ((rr && rr[x.wk + '_pts']) || 0) * T; }, 0);
       const startU = A.er + gapU, R0 = Math.max(1, A.budget - A.e0);
       const it = (WK.items[r.activity] || []).filter((x) => x.share > 0);
+      const mTot = it.reduce((s, x) => s + ((x.month && x.month[w.month]) || 0), 0);
+      it.forEach((x) => { x.wshare = mTot > 0 ? ((x.month && x.month[w.month]) || 0) / mTot : x.share; }); // item's share of this week's target
       return { activity: r.activity, group: r.group, area: r.area, finish: r.finish, budget: A.budget, e0: A.e0, R0, startU,
         a: r[w.wk + '_pts'] || 0, b: r[w.wk + '_pbn_pts'] || 0, start: startU / A.budget,
         tA: (startU + (r[w.wk + '_pts'] || 0) * T) / A.budget, tB: (startU + (r[w.wk + '_pbn_pts'] || 0) * T) / A.budget, items: it };
@@ -1485,8 +1490,8 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
             r.items.slice(0, limit).forEach((x) => {
               const ir = el('div', 'wk-row'); const it = el('div', 't'); it.append(el('b', null, x.detail), el('small', null, Math.round(x.share * 1000) / 10 + '% of the remaining work'));
               const ib = pctBox(x.detail + ' % done', (v) => { const o = wkLoad(w); delete o.n[r.activity]; if (v == null) delete o.i[x.id]; else o.i[x.id] = v; wkSave(w, o); wkUpdate(ib.inp); }); // item % = share of the item's remaining work done
-              const ia = el('div', 'num na'); ia.append(el('small', null, 'A'), '+' + pts(r.a * x.share) + ' pts');
-              const ibb = el('div', 'num nb'); ibb.append(el('small', null, 'B'), '+' + pts(r.b * x.share) + ' pts');
+              const ia = el('div', 'num na'); ia.append(el('small', null, 'A'), '+' + pts(r.a * x.wshare) + ' pts');
+              const ibb = el('div', 'num nb'); ibb.append(el('small', null, 'B'), '+' + pts(r.b * x.wshare) + ' pts');
               const ig = el('div', 'num gain');
               ir.append(it, ib.wrap, ia, ibb, ig); box2.append(ir); ref.items.push({ x, inp: ib.inp, ig });
             });
