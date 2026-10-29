@@ -38,7 +38,7 @@ git diff --cached --quiet && echo "No change in the dashboards; nothing to publi
 git commit -m "Update dashboards: $(python3 -c 'import json;v=json.load(open("docs/version.json"));print("status",v["status"],"· data",v["data_updated"])')"
 git push origin HEAD:main
 ```
-GitHub Pages republishes https://asayedhalim91-sudo.github.io/SBARC2026/ within a few minutes of the push.
+GitHub Pages republishes https://sbarc2026.github.io/ within a few minutes of the push.
 
 ## 5. Report
 One or two lines: published or no change, the status date, and any dashboard that failed to download.

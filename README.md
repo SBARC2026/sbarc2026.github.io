@@ -1,6 +1,6 @@
 # SBARC Project Portal
 
-The live portal is published by GitHub Pages from the `docs/` folder of `main`: **https://asayedhalim91-sudo.github.io/SBARC2026/**
+The live portal is published by GitHub Pages from the `docs/` folder of `main`: **https://sbarc2026.github.io/**
 
 - Open it, type the project name **SBARC** and the portal password.
 - All dashboard figures inside `docs/index.html` are encrypted. Without the password the file only shows the entrance page.
@@ -9,7 +9,7 @@ The live portal is published by GitHub Pages from the `docs/` folder of `main`: 
 Every morning a scheduled task in Claude:
 1. reads the latest **Executive Summary** and **Earned Value Progress Control** dashboards,
 2. rebuilds `docs/` with `builder/build.py`,
-3. commits here only if the figures changed. Netlify then republishes automatically.
+3. commits here only if the figures changed. GitHub Pages then republishes automatically.
 
 To change the figures, update the dashboards in Claude as usual. The site follows the next morning (or ask Claude to run the update now).
 
