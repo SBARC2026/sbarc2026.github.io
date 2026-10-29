@@ -58,7 +58,12 @@ li b{{font:500 14px 'IBM Plex Mono';color:var(--mut);font-weight:500}}
 .tb div:last-child{{border-right:0}}
 .tb span{{font:500 10.5px 'IBM Plex Mono';letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}}
 .tb b{{font:600 15px 'IBM Plex Mono';color:#fff}}
-</style></head><body><div class="grid"></div><div class="frame"></div>{art}
+body.dense h1{{font-size:150px}}
+body.dense h2{{margin-top:16px;font-size:40px}}
+body.dense .sub{{font-size:17px}}
+body.dense ol{{margin-top:20px;padding-top:14px;gap:5px}}
+body.dense li{{font-size:15px}}
+</style></head><body class="{'dense' if len(contents) > 8 else ''}"><div class="grid"></div><div class="frame"></div>{art}
 {logos}<div class="left"><div class="eyebrow">Management dashboards</div><h1>SBARC</h1><h2>{doc_title}</h2><div class="sub">{doc_sub}</div><ol>{items}</ol></div>
 <div class="tb"><div><span>Project</span><b>SBARC</b></div><div><span>Status</span><b>{status}</b></div><div><span>Issued</span><b>{issued}</b></div></div>
 </body></html>"""
@@ -103,6 +108,9 @@ async def _exec_pages(pg, path):
     await keep(['overview', 'kpis', '.sb-row2']); out.append(('Overview & KPIs', await _pdf_now(pg)))
     await keep(['clusters', 'activities']); out.append(('Clusters & activities', await _pdf_now(pg)))
     await keep(['villas']); out.append(('Villas', await _pdf_now(pg)))
+    for sid, title in (('buildings', 'Buildings'), ('manpower', 'Manpower')):  # newer sections, when the page has them
+        if await pg.query_selector('#' + sid):
+            await keep([sid]); await pg.wait_for_timeout(300); out.append((title, await _pdf_now(pg)))
     await keep(['layouts'])
     groups = await pg.evaluate("[...document.querySelectorAll('#lay-groups button')].map(b => b.firstChild.textContent.trim())")
     for gi, g in enumerate(groups):
@@ -192,16 +200,21 @@ async def _render(frames_paths, ctx):
         pg = await b.new_page(viewport={'width': W, 'height': 900})
         await pg.emulate_media(media='screen')
         ex = await _exec_pages(pg, frames_paths['exec'])
-        groups = {}
-        for t, _ in ex:
+        contents, groups = [], {}
+        for k, (t, _) in enumerate(ex):  # page k + 2 (the cover is page 1)
             if ' · ' in t and not t.startswith('Site map'):
-                g = t.split(' · ')[0]; groups[g] = groups.get(g, 0) + 1
-        contents = [('Overview & KPIs', 'p 2'), ('Clusters & activities', 'p 3'), ('Villas', 'p 4'), ('Site map · all activities', 'p 5')]
-        pn = 6
-        for g, n in groups.items():
-            contents.append((f'Layouts · {g} ({n})', f'p {pn}' if n == 1 else f'p {pn}–{pn + n - 1}')); pn += n
+                g = t.split(' · ')[0]
+                if g not in groups: groups[g] = [k + 2, k + 2]; contents.append([g, None])
+                groups[g][1] = k + 2
+            else:
+                contents.append([t, f'p {k + 2}'])
+        for c in contents:
+            if c[1] is None:
+                a, z = groups[c[0]]; n = z - a + 1
+                c[0], c[1] = f'Layouts · {c[0]} ({n})', (f'p {a}' if n == 1 else f'p {a}–{z}')
+        contents = [tuple(c) for c in contents]
         await pg.set_content(cover_html(ctx['fontcss'], ctx['logos'], ctx['art'], 'Executive Summary',
-                                        'Villas &amp; buildings progress, cluster ranking, activity status and every site layout still in progress.',
+                                        'Villas &amp; buildings progress, cluster ranking, activity status, manpower and every site layout still in progress.',
                                         ctx['status']['exec'], ctx['issued'], contents))
         res['exec'] = _assemble('SBARC Executive Summary', await _pdf_now(pg, 900), ex)
 
@@ -216,7 +229,7 @@ async def _render(frames_paths, ctx):
 
 
 TITLES = {'exec': 'Executive Summary', 'p02b': 'Management Tracking'}
-COVER_VERSION = '2'  # bump when the cover or page selection changes, to force new PDFs
+COVER_VERSION = '3'  # bump when the cover or page selection changes, to force new PDFs
 
 
 def build_pdfs(frames, ctx, site_dir, tmp_dir, password, encrypt_js):

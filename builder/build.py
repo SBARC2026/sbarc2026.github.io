@@ -198,6 +198,8 @@ def dates():
     m = re.search(r'Status date (\d\d-\d\d-\d{4})', ex.get('villas', {}).get('description', ''))
     stamps = [(meta.get('updated') or {}).get('at', '') for d in DASHBOARDS for meta in datasets(d['id']).values()]
     latest = max(s for s in stamps if s) if any(stamps) else ''
+    if not m:  # e.g. "Site tracker in the Daily Progress Report 28-10-2026."
+        m = re.search(r'(\d\d-\d\d-\d{4})', ex.get('villas', {}).get('description', ''))
     status = m.group(1) if m else dmy(latest)
     try:  # Management Tracking: latest reported week end
         p02b = dmy(max(r['week_end'] for r in blob_rows('p02b', 'actuals') if r.get('week_end')))
