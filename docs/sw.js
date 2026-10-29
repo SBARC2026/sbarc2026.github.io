@@ -1,5 +1,5 @@
 // SBARC Project Portal: keeps the app working offline. The latest version is fetched whenever the device is online.
-const CACHE = 'sbarc-035501efa861';
+const CACHE = 'sbarc-f93fe0d71a2c';
 const CORE = ['./', 'index.html', 'manifest.webmanifest', 'install.html', 'icons/icon-192.png', 'icons/icon-512.png',
   'icons/maskable-192.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
 

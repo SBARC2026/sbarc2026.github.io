@@ -419,6 +419,74 @@
     body.print-xp .xp-print-head{display:flex!important}
   }
   .xp-print-head{display:none;justify-content:space-between;align-items:baseline;border-bottom:2px solid #0C1D38;padding-bottom:6px;margin-bottom:10px;font:600 12px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+
+  /* ================= THIS WEEK (earned value targets with ticks) ================= */
+  .wk{position:absolute;inset:0;overflow-y:auto;background:var(--bg)}
+  .wk-in{max-width:1180px;margin:0 auto;padding:20px max(16px,3vw) 40px;display:flex;flex-direction:column;gap:18px}
+  .wk-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+  .wk-eb{font:500 11px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .wk-h{margin:4px 0 0;font:800 40px/1 var(--disp);font-stretch:72%}
+  .wk-sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:60em}
+  .wk-nav{display:flex;align-items:center;gap:6px}
+  .wk-nav button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
+  .wk-nav button:disabled{opacity:.4;cursor:default}
+  .wk-nav select{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 12px;font-size:13px}
+  .wk-meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:12px}
+  .wk-m{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+  .wk-m h3{margin:0;display:flex;justify-content:space-between;align-items:baseline;gap:10px;font:600 12px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .wk-m h3 small{font:500 12px var(--body);letter-spacing:0;text-transform:none}
+  .wk-big{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .wk-big b{font:800 46px/1 var(--disp);font-stretch:74%}
+  .wk-big span{font-size:13.5px;color:var(--muted)}
+  .wk-big .ok{color:var(--ok);font-weight:600}
+  .wk-big .bad{color:var(--nok);font-weight:600}
+  .wk-bar{position:relative;height:14px;border-radius:7px;background:var(--chip);overflow:hidden}
+  .wk-bar i{position:absolute;top:0;bottom:0;left:0;border-radius:7px;transition:width .35s cubic-bezier(.2,.7,.2,1)}
+  .wk-bar .t{background:color-mix(in srgb,var(--accent) 22%,transparent)}
+  .wk-bar .f{background:var(--ok)}
+  .wk-cap{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font:500 12px var(--mono);color:var(--muted)}
+  .wk-counts{display:flex;gap:6px;flex-wrap:wrap}
+  .wk-pill{font:600 11.5px var(--mono);padding:3px 9px;border-radius:999px;background:var(--chip);color:var(--muted)}
+  .wk-pill.y{background:color-mix(in srgb,var(--ok) 16%,transparent);color:color-mix(in srgb,var(--ok) 75%,var(--fg))}
+  .wk-pill.n{background:color-mix(in srgb,var(--nok) 16%,transparent);color:color-mix(in srgb,var(--nok) 75%,var(--fg))}
+  .wk-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .wk-tools .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+  .wk-tools .seg button{border:0;background:var(--panel);padding:6px 12px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+  .wk-tools .seg button[aria-pressed="true"]{background:#0C1D38;color:#fff}
+  .wk-btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer}
+  .wk-btn:hover{border-color:var(--muted)}
+  .wk-list{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .wk-head,.wk-row{display:grid;grid-template-columns:52px minmax(0,1fr) 92px 92px 92px;gap:10px;align-items:center;padding:10px 14px}
+  .wk-head{font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);background:var(--chip)}
+  .wk-head span:nth-child(n+3),.wk-row .num{text-align:right}
+  .wk-grp{padding:9px 14px 5px;font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);display:flex;justify-content:space-between}
+  .wk-grp:first-of-type{border-top:0}
+  .wk-row{border-top:1px solid color-mix(in srgb,var(--line) 60%,transparent);font-size:14px}
+  .wk-row.y{background:color-mix(in srgb,var(--ok) 6%,transparent)}
+  .wk-row.n{background:color-mix(in srgb,var(--nok) 6%,transparent)}
+  .wk-row .t{min-width:0}
+  .wk-row .t b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wk-row .t small{display:block;color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .wk-row .num{font:500 13px var(--mono)}
+  .wk-row .num small{display:none;font-size:11px;color:var(--muted)}
+  .tick{width:38px;height:38px;border-radius:10px;border:2px solid var(--line);background:var(--bg);cursor:pointer;display:grid;place-items:center;padding:0;transition:transform .12s,background .15s,border-color .15s}
+  .tick:active{transform:scale(.92)}
+  .tick svg{width:22px;height:22px;display:none}
+  .tick.y{background:var(--ok);border-color:var(--ok);color:#fff}
+  .tick.y .iy{display:block}
+  .tick.n{background:var(--nok);border-color:var(--nok);color:#fff}
+  .tick.n .in{display:block}
+  .wk-note{margin:0;font-size:12.5px;color:var(--muted)}
+  .wk-empty{padding:28px;text-align:center;color:var(--muted)}
+  @media (max-width:700px){
+    .wk-h{font-size:32px}
+    .wk-head{display:none}
+    .wk-row{grid-template-columns:48px minmax(0,1fr) 74px;grid-template-areas:"k t a" "k t b";row-gap:2px}
+    .wk-row .tick{grid-area:k}.wk-row .t{grid-area:t}.wk-row .na{grid-area:a}.wk-row .nb{grid-area:b}.wk-row .nd{display:none}
+    .wk-row .num small{display:inline;margin-right:4px}
+  }
+  @media print{ body.print-wk .bar,body.print-wk .stage>iframe,body.print-wk .wk-nav,body.print-wk .wk-tools,body.print-wk .gate,body.print-wk .modal,body.print-wk .menu{display:none!important}
+    body.print-wk .app,body.print-wk .stage,body.print-wk .wk{position:static!important;overflow:visible!important;height:auto!important} }
 </style>
 </head>
 <body>
@@ -491,6 +559,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       </div>
       <div class="xp-panel" id="xp-panel" aria-live="polite"></div>
     </div>
+    <div class="wk" id="wk" hidden><div class="wk-in" id="wk-in"><div class="wk-empty">Loading this week's targets…</div></div></div>
   </main>
 </section>
 
@@ -606,7 +675,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('pname').textContent = session.project;
     const tabs = $('tabs'); tabs.replaceChildren();
     session.dashboards.forEach((d) => {
-      const b = document.createElement('button'); b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer' };
+      const b = document.createElement('button'); b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh);
       b.addEventListener('click', () => show(d.id)); tabs.append(b);
     });
@@ -618,7 +687,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
     session = null; current = null; secret = ''; $('up').hidden = true;
-    xpReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
+    xpReset(); wkReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -632,15 +701,18 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.id === id)));
     Object.keys(frames).forEach((k) => { frames[k].hidden = k !== id; });
     $('xp').hidden = id !== 'explorer';
+    $('wk').hidden = id !== 'week';
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
-    if (!frames[id]) {
-      $('loading').hidden = false;
-      const f = document.createElement('iframe');
-      f.title = (session.dashboards.find((d) => d.id === id) || {}).title || id;
-      f.addEventListener('load', () => { applyTheme(f.contentDocument); if (current === id) $('loading').hidden = true; frameReady(id, f); });
-      f.srcdoc = session.frames[id];
-      frames[id] = f; $('stage').append(f);
-    } else $('loading').hidden = true;
+    if (id === 'week') { $('loading').hidden = true; wkOpen(); return; }
+    if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
+  }
+  function makeFrame(id) {
+    const f = document.createElement('iframe');
+    f.title = (session.dashboards.find((d) => d.id === id) || {}).title || id;
+    f.addEventListener('load', () => { f._ready = true; applyTheme(f.contentDocument); if (current === id) $('loading').hidden = true; frameReady(id, f); });
+    f.srcdoc = session.frames[id];
+    frames[id] = f; $('stage').append(f);
+    return f;
   }
   $('full').addEventListener('click', () => {
     if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
@@ -1168,6 +1240,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   }
   let execGoPending = false;
   function frameReady(id, f) {
+    if (id === 'p02b' && current === 'week') wkOpen();
     if (id !== 'exec') return;
     try {
       if (pendingCluster !== undefined) f.contentWindow.dash.setParams({ cluster: pendingCluster });
@@ -1234,6 +1307,131 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       st.textContent = ''; const er = el('p', 'err', navigator.onLine === false ? 'No internet connection. Connect and try again.' : 'The PDF could not be downloaded. Reload the page and try again.'); m.append(er);
     }
     b.disabled = false;
+  }
+
+
+  // ---------- this week: earned value targets with tick boxes ----------
+  // Figures come from the Management Tracking dashboard's own weekly calculations (same numbers as its Weekly targets tab):
+  // Plan A = recovery plan for the week; Plan B = plan plus the shortfall to date (made up in the week after the last report).
+  let WK = null, wkSel = null, wkFilter = 'all';
+  const MON = { Oct: 'October', Nov: 'November', Dec: 'December', Jan: 'January' };
+  const pp = (v) => (v * 100).toFixed(2) + '%';
+  const pts = (v) => { const x = v * 100; return (x >= 0.01 || x === 0 ? x.toFixed(2) : x.toFixed(3)); };
+  const dmy = (iso) => iso ? iso.slice(8, 10) + '-' + iso.slice(5, 7) + '-' + iso.slice(0, 4) : '';
+  const dm = (iso) => { const d = new Date(iso + 'T00:00:00'); return d.getDate() + ' ' + d.toLocaleString('en', { month: 'short' }); };
+  const wkKey = (w) => 'sbarc-ticks-' + w.month + '-' + w.wk;
+  function wkReset() { WK = null; wkSel = null; $('wk').hidden = true; $('wk-in').replaceChildren(el('div', 'wk-empty', "Loading this week's targets…")); }
+  function wkOpen() {
+    if (!session) return;
+    const f = frames.p02b || (() => { const n = makeFrame('p02b'); n.hidden = current !== 'p02b'; return n; })();
+    if (!f._ready) return; // frameReady() calls back once the dashboard has loaded
+    if (!WK) {
+      try {
+        const d = f.contentWindow.dash;
+        const wa = d.data('weekly_activities').data, wt = d.data('weekly_totals').data, la = (d.data('latest_actual').data || [])[0];
+        const weeks = []; const seen = {};
+        wt.filter((r) => r.scope === 'All').forEach((r) => { const k = r.month + '|' + r.wk; if (!seen[k]) { seen[k] = 1; weeks.push({ month: r.month, wk: r.wk, from: r.from, to: r.to, pts: r.pts }); } });
+        WK = { wa, weeks, la };
+      } catch (e) { $('wk-in').replaceChildren(el('div', 'wk-empty', 'The weekly targets could not be loaded. Open Management Tracking once, then come back to this tab.')); return; }
+      // default: the week containing today, but never before the first week after the last earned value report
+      const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+      const first = WK.weeks.findIndex((w) => w.from > WK.la.date);
+      let i = WK.weeks.findIndex((w) => w.from <= today && today <= w.to);
+      if (i < first) i = first;
+      wkSel = Math.max(0, i);
+    }
+    wkRender();
+  }
+  function wkTicks(w) { try { return JSON.parse(localStorage.getItem(wkKey(w)) || '{}'); } catch (e) { return wkTicks.mem[wkKey(w)] || {}; } }
+  wkTicks.mem = {};
+  function wkSave(w, t) { wkTicks.mem[wkKey(w)] = t; try { localStorage.setItem(wkKey(w), JSON.stringify(t)); } catch (e) { /* storage off: kept for this visit */ } }
+  function wkRows(w) {
+    return WK.wa.filter((r) => r.month === w.month && (r[w.wk + '_pts'] > 0 || r[w.wk + '_pbn_pts'] > 0)).map((r) => ({
+      activity: r.activity, group: r.group, area: r.area, a: r[w.wk + '_pts'] || 0, b: r[w.wk + '_pbn_pts'] || 0, done: r[w.wk + '_done'], finish: r.finish,
+    })).sort((x, y) => y.b - x.b);
+  }
+  function wkRender() {
+    const box = $('wk-in'); box.replaceChildren();
+    const w = WK.weeks[wkSel], la = WK.la, rows = wkRows(w), ticks = wkTicks(w);
+    // weeks between the last report and this one are assumed to reach Plan A
+    const gapWeeks = WK.weeks.filter((x) => x.from > la.date && x.to < w.from);
+    const base = la.actual_pct + gapWeeks.reduce((s, x) => s + x.pts, 0);
+    const sum = (k, f) => rows.reduce((s, r) => s + (f(r) ? r[k] : 0), 0);
+    const A = sum('a', () => true), B = sum('b', () => true);
+    const Ay = sum('a', (r) => ticks[r.activity] === 'y'), By = sum('b', (r) => ticks[r.activity] === 'y');
+    const ny = rows.filter((r) => ticks[r.activity] === 'y').length, nn = rows.filter((r) => ticks[r.activity] === 'n').length;
+
+    const top = el('div', 'wk-top'); const tl = el('div');
+    tl.append(el('div', 'wk-eb', MON[w.month] + ' ' + w.wk.toUpperCase() + ' · ' + dm(w.from) + ' – ' + dm(w.to) + ' · earned value'), el('h2', 'wk-h', "This week's targets"),
+      el('p', 'wk-sub', 'Tick ✓ when an activity reaches its target this week and ✗ when it misses. Plan A and Plan B update as you tick. Starting point: earned value ' + pp(la.actual_pct) + ' reported on ' + dmy(la.date) + (gapWeeks.length ? ', plus Plan A for ' + gapWeeks.length + ' unreported week' + (gapWeeks.length > 1 ? 's' : '') + ' before this one' : '') + '.'));
+    const nav = el('div', 'wk-nav');
+    const prev = el('button', null, '‹'); prev.type = 'button'; prev.setAttribute('aria-label', 'Previous week');
+    const next = el('button', null, '›'); next.type = 'button'; next.setAttribute('aria-label', 'Next week');
+    const first = WK.weeks.findIndex((x) => x.from > la.date);
+    prev.disabled = wkSel <= Math.max(0, first); next.disabled = wkSel >= WK.weeks.length - 1;
+    prev.addEventListener('click', () => { wkSel--; wkRender(); }); next.addEventListener('click', () => { wkSel++; wkRender(); });
+    const sel = document.createElement('select'); sel.setAttribute('aria-label', 'Week');
+    WK.weeks.forEach((x, i) => { if (i < Math.max(0, first)) return; const o = document.createElement('option'); o.value = i; o.textContent = MON[x.month].slice(0, 3) + ' ' + x.wk.toUpperCase() + ' · ' + dm(x.from) + '–' + dm(x.to); if (i === wkSel) o.selected = true; sel.append(o); });
+    sel.addEventListener('change', () => { wkSel = Number(sel.value); wkRender(); });
+    nav.append(prev, sel, next); top.append(tl, nav); box.append(top);
+
+    const meters = el('div', 'wk-meters');
+    [['Plan A', 'recovery plan', A, Ay], ['Plan B', 'plan + shortfall to date', B, By]].forEach(([name, note, tot, got]) => {
+      const m = el('section', 'wk-m'); const h = el('h3'); h.append(name, el('small', null, note)); m.append(h);
+      const big = el('div', 'wk-big'); const target = base + tot, now = base + got;
+      big.append(el('b', null, pp(now)));
+      const left = target - now; const st = el('span'); st.append('target ' + pp(target) + ' at ' + dm(w.to) + ' · ');
+      const lv = el('span', left <= 1e-9 ? 'ok' : 'bad', left <= 1e-9 ? 'target reached' : pts(left) + ' pts to go'); st.append(lv); big.append(st); m.append(big);
+      const bar = el('div', 'wk-bar'); const t = el('i', 't'); t.style.width = '100%'; const fl = el('i', 'f'); fl.style.width = (tot > 0 ? Math.min(100, got / tot * 100) : 0) + '%'; bar.append(t, fl); m.append(bar);
+      const cap = el('div', 'wk-cap'); cap.append(el('span', null, '+' + pts(got) + ' of +' + pts(tot) + ' pts ticked'), el('span', null, tot > 0 ? Math.round(got / tot * 100) + '% of the week' : '')); m.append(cap);
+      meters.append(m);
+    });
+    box.append(meters);
+
+    const tools = el('div', 'wk-tools');
+    const counts = el('div', 'wk-counts'); counts.append(el('span', 'wk-pill y', ny + ' ✓'), el('span', 'wk-pill n', nn + ' ✗'), el('span', 'wk-pill', (rows.length - ny - nn) + ' open'), el('span', 'wk-pill', rows.length + ' activities'));
+    const seg = el('div', 'seg'); [['all', 'All'], ['open', 'Open'], ['y', '✓'], ['n', '✗']].forEach(([k, l]) => { const b = el('button', null, l); b.type = 'button'; b.setAttribute('aria-pressed', String(wkFilter === k)); b.addEventListener('click', () => { wkFilter = k; wkRender(); }); seg.append(b); });
+    const mail = el('button', 'wk-btn', 'Email summary'); mail.type = 'button'; mail.addEventListener('click', () => wkMail(w, rows, ticks, base, A, B, Ay, By));
+    const reset = el('button', 'wk-btn', 'Clear ticks'); reset.type = 'button'; reset.addEventListener('click', () => { wkSave(w, {}); wkRender(); });
+    tools.append(counts, seg, mail, reset);
+    if (!isWebView && typeof window.print === 'function') { const pr = el('button', 'wk-btn', 'Print'); pr.type = 'button'; pr.addEventListener('click', () => { document.body.classList.add('print-wk'); const done = () => { document.body.classList.remove('print-wk'); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); setTimeout(() => { window.print(); setTimeout(done, 1500); }, 60); }); tools.append(pr); }
+    box.append(tools);
+
+    const list = el('div', 'wk-list');
+    const hd = el('div', 'wk-head'); ['Done?', 'Activity', 'Plan A', 'Plan B', 'Target % done'].forEach((t) => hd.append(el('span', null, t))); list.append(hd);
+    const shown = rows.filter((r) => wkFilter === 'all' || (wkFilter === 'open' ? !ticks[r.activity] : ticks[r.activity] === wkFilter));
+    if (!rows.length) list.append(el('div', 'wk-empty', 'No planned earned value in this week.'));
+    else if (!shown.length) list.append(el('div', 'wk-empty', 'Nothing in this view.'));
+    const groups = [...new Set(shown.map((r) => r.group))].sort((g1, g2) => shown.filter((r) => r.group === g2).reduce((s, r) => s + r.b, 0) - shown.filter((r) => r.group === g1).reduce((s, r) => s + r.b, 0));
+    groups.forEach((g) => {
+      const gr = shown.filter((r) => r.group === g);
+      const gh = el('div', 'wk-grp'); gh.append(el('span', null, g), el('span', null, 'A ' + pts(gr.reduce((s, r) => s + r.a, 0)) + ' · B ' + pts(gr.reduce((s, r) => s + r.b, 0)) + ' pts')); list.append(gh);
+      gr.forEach((r) => {
+        const st = ticks[r.activity] || '';
+        const row = el('div', 'wk-row' + (st ? ' ' + st : ''));
+        const tk = el('button', 'tick' + (st ? ' ' + st : '')); tk.type = 'button';
+        tk.setAttribute('aria-label', r.activity + ': ' + (st === 'y' ? 'target reached' : st === 'n' ? 'target missed' : 'not marked yet') + '. Tap to change.');
+        tk.innerHTML = '<svg class="iy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><svg class="in" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+        tk.addEventListener('click', () => { const t = wkTicks(w); t[r.activity] = !t[r.activity] ? 'y' : t[r.activity] === 'y' ? 'n' : undefined; if (!t[r.activity]) delete t[r.activity]; wkSave(w, t); wkRender(); });
+        const t = el('div', 't'); t.append(el('b', null, r.activity), el('small', null, r.area + ' · finish ' + dmy(r.finish)));
+        const na = el('div', 'num na'); na.append(el('small', null, 'A'), pts(r.a));
+        const nb = el('div', 'num nb'); nb.append(el('small', null, 'B'), pts(r.b));
+        const nd = el('div', 'num nd', r.done != null ? Math.round(r.done * 100) + '%' : '–');
+        row.append(tk, t, na, nb, nd); list.append(row);
+      });
+    });
+    box.append(list);
+    box.append(el('p', 'wk-note', 'Figures are % of the total project (earned value points), from the Management Tracking dashboard. Tap a box once for ✓, again for ✗, and a third time to clear. Ticks are saved on this device only. Use Email summary to share them.'));
+  }
+  function wkMail(w, rows, ticks, base, A, B, Ay, By) {
+    const L = ['SBARC – this week\'s earned value targets', MON[w.month] + ' ' + w.wk.toUpperCase() + ' (' + dmy(w.from) + ' to ' + dmy(w.to) + ')', '',
+      'Plan A: ' + pp(base + Ay) + ' of target ' + pp(base + A), 'Plan B: ' + pp(base + By) + ' of target ' + pp(base + B), ''];
+    [['y', 'Reached ✓'], ['n', 'Missed ✗'], ['', 'Not marked']].forEach(([k, t]) => {
+      const rr = rows.filter((r) => (ticks[r.activity] || '') === k); if (!rr.length) return;
+      L.push(t + ' (' + rr.length + '):'); rr.forEach((r) => L.push('  • ' + r.activity + ' – A ' + pts(r.a) + ', B ' + pts(r.b) + ' pts')); L.push('');
+    });
+    L.push('— Sent from the SBARC Project Portal');
+    location.href = 'mailto:' + (session.upload.email || '') + '?subject=' + encodeURIComponent('SBARC weekly targets ' + MON[w.month].slice(0, 3) + ' ' + w.wk.toUpperCase()) + '&body=' + encodeURIComponent(L.join('\r\n'));
   }
 
   $('g-project').focus();

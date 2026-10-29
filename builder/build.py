@@ -225,7 +225,7 @@ def build():
                                SITE, os.path.join(B, '_data'), os.environ['SBARC_PASSWORD'], os.path.join(B, 'encrypt.js'))
     # Site explorer tab removed at the owner's request (28-10-2026). To bring it back, add
     # {'id': 'explorer', 'title': 'Site explorer', 'native': True} to tabs and 'explorer': explorer_data(status) to the payload.
-    tabs = [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS]
+    tabs = [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS] + [{'id': 'week', 'title': 'This week', 'native': True}]
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     tmp = os.path.join(B, '_data', 'payload.json')
     with open(tmp, 'w', encoding='utf-8') as f: json.dump(payload, f, ensure_ascii=False, separators=(',', ':'))
