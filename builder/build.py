@@ -251,7 +251,7 @@ def build():
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">'''
     t = rd(f'{T}/portal.html')
     reps = {
-        '<!--FONTCSS-->': FONTCSS, '<!--ART-->': art_detailed(), '<!--LOGOS-->': logos_row(),
+        '<!--FONTCSS-->': FONTCSS, '<!--ART-->': art_detailed(), '<!--LOGOS-->': logos_row(), '<!--MARK-->': rd(f'{B}/logos/kharafi-mark.svg').replace('role="img" aria-label="Al-Kharafi"', 'focusable="false"'),
         '<!--STATUS-->': status, '<!--ISSUED-->': issued,
         '<!--VAULT-->': '<script type="text/plain" id="vault-SBARC">' + v['ct'] + '</script>',
         '<!--CRYPTOJS-->': '<script>' + rd(f'{B}/vendor/crypto-js.js').replace('</script', '<\\/script') + '</script>',

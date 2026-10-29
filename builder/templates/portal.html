@@ -194,8 +194,9 @@
     background:var(--side-bg);border-right:1px solid var(--line);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
   .side::-webkit-scrollbar{display:none}
   .side-brand{display:flex;align-items:center;gap:12px;padding:2px 6px 16px;margin-bottom:6px;border-bottom:1px solid var(--line);min-width:0}
-  .side-brand .mk{width:40px;height:40px;border-radius:12px;flex:none;display:grid;place-items:center;font:800 15px/1 var(--disp);font-stretch:74%;letter-spacing:.02em;color:#1A1205;
-    background:linear-gradient(160deg,var(--gold-2),var(--gold));box-shadow:0 6px 18px -8px rgba(232,194,122,.55)}
+  .side-brand .mk{width:42px;height:42px;border-radius:12px;flex:none;display:grid;place-items:center;padding:4px;background:#fff;
+    box-shadow:0 6px 18px -8px rgba(0,0,0,.55),0 0 0 1px rgba(232,194,122,.35)}
+  .side-brand .mk svg{width:100%;height:100%;display:block}
   .proj{display:flex;flex-direction:column;gap:4px;min-width:0}
   .proj b{font:800 22px/1 var(--disp);font-stretch:72%;letter-spacing:.02em}
   .proj span{font:500 9.5px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
@@ -622,7 +623,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
 <!-- ============ APP ============ -->
 <section class="app" id="app" hidden>
   <aside class="side" id="side" aria-label="Navigation">
-    <div class="side-brand"><span class="mk" aria-hidden="true">SB</span><div class="proj"><b id="pname">SBARC</b><span>Management dashboards</span></div></div>
+    <div class="side-brand"><span class="mk" aria-hidden="true"><!--MARK--></span><div class="proj"><b id="pname">SBARC</b><span>Management dashboards</span></div></div>
     <div class="side-lab">Dashboards</div>
     <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboards" aria-orientation="vertical"></nav>
     <div class="side-lab">Tools</div>

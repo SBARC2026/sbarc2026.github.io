@@ -229,7 +229,7 @@ async def _render(frames_paths, ctx):
 
 
 TITLES = {'exec': 'Executive Summary', 'p02b': 'Management Tracking'}
-COVER_VERSION = '3'  # bump when the cover or page selection changes, to force new PDFs
+COVER_VERSION = '4'  # bump when the cover or page selection changes, to force new PDFs
 
 
 def build_pdfs(frames, ctx, site_dir, tmp_dir, password, encrypt_js):
