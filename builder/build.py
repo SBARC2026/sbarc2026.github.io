@@ -101,6 +101,7 @@ body{background:var(--color-bg);color:var(--color-fg);font-family:var(--font-ant
 </style>'''
 D3_TAG = '<script>' + rd(f'{B}/vendor/d3.min.js').replace('</script', '<\\/script') + '</script>'
 DASH_SHIM = rd(f'{T}/dash_shim.html')
+GLASS_CSS = '<style>' + rd(f'{T}/glass.css') + '</style>'
 
 def inline_assets(dash, o):
     if isinstance(o, dict): return {k: inline_assets(dash, v) for k, v in o.items()}
@@ -112,14 +113,17 @@ def inline_assets(dash, o):
         return f'data:{mt};base64,' + b64(hits[0])
     return o
 
-def dash_frame(dash):
+def dash_frame(dash, glass=False):
+    """glass=True: the site version (glass theme on by default); False: the PDF version (original look)."""
     page = doc(f'{DATA}/{dash}/files/index.html.json')['text']
     data = {name: json.loads(rd(blob_path(dash, blob_id(meta['source']['url'])))) for name, meta in datasets(dash).items()}
     data = inline_assets(dash, data)
     pp = f'{DATA}/{dash}/dash/params.json'
     params = doc(pp) if os.path.exists(pp) else {}
     pre = '<script>window.__DATA__=' + js_json(data) + ';window.__PARAMS__=' + js_json(params) + ';</script>'
-    h = BASE_HEAD + TOKENS + D3_TAG + pre + DASH_SHIM + '</head><body><div id="dash-root">' + page + '</div></body></html>'
+    h = BASE_HEAD + TOKENS + (GLASS_CSS if glass else '') + D3_TAG + pre + DASH_SHIM + '</head><body><div id="dash-root">' + page + '</div></body></html>'
+    if glass:
+        h = h.replace('<!doctype html><html>', '<!doctype html><html class="glass" data-theme="dark">', 1)
     h = h.replace('--font-anthropic-sans', '--font-ui-sans').replace('--font-anthropic-serif', '--font-ui-display')
     return h
 
@@ -218,7 +222,8 @@ def build():
     if miss:
         print(json.dumps(miss, indent=1)); raise SystemExit(f'{len(miss)} data file(s) missing; download them first (see UPDATE.md).')
     status, issued, status_p02b = dates()
-    frames = {d['id']: dash_frame(d['id']) for d in DASHBOARDS}
+    frames = {d['id']: dash_frame(d['id']) for d in DASHBOARDS}           # PDFs: original print look
+    site_frames = {d['id']: dash_frame(d['id'], glass=True) for d in DASHBOARDS}  # site: glass theme
     geo = site_geometry()
     pdf_list = pdfs.build_pdfs(frames, {'fontcss': FONTCSS, 'logos': logos_row(), 'art': pdfs.cover_art(geo), 'issued': issued,
                                         'status': {'exec': status, 'p02b': status_p02b}},
@@ -226,7 +231,7 @@ def build():
     # Site explorer tab removed at the owner's request (28-10-2026). To bring it back, add
     # {'id': 'explorer', 'title': 'Site explorer', 'native': True} to tabs and 'explorer': explorer_data(status) to the payload.
     tabs = [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS] + [{'id': 'week', 'title': 'This week', 'native': True}]
-    payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
+    payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     tmp = os.path.join(B, '_data', 'payload.json')
     with open(tmp, 'w', encoding='utf-8') as f: json.dump(payload, f, ensure_ascii=False, separators=(',', ':'))
     vault_p = os.path.join(B, '_data', 'vault.json')

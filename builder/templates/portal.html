@@ -174,31 +174,83 @@
     .tblock div{padding:8px 10px}
   }
 
-  /* ================= APP ================= */
-  .app{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg);color:var(--fg)}
-  .bar{background:var(--bar);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-    padding:8px max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));padding-top:max(8px,env(safe-area-inset-top))}
-  .proj{display:flex;align-items:baseline;gap:10px;padding-bottom:8px}
-  .proj b{font:800 24px/1 var(--disp);font-stretch:72%;letter-spacing:.01em}
-  .proj span{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-  .tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;min-width:0;align-self:flex-end}
-  .tabs::-webkit-scrollbar{display:none}
-  .tab{appearance:none;background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px 11px;cursor:pointer;white-space:nowrap;color:var(--muted);font-weight:500;font-size:14.5px}
-  .tab:hover{color:var(--fg)}
-  .tab[aria-selected="true"]{color:var(--fg);border-bottom-color:#C68A2B}
-  .tools{display:flex;gap:6px;padding-bottom:8px;align-items:center}
-  .tb-btn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:999px;padding:7px 13px;cursor:pointer;font-size:13px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
-  .tb-btn:hover{border-color:var(--muted)}
-  .tb-btn.primary{background:#C68A2B;border-color:#C68A2B;color:#fff;font-weight:600}
-  .tb-btn.primary:hover{background:#B47A20}
+  /* ================= APP: glass sidebar + header ================= */
+  :root{--app-bg:var(--bg);--side-bg:var(--panel);--top-bg:var(--bar);--hover:var(--chip);--active-bg:color-mix(in srgb,var(--accent) 12%,transparent);--active-line:color-mix(in srgb,var(--accent) 40%,transparent);--solid:var(--panel);--card:var(--panel);--blur:none;--shadow:0 1px 0 rgba(0,0,0,.02)}
+  :root[data-theme="glass"]{
+    --bg:transparent; --panel:rgba(255,255,255,.06); --fg:#EAF1F8; --muted:#A9B7CA; --line:rgba(255,255,255,.12); --accent:#7DD3FC; --bar:transparent; --chip:rgba(255,255,255,.06);
+    --ok:#62C48A; --warn:#E3AA4E; --nok:#F07D66; --paper:#0F1B30; color-scheme:dark;
+    --app-bg:radial-gradient(1100px 700px at 0% -10%,rgba(45,212,191,.10),transparent 60%),radial-gradient(1000px 700px at 100% 0%,rgba(99,102,241,.14),transparent 58%),radial-gradient(900px 600px at 50% 110%,rgba(30,64,175,.12),transparent 60%),linear-gradient(180deg,#0A1428 0%,#08101F 55%,#060B17 100%);
+    --side-bg:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.025)); --top-bg:rgba(8,16,32,.35);
+    --hover:rgba(255,255,255,.06); --active-bg:rgba(125,211,252,.14); --active-line:rgba(125,211,252,.40); --solid:rgba(14,26,49,.97);
+    --card:linear-gradient(180deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.035) 100%); --blur:saturate(140%) blur(16px);
+    --shadow:inset 0 1px 0 rgba(255,255,255,.07),0 24px 48px -30px rgba(0,0,0,.75);
+  }
+  .app{position:fixed;inset:0;display:grid;grid-template-columns:var(--side-w,224px) minmax(0,1fr);background:#070F1F;color:var(--fg);transition:grid-template-columns .28s cubic-bezier(.2,.7,.2,1)}
+  :root:not([data-theme="glass"]) .app{background:var(--bg)}
+  .app::before{content:"";position:absolute;inset:0;background:var(--app-bg);pointer-events:none}
+  .app.collapsed{--side-w:78px}
+  .side{position:relative;z-index:30;display:flex;flex-direction:column;gap:4px;min-width:0;overflow:hidden auto;scrollbar-width:none;
+    padding:max(18px,env(safe-area-inset-top)) 12px max(14px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));
+    background:var(--side-bg);border-right:1px solid var(--line);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+  .side::-webkit-scrollbar{display:none}
+  .side-brand{display:flex;align-items:center;gap:12px;padding:2px 6px 16px;margin-bottom:6px;border-bottom:1px solid var(--line);min-width:0}
+  .side-brand .mk{width:40px;height:40px;border-radius:12px;flex:none;display:grid;place-items:center;font:800 15px/1 var(--disp);font-stretch:74%;letter-spacing:.02em;color:#1A1205;
+    background:linear-gradient(160deg,var(--gold-2),var(--gold));box-shadow:0 6px 18px -8px rgba(232,194,122,.55)}
+  .proj{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .proj b{font:800 22px/1 var(--disp);font-stretch:72%;letter-spacing:.02em}
+  .proj span{font:500 9.5px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .side-lab{font:600 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:14px 12px 8px;white-space:nowrap}
+  .tabs{display:flex;flex-direction:column;gap:3px}
+  .tab,.tb-btn{appearance:none;display:flex;align-items:center;gap:12px;width:100%;min-width:0;padding:10px 12px;border:0;border-radius:12px;background:none;color:var(--muted);
+    font:500 14px/1.2 var(--body);text-align:left;cursor:pointer;white-space:nowrap;position:relative;transition:background .18s,color .18s,box-shadow .18s}
+  .tab:hover,.tb-btn:hover{background:var(--hover);color:var(--fg)}
+  .tab[aria-selected="true"]{background:var(--active-bg);color:var(--fg);font-weight:600;box-shadow:inset 0 0 0 1px var(--active-line)}
+  .tab[aria-selected="true"]::before{content:"";position:absolute;left:-12px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--accent)}
+  .tab .ico,.tb-btn svg{width:19px;height:19px;flex:none}
+  .tab .ico svg{width:19px;height:19px;display:block}
+  .tab .short{display:none!important}
+  .tab .full,.tb-btn .lbl{overflow:hidden;text-overflow:ellipsis}
+  .tools{display:flex;flex-direction:column;gap:3px}
+  .tb-btn.primary{margin-bottom:6px;background:linear-gradient(160deg,var(--gold-2),var(--gold));color:#1A1205;font-weight:700;box-shadow:0 10px 24px -14px rgba(232,194,122,.7)}
+  .tb-btn.primary:hover{background:linear-gradient(160deg,#F7E2B3,#EDCA88);color:#1A1205}
+  .tb-btn[aria-expanded="true"]{background:var(--active-bg);color:var(--fg)}
+  .side-foot{margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+  .side-foot .tb-btn svg{transition:transform .28s}
+  .app.collapsed .side-foot .tb-btn svg{transform:rotate(180deg)}
+  .app.collapsed .proj,.app.collapsed .side-lab,.app.collapsed .tab .full,.app.collapsed .tb-btn .lbl{display:none}
+  .app.collapsed .side-brand{justify-content:center;padding-left:0;padding-right:0}
+  .app.collapsed .tab,.app.collapsed .tb-btn{justify-content:center;padding:11px 0}
+  .main{position:relative;display:flex;flex-direction:column;min-width:0;min-height:0}
+  .topbar{display:flex;align-items:center;gap:14px;padding:max(14px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) 14px 24px;border-bottom:1px solid var(--line);
+    background:var(--top-bg);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);min-width:0}
+  .crumb{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+  .crumb .eb{font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .crumb h1{margin:0;font:700 23px/1.05 var(--disp);font-stretch:84%;letter-spacing:.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top-meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .top-meta span{display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);font:500 12px var(--mono);color:var(--muted);white-space:nowrap}
+  .top-meta b{color:var(--fg);font-weight:600}
+  .top-meta i{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+  .hamb{display:none;appearance:none;width:42px;height:42px;flex:none;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--fg);cursor:pointer;place-items:center}
+  .scrim{display:none}
   .stage{flex:1;min-height:0;position:relative}
   .stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg)}
   .loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font:500 12px var(--mono);letter-spacing:.14em;text-transform:uppercase}
-  @media (max-width:760px){
-    .proj span,.tools .wide{display:none}
-    .tools{margin-left:auto}
-    .tabs{order:3;flex-basis:100%}
+  @media (max-width:900px){
+    .app,.app.collapsed{grid-template-columns:minmax(0,1fr)}
+    .side{position:fixed;left:0;top:0;bottom:0;width:min(290px,86vw);transform:translateX(-105%);transition:transform .28s cubic-bezier(.2,.7,.2,1);box-shadow:24px 0 60px -20px rgba(0,0,0,.6)}
+    :root[data-theme="glass"] .side{background:linear-gradient(180deg,rgba(14,26,49,.96),rgba(9,17,33,.97))}
+    .app.drawer .side{transform:none}
+    .app.collapsed .proj,.app.collapsed .side-lab,.app.collapsed .tab .full,.app.collapsed .tb-btn .lbl{display:revert}
+    .app.collapsed .tab,.app.collapsed .tb-btn{justify-content:flex-start;padding:10px 12px}
+    .side-foot{display:none}
+    .scrim{display:block;position:fixed;inset:0;z-index:25;background:rgba(3,8,18,.55);opacity:0;pointer-events:none;transition:opacity .25s}
+    .app.drawer .scrim{opacity:1;pointer-events:auto}
+    .hamb{display:grid}
+    .topbar{padding:max(10px,env(safe-area-inset-top)) 14px 10px 12px;gap:10px}
+    .crumb h1{font-size:20px}
+    .top-meta span:nth-child(2){display:none}
   }
+  @media (max-width:520px){ .top-meta{display:none} }
 
   /* ================= UPLOAD DIALOG ================= */
   .modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(6,14,28,.62);backdrop-filter:blur(3px)}
@@ -387,15 +439,15 @@
   }
 
   /* ================= PDF MENU ================= */
-  .tools{position:relative}
-  .menu{position:absolute;right:0;top:calc(100% + 2px);z-index:40;width:min(360px,calc(100vw - 24px));background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:14px;
-    box-shadow:0 22px 60px rgba(0,0,0,.22);padding:8px;display:flex;flex-direction:column;gap:2px}
+  .menu{position:fixed;z-index:60;width:min(360px,calc(100vw - 24px));background:var(--solid);color:var(--fg);border:1px solid var(--line);border-radius:16px;
+    box-shadow:0 22px 60px rgba(0,0,0,.35);padding:8px;display:flex;flex-direction:column;gap:2px;backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
   .menu h4{margin:6px 8px 4px;font:600 11px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .mi{display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:10px;align-items:center;border:0;background:none;border-radius:10px;padding:9px 8px;text-align:left;cursor:pointer;width:100%}
   .mi:hover{background:var(--chip)}
   .mi:disabled{cursor:progress;opacity:.8}
   .mi .ic{width:36px;height:42px;border-radius:6px;background:#B13F2B;color:#fff;display:grid;place-items:end center;padding-bottom:6px;font:700 9.5px var(--mono);letter-spacing:.06em;position:relative}
-  .mi .ic::before{content:"";position:absolute;right:0;top:0;border-style:solid;border-width:0 10px 10px 0;border-color:transparent var(--panel) rgba(255,255,255,.35) transparent}
+  .mi .ic::before{content:"";position:absolute;right:0;top:0;border-style:solid;border-width:0 10px 10px 0;border-color:transparent #0E1A31 rgba(255,255,255,.35) transparent}
+  :root:not([data-theme="glass"]) .mi .ic::before{border-color:transparent var(--panel) rgba(255,255,255,.35) transparent}
   .mi .ic.pr{background:#0C1D38}
   .mi b{display:block;font-size:14px}
   .mi span{display:block;font-size:12px;color:var(--muted)}
@@ -403,8 +455,25 @@
   .mi .spin{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--line);border-top-color:#C68A2B;animation:spin .8s linear infinite;display:inline-block}
   .menu .note{margin:4px 8px 6px;font-size:12.5px;color:var(--muted)}
   .menu .err{margin:2px 8px 6px;font-size:12.5px;color:#B13F2B}
-  @media (max-width:760px){ .tb-btn .lbl{display:none} .tb-btn{padding:7px 10px} .tab{padding:10px 10px 11px} }
-  @media (max-width:520px){ .tab .full{display:none} .tab .short{display:inline!important} }
+  /* glass surfaces for the portal's own panels (dialog, This week tab) */
+  :root[data-theme="glass"] .sheet{background:var(--solid);border:1px solid var(--line);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur)}
+  :root[data-theme="glass"] .f input,:root[data-theme="glass"] .f select,:root[data-theme="glass"] .f textarea{background:rgba(255,255,255,.05);border-color:var(--line)}
+  :root[data-theme="glass"] select option{background:#0E1A31;color:#EAF1F8}
+  :root[data-theme="glass"] .sbtn.main{background:linear-gradient(160deg,#1C3A66,#14284A);border-color:rgba(125,211,252,.35)}
+  :root[data-theme="glass"] .wk-m,:root[data-theme="glass"] .wk-list,:root[data-theme="glass"] .xp-kpi{background:var(--card);border-color:var(--line);box-shadow:var(--shadow);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:18px}
+  :root[data-theme="glass"] .wk-head{background:#101D35;color:#B9C6D7}
+  :root[data-theme="glass"] .wk-pct input{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:#F5F9FD}
+  :root[data-theme="glass"] .wk-pct input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(125,211,252,.18)}
+  :root[data-theme="glass"] .wk-pct input.calc{color:var(--accent)}
+  :root[data-theme="glass"] .wk-tools .seg button,:root[data-theme="glass"] .wk-btn,:root[data-theme="glass"] .wk-nav button,:root[data-theme="glass"] .wk-nav select{background:rgba(255,255,255,.05);border-color:var(--line)}
+  :root[data-theme="glass"] .wk-tools .seg button[aria-pressed="true"]{background:var(--active-bg);color:#F2FAFF;box-shadow:inset 0 0 0 1px var(--active-line)}
+  :root[data-theme="glass"] .wk-btn:hover,:root[data-theme="glass"] .wk-nav button:hover:not(:disabled){border-color:rgba(255,255,255,.28)}
+  :root[data-theme="glass"] .wk-row:hover{background:rgba(125,211,252,.04)}
+  :root[data-theme="glass"] .wk-h{font-weight:700;font-stretch:80%}
+  :root[data-theme="glass"] .wk-big b{color:#F5F9FD;font-weight:700}
+  :root[data-theme="glass"] .tick{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.2)}
+  :root[data-theme="glass"] .wk-items{background:rgba(255,255,255,.025)}
+  :root[data-theme="glass"] .wk-bar{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
 
   /* ================= PRINT (explorer card) ================= */
   @media print{
@@ -552,19 +621,29 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
 
 <!-- ============ APP ============ -->
 <section class="app" id="app" hidden>
-  <header class="bar">
-    <div class="proj"><b id="pname">SBARC</b><span>Management dashboards</span></div>
-    <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboards"></nav>
+  <aside class="side" id="side" aria-label="Navigation">
+    <div class="side-brand"><span class="mk" aria-hidden="true">SB</span><div class="proj"><b id="pname">SBARC</b><span>Management dashboards</span></div></div>
+    <div class="side-lab">Dashboards</div>
+    <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboards" aria-orientation="vertical"></nav>
+    <div class="side-lab">Tools</div>
     <div class="tools">
-      <button class="tb-btn primary" id="up-open" type="button"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg>Send update</button>
-      <button class="tb-btn" id="find-open" type="button" aria-label="Find a villa"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Find villa</span></button>
-      <button class="tb-btn" id="pdf-open" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Download PDF"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span class="lbl">PDF</span></button>
-      <div class="menu" id="pdf-menu" hidden role="menu" aria-label="Download PDF"></div>
-      <button class="tb-btn wide" id="theme" type="button">Theme: auto</button>
-      <button class="tb-btn wide" id="full" type="button">Full screen</button>
-      <button class="tb-btn" id="lockbtn" type="button" aria-label="Lock"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="lbl">Lock</span></button>
+      <button class="tb-btn primary" id="up-open" type="button" title="Send update"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg><span class="lbl">Send update</span></button>
+      <button class="tb-btn" id="find-open" type="button" aria-label="Find a villa" title="Find villa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><span class="lbl">Find villa</span></button>
+      <button class="tb-btn" id="pdf-open" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Download PDF" title="Download PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9.5 14.5 12 17l2.5-2.5"/></svg><span class="lbl">Download PDF</span></button>
+      <button class="tb-btn" id="theme" type="button" title="Theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z" fill="currentColor"/></svg><span class="lbl">Theme: Glass</span></button>
+      <button class="tb-btn" id="full" type="button" title="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Full screen</span></button>
+      <button class="tb-btn" id="lockbtn" type="button" aria-label="Lock" title="Lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="11" width="15" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span class="lbl">Lock</span></button>
     </div>
-  </header>
+    <div class="side-foot"><button class="tb-btn" id="side-collapse" type="button" aria-label="Collapse sidebar" title="Collapse sidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg><span class="lbl">Collapse</span></button></div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="menu" id="pdf-menu" hidden role="menu" aria-label="Download PDF"></div>
+  <div class="main">
+    <header class="topbar">
+      <button class="hamb" id="side-open" type="button" aria-label="Open menu" aria-controls="side" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <div class="crumb"><span class="eb">SBARC · Phase 02-B</span><h1 id="page-title">Dashboards</h1></div>
+      <div class="top-meta" id="top-meta"></div>
+    </header>
   <main class="stage" id="stage"><div class="loading" id="loading">Loading</div>
     <div class="xp" id="xp" hidden>
       <div class="xp-find"><div class="box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
@@ -582,6 +661,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     </div>
     <div class="wk" id="wk" hidden><div class="wk-in" id="wk-in"><div class="wk-empty">Loading this week's targets…</div></div></div>
   </main>
+  </div>
 </section>
 
 <!-- ============ UPLOAD DIALOG ============ -->
@@ -628,7 +708,8 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   const PROJECTS = /*PROJECTS*/[];
   const $ = (id) => document.getElementById(id);
   const norm = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
-  let session = null, current = null, theme = '', secret = '';
+  let session = null, current = null, theme = 'glass', secret = '';
+  try { const t = localStorage.getItem('sbarc-theme'); if (t === 'light' || t === 'glass') theme = t; } catch (e) { /* storage off */ }
   const frames = {};
 
   // ---------- entrance ----------
@@ -696,10 +777,15 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('pname').textContent = session.project;
     const tabs = $('tabs'); tabs.replaceChildren();
     session.dashboards.forEach((d) => {
-      const b = document.createElement('button'); b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week' };
+      const b = document.createElement('button'); b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh);
-      b.addEventListener('click', () => show(d.id)); tabs.append(b);
+      b.addEventListener('click', () => { show(d.id); drawer(false); }); tabs.append(b);
     });
+    const tb = [...document.querySelectorAll('.tblock div')].map((x) => [x.querySelector('span').textContent, x.querySelector('b').textContent]);
+    const meta = $('top-meta'); meta.replaceChildren();
+    tb.filter(([k]) => k !== 'Project').forEach(([k, v], i) => { const sp = document.createElement('span'); if (i === 0) sp.append(document.createElement('i')); sp.append(k + ' '); const bb = document.createElement('b'); bb.textContent = v; sp.append(bb); meta.append(sp); });
+    applyTheme(document);
     $('u-to').textContent = session.upload.email;
     $('find-open').hidden = !session.explorer;
     show(session.dashboards[0].id);
@@ -716,9 +802,36 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   $('lockbtn').addEventListener('click', lock);
 
   // ---------- dashboards ----------
-  function applyTheme(doc) { try { if (theme) doc.documentElement.setAttribute('data-theme', theme); else doc.documentElement.removeAttribute('data-theme'); } catch (e) { /* not ready */ } }
+  // Theme: Glass (default) or Light. Inside the dashboards Glass uses their dark palette plus the glass layer.
+  function applyTheme(doc) {
+    try {
+      const root = doc.documentElement;
+      if (doc === document) { root.setAttribute('data-theme', theme); return; }
+      root.classList.toggle('glass', theme === 'glass'); root.setAttribute('data-theme', theme === 'glass' ? 'dark' : 'light');
+    } catch (e) { /* not ready */ }
+  }
+  const TAB_ICONS = {
+    exec: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="8" rx="2"/><rect x="13.5" y="3.5" width="7" height="5" rx="2"/><rect x="13.5" y="11.5" width="7" height="9" rx="2"/><rect x="3.5" y="14.5" width="7" height="6" rx="2"/></svg>',
+    p02b: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"/><path d="M5 16l4.5-5 3.5 3 6-7"/><path d="M15 7h4v4"/></svg>',
+    week: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>',
+    explorer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg>',
+  };
+  // sidebar: collapse on desktop, drawer on phones and tablets
+  const isNarrow = () => window.matchMedia('(max-width:900px)').matches;
+  function drawer(open) { $('app').classList.toggle('drawer', !!open); $('side-open').setAttribute('aria-expanded', String(!!open)); }
+  $('side-open').addEventListener('click', () => drawer(!$('app').classList.contains('drawer')));
+  $('scrim').addEventListener('click', () => drawer(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('app').classList.contains('drawer')) drawer(false); });
+  try { if (localStorage.getItem('sbarc-side') === 'collapsed') $('app').classList.add('collapsed'); } catch (e) { /* storage off */ }
+  $('side-collapse').addEventListener('click', () => {
+    const c = $('app').classList.toggle('collapsed'); $('side-collapse').setAttribute('aria-label', c ? 'Expand sidebar' : 'Collapse sidebar'); $('side-collapse').title = c ? 'Expand sidebar' : 'Collapse sidebar';
+    $('side-collapse').querySelector('.lbl').textContent = c ? 'Expand' : 'Collapse';
+    try { localStorage.setItem('sbarc-side', c ? 'collapsed' : 'open'); } catch (e) { /* storage off */ }
+  });
+  $('theme').querySelector('.lbl').textContent = 'Theme: ' + (theme === 'glass' ? 'Glass' : 'Light');
   function show(id) {
     current = id;
+    const d0 = session && session.dashboards.find((d) => d.id === id); if (d0) $('page-title').textContent = d0.title;
     document.querySelectorAll('.tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.id === id)));
     Object.keys(frames).forEach((k) => { frames[k].hidden = k !== id; });
     $('xp').hidden = id !== 'explorer';
@@ -739,10 +852,11 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     if (document.fullscreenElement) document.exitFullscreen && document.exitFullscreen();
     else document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {});
   });
-  document.addEventListener('fullscreenchange', () => { $('full').textContent = document.fullscreenElement ? 'Exit full screen' : 'Full screen'; });
+  document.addEventListener('fullscreenchange', () => { $('full').querySelector('.lbl').textContent = document.fullscreenElement ? 'Exit full screen' : 'Full screen'; });
   $('theme').addEventListener('click', () => {
-    theme = theme === '' ? 'light' : theme === 'light' ? 'dark' : '';
-    $('theme').textContent = 'Theme: ' + (theme || 'auto'); applyTheme(document); Object.values(frames).forEach((f) => applyTheme(f.contentDocument));
+    theme = theme === 'glass' ? 'light' : 'glass';
+    $('theme').querySelector('.lbl').textContent = 'Theme: ' + (theme === 'glass' ? 'Glass' : 'Light'); applyTheme(document); Object.values(frames).forEach((f) => applyTheme(f.contentDocument));
+    try { localStorage.setItem('sbarc-theme', theme); } catch (e) { /* storage off */ }
   });
 
   // ---------- team update ----------
@@ -1299,8 +1413,15 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       const nm = xpSel.k === 'c' ? 'Cluster ' + xpSel.id : xpSel.k === 'v' ? 'Villa ' + xpSel.id : xpSel.k === 'a' ? label(actsOf(xpSel.s)[xpSel.i]) : 'Building ' + xpSel.id;
       m.append(mItem('CARD', 'Print this card', nm + ' · choose “Save as PDF”', () => { closeMenu(); printCard(); }, true));
     }
-    m.hidden = false; $('pdf-open').setAttribute('aria-expanded', 'true');
+    m.hidden = false; $('pdf-open').setAttribute('aria-expanded', 'true'); placeMenu();
   }
+  function placeMenu() {
+    const m = $('pdf-menu'), r = $('pdf-open').getBoundingClientRect();
+    if (isNarrow()) { Object.assign(m.style, { left: '12px', right: '12px', top: 'auto', bottom: 'max(12px, env(safe-area-inset-bottom))', width: 'auto' }); return; }
+    Object.assign(m.style, { right: 'auto', bottom: 'auto', width: '', left: Math.round(r.right + 10) + 'px' });
+    m.style.top = Math.round(Math.max(12, Math.min(r.top - 8, window.innerHeight - m.offsetHeight - 12))) + 'px';
+  }
+  window.addEventListener('resize', () => { if (!$('pdf-menu').hidden) placeMenu(); });
   $('pdf-open').addEventListener('click', (e) => { e.stopPropagation(); if ($('pdf-menu').hidden) openMenu(); else closeMenu(); });
   document.addEventListener('click', (e) => { if (e.isTrusted && !$('pdf-menu').hidden && !$('pdf-menu').contains(e.target)) closeMenu(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });

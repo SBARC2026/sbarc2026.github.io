@@ -1,0 +1,119 @@
+/* SBARC glass theme for the embedded dashboards (site only; the PDFs keep the original look).
+   Visual layer only: it re-maps surface tokens and restyles containers. Data, scripts, chart colours
+   and status colours (ok / warn / bad) are left as the dashboards define them. Active when <html class="glass">. */
+:root.glass,:root.glass[data-theme]{
+  --g-ink:#EAF1F8; --g-mute:#A9B7CA; --g-line:rgba(255,255,255,.12); --g-line2:rgba(255,255,255,.07);
+  --g-card:linear-gradient(180deg,rgba(255,255,255,.075) 0%,rgba(255,255,255,.035) 100%);
+  --g-solid:#0E1A31; --g-solid2:#0B1528;
+  --g-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 24px 48px -30px rgba(0,0,0,.75);
+  --g-blur:saturate(140%) blur(16px);
+  --g-accent:#7DD3FC; --g-teal:#5EEAD4;
+  /* surface tokens shared by both dashboards (dark palette already set by data-theme="dark") */
+  --color-fg:var(--g-ink); --color-fg-muted:var(--g-mute); --color-border-line:var(--g-line);
+  --cds-chart-grid:rgba(255,255,255,.07); --cds-chart-axis:rgba(255,255,255,.26);
+  --cds-surface-popover:rgba(12,22,41,.96); --cds-border:rgba(255,255,255,.16); --cds-shadow-popover:0 16px 40px -12px rgba(0,0,0,.7);
+  --cds-text-secondary:var(--g-mute);
+}
+html.glass{background:#070F1F}
+html.glass body{
+  background:
+    radial-gradient(1100px 700px at 0% -10%,rgba(45,212,191,.10),transparent 60%),
+    radial-gradient(1000px 700px at 100% 0%,rgba(99,102,241,.14),transparent 58%),
+    radial-gradient(900px 600px at 50% 110%,rgba(30,64,175,.12),transparent 60%),
+    linear-gradient(180deg,#0A1428 0%,#08101F 55%,#060B17 100%) fixed;
+  color:var(--g-ink);
+}
+html.glass ::selection{background:rgba(125,211,252,.32)}
+html.glass ::-webkit-scrollbar{width:10px;height:10px}
+html.glass ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+html.glass ::-webkit-scrollbar-track{background:transparent}
+
+/* ================= Executive Summary (.sb) ================= */
+html.glass .sb{--color-panel:rgba(255,255,255,.055);--color-bg:rgba(255,255,255,.04);--ns:rgba(255,255,255,.18);--glow:rgba(45,212,191,.10);--glow2:rgba(125,211,252,.06)}
+html.glass .sb-card{background:var(--g-card);border:1px solid var(--g-line);box-shadow:var(--g-shadow);backdrop-filter:var(--g-blur);-webkit-backdrop-filter:var(--g-blur);border-radius:20px}
+html.glass .sb-hero{background:radial-gradient(120% 140% at 100% 0%,rgba(45,212,191,.12) 0%,transparent 55%),radial-gradient(90% 120% at 0% 100%,rgba(99,102,241,.10) 0%,transparent 60%),var(--g-card)}
+html.glass .sb-spot{background:radial-gradient(100% 120% at 100% 100%,rgba(45,212,191,.10) 0%,transparent 55%),var(--g-card)}
+html.glass .sb-title,html.glass .sb-ring-num,html.glass .sb-kpi-num,html.glass .sb-spot-big,html.glass .sb-spot-name,html.glass .sb-mini .n{font-weight:500;letter-spacing:-.02em;color:#F5F9FD}
+html.glass .sb-kpi-num{font-weight:600}
+html.glass .sb-eyebrow,html.glass .sb-kpi-lab{color:var(--g-mute)}
+html.glass .sb-kpi::after{background:radial-gradient(circle,rgba(125,211,252,.12),transparent 70%)}
+html.glass .sb-kpi:hover{box-shadow:var(--g-shadow),0 0 0 1px rgba(125,211,252,.28)}
+html.glass .sb-live{border-color:var(--g-line);background:rgba(255,255,255,.04)}
+/* section nav */
+html.glass .sb-nav{background:rgba(12,22,41,.72);border-color:var(--g-line);box-shadow:0 12px 30px -18px rgba(0,0,0,.8);backdrop-filter:var(--g-blur);-webkit-backdrop-filter:var(--g-blur)}
+html.glass .sb-nav button{color:var(--g-mute)}
+html.glass .sb-nav button:hover{color:var(--g-ink);background:rgba(255,255,255,.06)}
+html.glass .sb-nav button[aria-current=true]{background:rgba(125,211,252,.16);color:#F2FAFF;box-shadow:inset 0 0 0 1px rgba(125,211,252,.42)}
+html.glass .sb-clrow:focus-visible,html.glass .sb-tile:focus-visible,html.glass .sb-seg button:focus-visible,html.glass .sb-nav button:focus-visible{outline:2px solid var(--g-accent);outline-offset:2px}
+html.glass .sb-nav button{outline:none}
+/* controls */
+html.glass .sb-chip{background:rgba(255,255,255,.04);border-color:var(--g-line);color:var(--g-mute)}
+html.glass .sb-chip:hover{border-color:rgba(255,255,255,.28);color:var(--g-ink)}
+html.glass .sb-chip[aria-pressed=true]{background:rgba(125,211,252,.18);border-color:rgba(125,211,252,.55);color:#F2FAFF}
+html.glass .sb-seg{background:rgba(255,255,255,.04);border-color:var(--g-line)}
+html.glass .sb-seg button[aria-pressed=true]{background:rgba(255,255,255,.12);color:#F5F9FD;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+html.glass .sb-rank{color:#08111F}
+html.glass .sb-clrow:hover{background:rgba(255,255,255,.05)}
+html.glass .sb-clrow[aria-pressed=true]{background:rgba(125,211,252,.10)}
+html.glass .sb-track,html.glass .sb-dual,html.glass .sb-stack,html.glass .sb-lay-bd .row .b{background:rgba(255,255,255,.08)}
+html.glass .sb-fitem,html.glass .sb-ditem{border-color:var(--g-line2)}
+html.glass .sb-tile{box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+html.glass .sb-tile[aria-pressed=true]{box-shadow:0 0 0 2px var(--g-accent)}
+html.glass .sb-detail{border-color:var(--g-line)}
+/* navy sections (layouts, buildings, manpower): same glass surfaces, their own status palette kept */
+html.glass #layouts.sb-card,html.glass #buildings.sb-card,html.glass #manpower.sb-card{
+  --color-panel:rgba(255,255,255,.055);--color-bg:rgba(255,255,255,.035);--color-border-line:var(--g-line);--color-fg:var(--g-ink);--color-fg-muted:var(--g-mute);--cds-chart-grid:rgba(255,255,255,.08);
+  background:radial-gradient(70% 60% at 100% 0%,rgba(56,189,248,.09) 0%,transparent 60%),radial-gradient(60% 60% at 0% 100%,rgba(232,194,122,.06) 0%,transparent 60%),var(--g-card);
+  border-color:var(--g-line);box-shadow:var(--g-shadow)}
+html.glass :is(#layouts,#buildings,#manpower) .sb-map{border-color:var(--g-line);background:radial-gradient(70% 70% at 85% 10%,rgba(56,189,248,.08) 0%,transparent 60%),rgba(8,16,32,.72)}
+html.glass .sb-map-leg,html.glass .sb-map-info{background:rgba(12,22,41,.86);border-color:var(--g-line)}
+html.glass .sb-bcard,html.glass .sb-mpk>div,html.glass .sb-mpbox{background:var(--g-card);border-color:var(--g-line);box-shadow:var(--g-shadow)}
+html.glass .sb-bcard:hover{border-color:rgba(255,255,255,.26)}
+html.glass .sb-bdetail{background:rgba(10,19,36,.72);border-color:var(--g-line)}
+html.glass .sb-bdgrid .gh,html.glass .sb-bdgrid .row,html.glass .sb-roles div{border-color:var(--g-line2)}
+html.glass .sb-mpbar{background:rgba(255,255,255,.08)}
+
+/* ================= Management Tracking (.pc, Command theme) ================= */
+html.glass #dash-root .pc.theme-command{
+  --color-panel:rgba(16,29,52,.80); --color-border-line:var(--g-line); --color-fg:var(--g-ink); --color-fg-muted:var(--g-mute);
+  --cds-chart-grid:rgba(255,255,255,.07); --cds-chart-axis:rgba(255,255,255,.26); --cds-surface-popover:rgba(12,22,41,.96); --cds-border:rgba(255,255,255,.16);
+  --pc-canvas:transparent; --pc-card:var(--g-card); --pc-card-border:var(--g-line); --pc-card-shadow:var(--g-shadow);
+  --pc-kpi-ink:#F5F9FD; --pc-kpi-glow:none; --pc-kpi-hero-glow:none;
+  --pc-th:#101D35; --pc-sticky:#0F1B31; --pc-foot:rgba(255,255,255,.045); --pc-track:rgba(255,255,255,.04);
+  --pc-tab-ink:var(--g-mute); --pc-input:rgba(255,255,255,.05); --pc-btn:rgba(255,255,255,.06);
+}
+html.glass #dash-root .pc.theme-command{box-shadow:none;background:transparent}
+html.glass #dash-root .pc.theme-command .pc-card,html.glass #dash-root .pc.theme-command .pc-kpi{backdrop-filter:var(--g-blur);-webkit-backdrop-filter:var(--g-blur);border-radius:18px}
+html.glass #dash-root .pc.theme-command .pc-kpi::after{background:radial-gradient(circle,rgba(125,211,252,.12),transparent 70%)}
+html.glass #dash-root .pc.theme-command .pc-kpi:hover{box-shadow:var(--g-shadow),0 0 0 1px rgba(125,211,252,.28)}
+html.glass #dash-root .pc.theme-command .pc-kpi-value{font-weight:500;letter-spacing:-.015em}
+html.glass #dash-root .pc.theme-command .pc-hero{
+  --h-line:rgba(255,255,255,.035);
+  background:repeating-linear-gradient(0deg,var(--h-line) 0 1px,transparent 1px 28px),repeating-linear-gradient(90deg,var(--h-line) 0 1px,transparent 1px 28px),
+    radial-gradient(120% 140% at 85% 20%,rgba(99,102,241,.16) 0%,transparent 55%),radial-gradient(90% 120% at 0% 100%,rgba(45,212,191,.10) 0%,transparent 60%),var(--g-card);
+  border:1px solid var(--g-line);box-shadow:var(--g-shadow);backdrop-filter:var(--g-blur);-webkit-backdrop-filter:var(--g-blur);border-radius:22px}
+html.glass #dash-root .pc.theme-command .pc-hero::after{opacity:.55;height:3px}
+html.glass #dash-root .pc.theme-command .pc-hero-title{font-weight:500;letter-spacing:-.02em}
+html.glass #dash-root .pc.theme-command .pc-hchip{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.16)}
+html.glass #dash-root .pc.theme-command .pc-hchip-a i{box-shadow:none}
+/* pages sidebar */
+html.glass #dash-root .pc.theme-command.layout-side > .pc-bar{background:var(--g-card);border-color:var(--g-line);box-shadow:var(--g-shadow);backdrop-filter:var(--g-blur);-webkit-backdrop-filter:var(--g-blur);border-radius:18px}
+html.glass #dash-root .pc.theme-command .pc-tab{transition:background .18s,color .18s}
+html.glass #dash-root .pc.theme-command .pc-tab:hover{background:rgba(255,255,255,.06);color:var(--g-ink)}
+html.glass #dash-root .pc.theme-command .pc-tab[aria-selected="true"]{background:rgba(125,211,252,.14);color:#F2FAFF;font-weight:600;box-shadow:inset 0 0 0 1px rgba(125,211,252,.40)}
+html.glass #dash-root .pc.theme-command.layout-side .pc-tab[aria-selected="true"]::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:var(--g-accent)}
+html.glass #dash-root .pc.theme-command .pc-chip[aria-pressed="true"]{box-shadow:0 4px 14px -8px rgba(76,201,240,.7)}
+html.glass #dash-root .pc.theme-command .pc-ctl select,html.glass #dash-root .pc.theme-command .pc-hero-btn{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.22)}
+html.glass #dash-root .pc.theme-command .pc-ctl select option{background:#0E1A31;color:#EAF1F8}
+/* tables */
+html.glass #dash-root .pc.theme-command th{background:var(--pc-th);color:#B9C6D7;letter-spacing:.07em;border-bottom:1px solid rgba(255,255,255,.14)}
+html.glass #dash-root .pc.theme-command td{border-bottom-color:var(--g-line2)}
+html.glass #dash-root .pc.theme-command tbody tr:hover td{background:rgba(125,211,252,.06)}
+html.glass #dash-root .pc.theme-command .pc-tablebox{border-top-color:var(--g-line)}
+html.glass #dash-root .pc.theme-command .pc-pill{background:color-mix(in srgb,currentColor 12%,transparent);border-color:color-mix(in srgb,currentColor 55%,transparent);font-weight:600}
+html.glass #dash-root .pc.theme-command .pc-search:focus{border-color:var(--g-accent)}
+/* tooltip */
+html.glass .pc-tip{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:10px;color:var(--g-ink)}
+
+/* motion: restrained */
+@media (prefers-reduced-motion:reduce){html.glass *{transition:none!important}}
