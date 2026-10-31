@@ -549,6 +549,44 @@
   @media print{body.print-pv .app{position:static!important;display:block!important}body.print-pv .side,body.print-pv .topbar,body.print-pv .stage>iframe,body.print-pv .pv-tools,body.print-pv .pv-seg,body.print-pv .pv-pg{display:none!important}
     body.print-pv .stage,body.print-pv .pv{position:static!important;overflow:visible!important;height:auto!important}body.print-pv .pv-card,body.print-pv .pv-kpi{break-inside:avoid}}
 
+
+  /* Gantt (Primavera tab) */
+  .gt-wrap{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:auto;max-height:calc(100vh - 330px);min-height:320px}
+  .gt{position:relative;min-width:1080px}
+  .gt-row{display:grid;grid-template-columns:270px minmax(0,1fr);align-items:center;min-height:38px;border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+  .gt-lab{position:sticky;left:0;z-index:3;background:var(--panel);padding:6px 12px;min-width:0;border-right:1px solid var(--line);align-self:stretch;display:flex;flex-direction:column;justify-content:center}
+  .gt-lab b{font:600 12.5px var(--body);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .gt-lab small{font:500 11px var(--mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gt-head{position:sticky;top:0;z-index:5;background:var(--chip)}
+  .gt-head .gt-lab{background:var(--chip);font:600 11px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex-direction:row;align-items:center}
+  .gt-months{position:relative;height:34px}
+  .gt-months span{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding-left:8px;border-left:1px solid var(--line);font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .gt-grp{background:color-mix(in srgb,var(--chip) 80%,transparent);font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:7px 12px;position:sticky;left:0}
+  .gt-track{position:relative;height:38px}
+  .gt-bar{position:absolute;top:9px;height:20px;border-radius:6px;background:color-mix(in srgb,var(--accent) 22%,var(--chip));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 45%,transparent);overflow:hidden}
+  .gt-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);opacity:.85}
+  .gt-bar.done i{background:var(--ok)}.gt-bar.low i{background:var(--warn)}
+  .gt-bar em{position:absolute;left:7px;top:0;bottom:0;display:flex;align-items:center;font:700 10.5px var(--mono);font-style:normal;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55);white-space:nowrap}
+  .gt-tail{position:absolute;top:17px;height:4px;border-radius:2px;background:repeating-linear-gradient(90deg,var(--warn) 0 5px,transparent 5px 9px);opacity:.9}
+  .gt-lines{position:absolute;left:270px;right:0;top:0;bottom:0;pointer-events:none;z-index:1}
+  .gt-lines i{position:absolute;top:34px;bottom:0;width:1px;background:color-mix(in srgb,var(--line) 55%,transparent)}
+  .gt-lines i.m{background:var(--line)}
+  .gt-lines u{position:absolute;top:34px;bottom:0;width:0;border-left:2px dashed var(--warn);text-decoration:none}
+  .gt-lines u.td{border-left-color:var(--nok)}
+  .gt-lines u span{position:absolute;top:2px;left:4px;font:700 10px var(--mono);color:var(--warn);white-space:nowrap;background:var(--panel);padding:1px 4px;border-radius:4px}
+  .gt-lines u.td span{color:var(--nok);top:20px}
+  .gt-key{display:flex;gap:14px;flex-wrap:wrap;font:500 11.5px var(--mono);color:var(--muted)}
+  .gt-key span{display:inline-flex;align-items:center;gap:6px}.gt-key s{display:inline-block;width:22px;height:9px;border-radius:3px;background:var(--accent)}
+  .gt-key s.t{background:repeating-linear-gradient(90deg,var(--warn) 0 5px,transparent 5px 9px);height:4px}
+  :root[data-theme="glass"] .gt-wrap{background:var(--card);border-color:var(--line);box-shadow:var(--shadow);border-radius:18px}
+  :root[data-theme="glass"] .gt-lab{background:#0F1B30}:root[data-theme="glass"] .gt-head,:root[data-theme="glass"] .gt-head .gt-lab{background:#101D35}
+  :root[data-theme="glass"] .gt-grp{background:#122240}
+  :root[data-theme="glass"] .gt-lines u span{background:#0F1B30}
+  .wk-p6{margin-left:12px}
+  .wk-p6box{padding:12px 14px;background:rgba(127,127,127,.05);border-top:1px solid var(--line)}
+  .wk-p6box p{margin:0 0 10px;font-size:12.5px;color:var(--muted)}
+  .wk-p6box .pv-tbl-w{border-radius:10px}
+  @media (max-width:700px){.gt-row{grid-template-columns:150px minmax(0,1fr)}.gt-lines{left:150px}.gt{min-width:900px}}
   /* ================= PRINT (explorer card) ================= */
   @media print{
     body.print-xp{background:#fff}
@@ -1573,9 +1611,9 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     tl.append(el('div', 'pv-eb', 'Primavera P6 · data date ' + dmyIso(P.date) + ' · labour units'), el('h1', 'pv-h', 'Primavera tracking'),
       el('p', 'pv-sub', 'Earned value from the weekly P6 export (' + P.file + '): the project, every trade group, each villa and building, and the activities under them.'));
     const seg = el('div', 'pv-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'View');
-    [['ov', 'Overview'], ['tr', 'Trades'], ['un', 'Villas & buildings'], ['ac', 'Activities']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(PV.view === k)); b.addEventListener('click', () => { PV.view = k; pvRender(); }); seg.append(b); });
+    [['ov', 'Overview'], ['gt', 'Gantt'], ['tr', 'Trades'], ['un', 'Villas & buildings'], ['ac', 'Activities']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(PV.view === k)); b.addEventListener('click', () => { PV.view = k; pvRender(); }); seg.append(b); });
     top.append(tl, seg); root.append(top);
-    ({ ov: pvOverview, tr: pvTrades, un: pvUnits, ac: pvActs })[PV.view](root);
+    ({ ov: pvOverview, gt: pvGantt, tr: pvTrades, un: pvUnits, ac: pvActs })[PV.view](root);
     $('pv').scrollTop = 0;
   }
 
@@ -1699,6 +1737,87 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     draw();
   }
 
+
+  // ----- Gantt: plan bars (recovery plan dates) with P6 % complete -----
+  const isoMs = (s) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10));
+  const gtDm = (s) => new Date(isoMs(s)).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+  function pvGantt(root) {
+    const P = PV.P, S = PV.gt || (PV.gt = { front: '', q: '', hide: false, sort: 'start' }), rowsAll = (P.gantt || []).slice();
+    if (!rowsAll.length) { root.append(el('div', 'pv-note', 'No schedule dates are available for the Gantt chart.')); return; }
+    const tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search activities'; inp.value = S.q; inp.setAttribute('aria-label', 'Search activities');
+    const sf = el('select'); sf.setAttribute('aria-label', 'Work front'); const o0 = el('option', null, 'All work fronts'); o0.value = ''; sf.append(o0);
+    [...new Set(rowsAll.map((r) => r.front))].forEach((f) => { const o = el('option', null, f); o.value = f; sf.append(o); }); sf.value = S.front;
+    const ss = el('select'); ss.setAttribute('aria-label', 'Sort'); [['start', 'Sort: start date'], ['finish', 'Sort: finish date'], ['pct', 'Sort: % complete'], ['step', 'Sort: sequence step']].forEach(([v, t]) => { const o = el('option', null, t); o.value = v; ss.append(o); }); ss.value = S.sort;
+    const lb = el('label', 'wk-btn'); const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = S.hide; lb.append(cb, ' Hide complete'); lb.style.cursor = 'pointer';
+    tools.append(inp, sf, ss, lb);
+    const key = el('div', 'gt-key'); key.innerHTML = '<span><s></s>Planned window, filled to % complete (P6)</span><span><s class="t"></s>Original pace if later than the plan finish</span><span style="color:var(--warn)">┆ Data date</span><span style="color:var(--nok)">┆ Today</span>';
+    const holder = el('div'); root.append(tools, key, holder);
+    const draw = () => {
+      const q = S.q.trim().toLowerCase();
+      const rows = rowsAll.filter((r) => (!S.front || r.front === S.front) && (!q || r.activity.toLowerCase().includes(q)) && (!S.hide || !(r.bu > 0 && r.eu >= r.bu - 0.5)));
+      const pct = (r) => (r.bu > 0 ? r.eu / r.bu : 0);
+      rows.sort((a, b) => (S.sort === 'pct' ? pct(b) - pct(a) : S.sort === 'step' ? a.step - b.step || isoMs(a.start) - isoMs(b.start) : S.sort === 'finish' ? isoMs(a.finish) - isoMs(b.finish) : isoMs(a.start) - isoMs(b.start)));
+      const all = rowsAll, lo0 = Math.min(...all.map((r) => isoMs(r.start))), hi0 = Math.max(...all.map((r) => isoMs(r.rate_finish || r.finish)));
+      const DAY = 864e5, d0 = new Date(lo0); const lo = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth(), 1), hi = hi0 + 7 * DAY, span = hi - lo;
+      const X = (ms) => ((ms - lo) / span * 100).toFixed(3) + '%';
+      const wrap = el('div', 'gt-wrap'), g = el('div', 'gt'); wrap.append(g);
+      const lines = el('div', 'gt-lines');
+      for (let ms = lo; ms < hi; ms += DAY) { const d = new Date(ms); if (d.getUTCDay() === 1) { const i = el('i'); i.style.left = X(ms); lines.append(i); } }
+      const mon = el('div', 'gt-months'); let c = new Date(lo);
+      while (c.getTime() < hi) { const nx = Date.UTC(c.getUTCFullYear(), c.getUTCMonth() + 1, 1), s = el('span', null, c.toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' })); s.style.left = X(c.getTime()); s.style.width = ((Math.min(nx, hi) - c.getTime()) / span * 100).toFixed(3) + '%'; mon.append(s); const i = el('i', 'm'); i.style.left = X(c.getTime()); lines.append(i); c = new Date(nx); }
+      const dd = isoMs(P.date), today = Date.now() - (Date.now() % DAY);
+      [[dd, 'Data date ' + gtDm(P.date), ''], [today, 'Today', 'td']].forEach(([ms, txt, cl]) => { if (ms < lo || ms > hi) return; const u = el('u', cl); u.style.left = X(ms); u.append(el('span', null, txt)); lines.append(u); });
+      const hd = el('div', 'gt-row gt-head'); hd.append(el('div', 'gt-lab', 'Activity'), mon); g.append(hd, lines);
+      const fronts = [...new Set(rows.map((r) => r.front))];
+      if (!rows.length) g.append(el('div', 'wk-empty', 'No activities match.'));
+      fronts.forEach((f) => {
+        const fr = rows.filter((r) => r.front === f); g.append(el('div', 'gt-grp', f + ' · ' + fr.length));
+        fr.forEach((r) => {
+          const row = el('div', 'gt-row'), lab = el('div', 'gt-lab'), p = pct(r);
+          lab.append(el('b', null, r.activity), el('small', null, gtDm(r.start) + ' → ' + gtDm(r.finish) + ' · ' + (r.bu > 0 ? pf(p) + ' done' : '—'))); lab.title = r.activity + '\n' + r.logic;
+          const tr = el('div', 'gt-track'), a = isoMs(r.start), b = isoMs(r.finish) + DAY;
+          const bar = el('div', 'gt-bar' + (p >= 0.999 ? ' done' : p < 0.4 ? ' low' : '')); bar.style.left = X(a); bar.style.width = ((b - a) / span * 100).toFixed(3) + '%';
+          bar.title = r.activity + '\n' + gtDm(r.start) + ' → ' + gtDm(r.finish) + '\n' + r.logic + '\nP6 earned ' + nf(r.eu) + ' of ' + nf(r.bu) + ' units (' + pf(p) + ')';
+          const fi = el('i'); fi.style.width = Math.max(0, Math.min(100, p * 100)) + '%'; bar.append(fi, el('em', null, r.bu > 0 ? pf(p, 0) : ''));
+          tr.append(bar);
+          if (r.rate_finish && isoMs(r.rate_finish) > b) { const tl = el('div', 'gt-tail'); tl.style.left = X(b); tl.style.width = ((isoMs(r.rate_finish) + DAY - b) / span * 100).toFixed(3) + '%'; tl.title = 'At the original pace this would finish ' + gtDm(r.rate_finish); tr.append(tl); }
+          row.append(lab, tr); g.append(row);
+        });
+      });
+      holder.replaceChildren(wrap, el('p', 'wk-note', 'Dates are the recovery plan (93.7% by 31 Dec 2026, 100% by 31 Jan 2027). The P6 export has no dates, so each bar is filled with the activity\'s overall % complete from P6. Activities that are already complete show in green; those under 40% in amber.'));
+    };
+    inp.addEventListener('input', () => { S.q = inp.value; draw(); }); sf.addEventListener('change', () => { S.front = sf.value; draw(); }); ss.addEventListener('change', () => { S.sort = ss.value; draw(); }); cb.addEventListener('change', () => { S.hide = cb.checked; draw(); });
+    draw();
+  }
+
+  // ----- This week: P6 breakdown by villa / building -----
+  const wkOpenP6 = new Set(); let p6UnitIdx = null;
+  function wkP6Units(r) {
+    const P = session.p6, m = P && P.amap && P.amap[r.activity]; if (!m) return null;
+    if (!p6UnitIdx) { p6UnitIdx = {}; P.units.forEach((u) => { if (u[2] === '(whole area)') return; (p6UnitIdx[u[0] + '|' + u[1]] || (p6UnitIdx[u[0] + '|' + u[1]] = [])).push(u); }); }
+    const us = p6UnitIdx[m[0] + '|' + m[1]] || []; return us.length ? us : null;
+  }
+  // Week target (units) spread over the villas / buildings that still have work: the most advanced first, so they are finished before new ones start.
+  function wkP6Plan(r, us) {
+    const open = us.filter((u) => u[7] > 0.5 && u[3] > 0).map((u) => ({ n: u[2], bu: u[3], eu: u[4], rem: u[7], p: u[4] / u[3] })).sort((a, b) => b.p - a.p || a.rem - b.rem);
+    let la = Math.max(0, r.a * WK.T), lb = Math.max(0, r.b * WK.T);
+    open.forEach((u) => { u.a = Math.min(u.rem, la); la -= u.a; u.b = Math.min(u.rem, lb); lb -= u.b; });
+    return { open, done: us.length - open.length };
+  }
+  function wkP6Panel(r, us, box) {
+    const pl = wkP6Plan(r, us), N = 40; let limit = N;
+    const draw = () => {
+      box.replaceChildren();
+      box.append(el('p', null, 'From the P6 export: ' + pl.open.length + ' of ' + us.length + ' ' + (r.area === 'Buildings' ? 'buildings' : 'villas') + ' still have work (' + pl.done + ' complete). Plan A needs ' + nf(r.a * WK.T) + ' units this week and Plan B ' + nf(r.b * WK.T) + '; they are given to the most advanced first so those finish before new ones start.'));
+      const trs = pl.open.slice(0, limit).map((u, i) => { const tr = el('tr'); tr.append(td(String(i + 1), 'n'), td(u.n), pctCell(u.p), td(nf(u.rem), 'n'), td(u.a > 0 ? '+' + nf(u.a) : '–', 'n'), td(u.a > 0 ? pf(Math.min(1, (u.eu + u.a) / u.bu)) : '–', 'n'), td(u.b > 0 ? '+' + nf(u.b) : '–', 'n')); return tr; });
+      const w = el('div', 'pv-tbl-w'), tb = el('table', 'pv-tbl'), th = el('thead'), hr = el('tr');
+      ['#', r.area === 'Buildings' ? 'Building' : 'Villa', 'Done now', 'Remaining units', 'Plan A units', 'Done after A', 'Plan B units'].forEach((x, i) => hr.append(el('th', i === 0 || i >= 3 ? 'n' : '', x)));
+      th.append(hr); const body = el('tbody'); trs.forEach((x) => body.append(x)); tb.append(th, body); w.append(tb); box.append(w);
+      if (pl.open.length > limit) { const mo = el('div', 'more'); const b2 = el('button', null, 'Show all ' + pl.open.length); b2.type = 'button'; b2.addEventListener('click', () => { limit = pl.open.length; draw(); }); mo.append(pl.open.length - limit + ' more · ', b2); box.append(mo); }
+    };
+    draw();
+  }
+
   // ---------- this week: earned value targets with % done, breakdown and tick boxes ----------
   // Figures come from the Management Tracking dashboard's own calculations (same numbers as its Weekly targets tab):
   // Plan A = recovery plan for the week; Plan B = plan plus the shortfall to date (made up in the week after the last report).
@@ -1714,7 +1833,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   const dm = (iso) => { const d = new Date(iso + 'T00:00:00'); return d.getDate() + ' ' + d.toLocaleString('en', { month: 'short' }); };
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const wkKey = (w) => 'sbarc-week-' + w.month + '-' + w.wk;
-  function wkReset() { WK = null; wkSel = null; wkOpenItems.clear(); $('wk').hidden = true; $('wk-in').replaceChildren(el('div', 'wk-empty', "Loading this week's targets…")); }
+  function wkReset() { WK = null; p6UnitIdx = null; wkOpenP6.clear(); wkSel = null; wkOpenItems.clear(); $('wk').hidden = true; $('wk-in').replaceChildren(el('div', 'wk-empty', "Loading this week's targets…")); }
   function wkOpen() {
     if (!session) return;
     const f = frames.p02b || (() => { const n = makeFrame('p02b'); n.hidden = current !== 'p02b'; return n; })();
@@ -1844,12 +1963,18 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
         const t = el('div', 't'); t.append(el('b', null, r.activity), el('small', null, r.area + ' · now ' + pc1(r.start) + '% · finish ' + dmy(r.finish) + (r.start < 0 ? ' · revised programme is above the old budget, so % done starts below zero' : '')));
         let exp = null;
         if (r.items.length) { exp = el('button', 'wk-exp', 'Breakdown (' + r.items.length + ')'); exp.type = 'button'; exp.setAttribute('aria-expanded', String(wkOpenItems.has(r.activity))); t.append(exp); }
+        const p6u = wkP6Units(r); let exp6 = null;
+        if (p6u) { exp6 = el('button', 'wk-exp wk-p6', 'By ' + (r.area === 'Buildings' ? 'building' : 'villa') + ' (P6)'); exp6.type = 'button'; exp6.setAttribute('aria-expanded', String(wkOpenP6.has(r.activity))); t.append(exp6); }
         const pb = pctBox(r.activity + ' % done', (v) => { const o = wkLoad(w); r.items.forEach((x) => { delete o.i[x.id]; }); delete o.n[r.activity]; if (v == null) delete o.a[r.activity]; else o.a[r.activity] = v; wkSave(w, o); wkUpdate(pb.inp); }, r.start);
         const na = el('div', 'num na'); na.append(el('small', null, 'Target A'), pc1(r.tA) + '%');
         const nb = el('div', 'num nb'); nb.append(el('small', null, 'Target B'), pc1(r.tB) + '%');
         const ng = el('div', 'num gain');
         row.append(tk, t, pb.wrap, na, nb, ng); list.append(row);
         const ref = { r, row, tk, inp: pb.inp, ng, items: [] }; refs.push(ref);
+        if (p6u) {
+          const box3 = el('div', 'wk-p6box'); box3.hidden = !wkOpenP6.has(r.activity); list.append(box3); if (!box3.hidden) wkP6Panel(r, p6u, box3);
+          exp6.addEventListener('click', () => { const open = box3.hidden; box3.hidden = !open; exp6.setAttribute('aria-expanded', String(open)); if (open) { wkOpenP6.add(r.activity); wkP6Panel(r, p6u, box3); } else wkOpenP6.delete(r.activity); });
+        }
         if (r.items.length) {
           const box2 = el('div', 'wk-items'); box2.hidden = !wkOpenItems.has(r.activity); list.append(box2);
           let limit = 25;

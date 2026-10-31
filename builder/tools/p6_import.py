@@ -60,6 +60,16 @@ def parse(path):
 def r0(x):
     x = round(x); return 0 if x == 0 else x  # avoid -0
 
+def unit_map(groups, dash_activities):
+    """Dashboard activity -> [group index, area index] for the activities that sit on villas / buildings (their units are listed in the This week breakdown)."""
+    gi = {g['n']: i for i, g in enumerate(groups)}; out = {}
+    for act in dash_activities:
+        base, _, area = act['activity'].partition(' — ')
+        if area and base in GROUP_OF and GROUP_OF[base] in gi:
+            names = [x['n'] for x in groups[gi[GROUP_OF[base]]]['areas']]
+            if area in names: out[act['activity']] = [gi[GROUP_OF[base]], names.index(area)]
+    return out
+
 def ev_rows(groups, dash_activities, week_end):
     """Exact earned labor units per dashboard activity from the P6 group / area rows."""
     byname = {g['n']: g for g in groups}
@@ -106,7 +116,7 @@ def main():
         for a in g['areas']: a.pop('_pseudo', None)
     doc = {'date': args.date, 'week_end': we, 'file': args.name or os.path.basename(args.xlsx), 'total': total,
            'groups': groups, 'units': [[r0(x) if isinstance(x, float) else x for x in u] for u in units], 'names': names,
-           'acts': [[u, i, n] + [r0(x) for x in rest] for u, i, n, *rest in acts], 'actuals': rows}
+           'acts': [[u, i, n] + [r0(x) for x in rest] for u, i, n, *rest in acts], 'actuals': rows, 'amap': unit_map(groups, dash)}
     for g in groups:
         for a in g['areas']:
             for k in ('bc', 'ec', 'rc', 'bu', 'eu', 'prev', 'wk', 'rem'): a[k] = r0(a[k])
