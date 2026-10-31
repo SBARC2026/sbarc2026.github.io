@@ -43,3 +43,11 @@ GitHub Pages republishes https://sbarc2026.github.io/ within a few minutes of th
 ## 5. Report
 One or two lines: published or no change, the status date, and any dashboard that failed to download.
 Never print the password or any dashboard figures in the report. Never commit builder/_data.
+
+## Weekly Primavera (P6) export
+When a new "This Week" P6 export (.xlsx) arrives, convert it before step 3 (build). It replaces the previous week's file:
+`SBARC_PASSWORD='<password>' python3 builder/tools/p6_import.py <export.xlsx> --date <data date YYYY-MM-DD> [--week-end <plan Friday>] [--name "<file title>"]`
+This writes `builder/p6/p6.bin` (encrypted with the portal password; the repository is public, never commit the readable figures).
+The build then (a) sets the earned value of that reporting week in Management Tracking from the export, for all 81 activities, unless the dashboard
+already holds a later week, and (b) shows the Primavera tab (overview charts, trade groups, villas and buildings, activity list).
+Commit `builder/p6/p6.bin` together with `docs/`. The daily scheduled rebuild keeps using the committed file.

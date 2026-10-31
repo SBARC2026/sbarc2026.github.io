@@ -113,11 +113,34 @@ def inline_assets(dash, o):
         return f'data:{mt};base64,' + b64(hits[0])
     return o
 
+P6_FILE = os.path.join(B, 'p6', 'p6.bin')
+_p6 = []
+def p6_data():
+    """Weekly Primavera export (builder/p6/p6.bin, encrypted with the portal password; see tools/p6_import.py). None if absent."""
+    if _p6: return _p6[0]
+    out = None
+    if os.path.exists(P6_FILE):
+        tmp = os.path.join(DATA, 'p6.json')
+        os.makedirs(DATA, exist_ok=True)
+        subprocess.run(['node', os.path.join(B, 'decrypt.js'), P6_FILE, os.environ['SBARC_PASSWORD'], tmp], check=True)
+        out = json.loads(rd(tmp)); os.remove(tmp)
+    _p6.append(out)
+    return out
+
+def apply_p6(dash, data):
+    """Management Tracking: the P6 export sets the earned value of its reporting week, unless the dashboard already holds a later week."""
+    p6 = p6_data()
+    if dash != 'p02b' or not p6 or 'actuals' not in data: return data
+    we = p6['week_end']
+    if any(r.get('week_end', '') > we for r in data['actuals']): return data
+    data['actuals'] = [r for r in data['actuals'] if r.get('week_end') != we] + p6['actuals']
+    return data
+
 def dash_frame(dash, glass=False):
     """glass=True: the site version (glass theme on by default); False: the PDF version (original look)."""
     page = doc(f'{DATA}/{dash}/files/index.html.json')['text']
     data = {name: json.loads(rd(blob_path(dash, blob_id(meta['source']['url'])))) for name, meta in datasets(dash).items()}
-    data = inline_assets(dash, data)
+    data = apply_p6(dash, inline_assets(dash, data))
     pp = f'{DATA}/{dash}/dash/params.json'
     params = doc(pp) if os.path.exists(pp) else {}
     pre = '<script>window.__DATA__=' + js_json(data) + ';window.__PARAMS__=' + js_json(params) + ';</script>'
@@ -231,7 +254,10 @@ def build():
     # Site explorer tab removed at the owner's request (28-10-2026). To bring it back, add
     # {'id': 'explorer', 'title': 'Site explorer', 'native': True} to tabs and 'explorer': explorer_data(status) to the payload.
     tabs = [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS] + [{'id': 'week', 'title': 'This week', 'native': True}]
+    p6 = p6_data()
+    if p6: tabs.append({'id': 'p6', 'title': 'Primavera', 'native': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
+    if p6: payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
     tmp = os.path.join(B, '_data', 'payload.json')
     with open(tmp, 'w', encoding='utf-8') as f: json.dump(payload, f, ensure_ascii=False, separators=(',', ':'))
     vault_p = os.path.join(B, '_data', 'vault.json')

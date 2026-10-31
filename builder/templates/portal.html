@@ -476,6 +476,79 @@
   :root[data-theme="glass"] .wk-items{background:rgba(255,255,255,.025)}
   :root[data-theme="glass"] .wk-bar{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
 
+
+  /* ================= PRIMAVERA (P6 weekly export: charts + data) ================= */
+  .pv{position:absolute;inset:0;overflow-y:auto;background:var(--bg)}
+  .pv-in{max-width:1240px;margin:0 auto;padding:20px max(16px,3vw) 44px;display:flex;flex-direction:column;gap:16px}
+  .pv-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+  .pv-eb{font:500 11px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+  .pv-h{margin:4px 0 0;font:800 40px/1 var(--disp);font-stretch:72%}
+  .pv-sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:64em}
+  .pv-seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;flex-wrap:wrap}
+  .pv-seg button{border:0;background:var(--panel);padding:8px 15px;font-size:13px;cursor:pointer;color:var(--muted)}
+  .pv-seg button[aria-pressed="true"]{background:#0C1D38;color:#fff}
+  .pv-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr));gap:12px}
+  .pv-kpi,.pv-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;min-width:0}
+  .pv-kpi{display:flex;flex-direction:column;gap:6px}
+  .pv-kpi span{font:600 11px/1.2 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .pv-kpi b{font:800 34px/1 var(--disp);font-stretch:74%}
+  .pv-kpi small{font-size:12.5px;color:var(--muted)}
+  .pv-kpi .up{color:var(--ok);font-weight:600}
+  .pv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:12px}
+  .pv-card h3{margin:0 0 4px;font:700 15px var(--body)}
+  .pv-card > p{margin:0 0 12px;font-size:12.5px;color:var(--muted)}
+  .pv-bars{display:flex;flex-direction:column;gap:7px}
+  .pv-bar{display:grid;grid-template-columns:minmax(90px,200px) minmax(0,1fr) max-content;gap:10px;align-items:center;font-size:12.5px;border:0;background:none;padding:0;text-align:left;color:inherit;cursor:default;font-family:inherit}
+  button.pv-bar{cursor:pointer}
+  button.pv-bar:hover .pv-l{color:var(--accent)}
+  .pv-l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pv-t{height:12px;border-radius:6px;background:color-mix(in srgb,var(--accent) 14%,var(--chip));overflow:hidden;position:relative}
+  .pv-t i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;background:var(--accent)}
+  .pv-t i.ok{background:var(--ok)}.pv-t i.warn{background:var(--warn)}.pv-t i.rest{left:auto;right:0;background:color-mix(in srgb,var(--warn) 55%,transparent)}
+  .pv-v{font:500 12px var(--mono);text-align:right;color:var(--muted);white-space:nowrap}
+  .pv-v b{color:var(--fg);font-weight:600}
+  .pv-hist{display:flex;align-items:flex-end;gap:6px;height:170px;padding-top:8px}
+  .pv-hist div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%;font:500 11px var(--mono);color:var(--muted)}
+  .pv-hist i{display:block;width:100%;border-radius:5px 5px 0 0;background:var(--accent);min-height:2px}
+  .pv-hist b{color:var(--fg);font-weight:600}
+  .pv-donut{width:104px;height:104px;border-radius:50%;flex:none;display:grid;place-items:center}
+  .pv-donut::after{content:attr(data-v);width:76px;height:76px;border-radius:50%;background:var(--paper,var(--panel));display:grid;place-items:center;font:800 20px var(--disp);font-stretch:80%}
+  .pv-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .pv-note{font-size:12.5px;color:var(--muted);border:1px dashed var(--line);border-radius:12px;padding:10px 14px}
+  .pv-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .pv-tools input,.pv-tools select{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit;min-width:0}
+  .pv-tools input[type=search]{flex:1 1 220px}
+  .pv-tbl-w{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:auto}
+  .pv-tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .pv-tbl th{position:sticky;top:0;background:var(--chip);font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap;cursor:pointer;user-select:none}
+  .pv-tbl th.n,.pv-tbl td.n{text-align:right;font-variant-numeric:tabular-nums}
+  .pv-tbl th[aria-sort]::after{content:" ▲";font-size:9px}.pv-tbl th[aria-sort=descending]::after{content:" ▼"}
+  .pv-tbl td.n{white-space:nowrap}.pv-tbl td{padding:8px 12px;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);vertical-align:top}
+  .pv-tbl tr:hover td{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+  .pv-tbl tr.sub td{background:color-mix(in srgb,var(--chip) 60%,transparent);color:var(--muted);font-size:12.5px}
+  .pv-tbl tr.sub td:first-child{padding-left:34px}
+  .pv-tbl tfoot td{font-weight:700;background:var(--chip);border-top:2px solid var(--line)}
+  .pv-tbl .nm{max-width:420px}
+  .pv-tbl .go{border:0;background:none;color:var(--accent);cursor:pointer;font:inherit;padding:0;text-align:left}
+  .pv-tbl .tg{border:0;background:none;cursor:pointer;color:var(--muted);width:22px;padding:0;font-size:11px}
+  .pv-pg{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font:500 12px var(--mono);color:var(--muted)}
+  .pv-pg button{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:12.5px}
+  .pv-pg button:disabled{opacity:.4;cursor:default}
+  .pv-mini{display:inline-block;width:56px;height:6px;border-radius:3px;background:color-mix(in srgb,var(--accent) 16%,var(--chip));vertical-align:middle;margin-right:6px;position:relative;overflow:hidden}
+  .pv-mini i{position:absolute;left:0;top:0;bottom:0;background:var(--accent)}
+  :root[data-theme="glass"] .pv-kpi,:root[data-theme="glass"] .pv-card,:root[data-theme="glass"] .pv-tbl-w{background:var(--card);border-color:var(--line);box-shadow:var(--shadow);backdrop-filter:var(--blur);-webkit-backdrop-filter:var(--blur);border-radius:18px}
+  :root[data-theme="glass"] .pv-seg button,:root[data-theme="glass"] .pv-tools input,:root[data-theme="glass"] .pv-tools select,:root[data-theme="glass"] .pv-pg button{background:rgba(255,255,255,.05);border-color:var(--line)}
+  :root[data-theme="glass"] .pv-seg button[aria-pressed="true"]{background:var(--active-bg);color:#F2FAFF;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 0 0 1px var(--active-line)}
+  :root[data-theme="glass"] .pv-tbl th{background:#101D35;color:#B9C6D7}
+  :root[data-theme="glass"] .pv-tbl tfoot td{background:#101D35}
+  :root[data-theme="glass"] .pv-h{font-weight:700;font-stretch:80%}
+  :root[data-theme="glass"] .pv-donut::after{background:#0F1B30}
+  @media (max-width:700px){.pv-h{font-size:30px}.pv-bar{grid-template-columns:minmax(70px,104px) minmax(0,1fr) max-content;gap:8px}.pv-v{font-size:11px}.pv-v small{display:none}
+    .pv-seg{display:flex;width:100%;flex-wrap:nowrap}.pv-seg button{flex:1;padding:8px 4px;font-size:12px;white-space:nowrap}
+    .pv-kpis{grid-template-columns:1fr 1fr}.pv-kpi b{font-size:26px}.pv-kpi:first-child{grid-column:1/-1}.pv-card{padding:12px}.pv-grid{grid-template-columns:minmax(0,1fr)}}
+  @media print{body.print-pv .app{position:static!important;display:block!important}body.print-pv .side,body.print-pv .topbar,body.print-pv .stage>iframe,body.print-pv .pv-tools,body.print-pv .pv-seg,body.print-pv .pv-pg{display:none!important}
+    body.print-pv .stage,body.print-pv .pv{position:static!important;overflow:visible!important;height:auto!important}body.print-pv .pv-card,body.print-pv .pv-kpi{break-inside:avoid}}
+
   /* ================= PRINT (explorer card) ================= */
   @media print{
     body.print-xp{background:#fff}
@@ -661,6 +734,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       <div class="xp-panel" id="xp-panel" aria-live="polite"></div>
     </div>
     <div class="wk" id="wk" hidden><div class="wk-in" id="wk-in"><div class="wk-empty">Loading this week's targets…</div></div></div>
+    <div class="pv" id="pv" hidden><div class="pv-in" id="pv-in"></div></div>
   </main>
   </div>
 </section>
@@ -779,7 +853,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const tabs = $('tabs'); tabs.replaceChildren();
     session.dashboards.forEach((d) => {
       const b = document.createElement('button'); b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
-      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week' };
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh);
       b.addEventListener('click', () => { show(d.id); drawer(false); }); tabs.append(b);
     });
@@ -795,7 +869,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
     session = null; current = null; secret = ''; $('up').hidden = true;
-    xpReset(); wkReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
+    xpReset(); wkReset(); pvReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -815,6 +889,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     exec: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="8" rx="2"/><rect x="13.5" y="3.5" width="7" height="5" rx="2"/><rect x="13.5" y="11.5" width="7" height="9" rx="2"/><rect x="3.5" y="14.5" width="7" height="6" rx="2"/></svg>',
     p02b: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"/><path d="M5 16l4.5-5 3.5 3 6-7"/><path d="M15 7h4v4"/></svg>',
     week: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>',
+    p6: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M4 12h13M4 18h7"/><rect x="13" y="4" width="7" height="4" rx="1.2"/><rect x="17" y="10" width="3.5" height="4" rx="1.2"/><rect x="11" y="16" width="9" height="4" rx="1.2"/></svg>',
     explorer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg>',
   };
   // sidebar: collapse on desktop, drawer on phones and tablets
@@ -837,8 +912,10 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     Object.keys(frames).forEach((k) => { frames[k].hidden = k !== id; });
     $('xp').hidden = id !== 'explorer';
     $('wk').hidden = id !== 'week';
+    $('pv').hidden = id !== 'p6';
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
     if (id === 'week') { $('loading').hidden = true; wkOpen(); return; }
+    if (id === 'p6') { $('loading').hidden = true; pvOpen(); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
   function makeFrame(id) {
@@ -1452,6 +1529,175 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     b.disabled = false;
   }
 
+
+  // ---------- Primavera (P6): weekly export as charts and data ----------
+  // session.p6: { date, file, total, groups:[{n, areas:[{n, pc, bc, ec, rc, bu, eu, prev, wk, rem}]}], units:[[g, area, name, bu, eu, prev, wk, rem]], names, acts:[[unit, id, name, bu, eu, prev, wk, rem]] }
+  // Units are labour units (P6 "units"); earned = Earned Value Labor Units, this week = This Week EV Unit.
+  let PV = null;
+  const nf = (n) => Math.round(n).toLocaleString('en-US');
+  const pf = (x, d) => (x * 100).toFixed(d == null ? 1 : d) + '%';
+  const tradeName = (n) => n.replace('Fixand', 'Fix and');
+  const areaName = (n) => (n === 'No VILLA NO.' ? 'Project-wide' : n);
+  const dmyIso = (s) => s ? s.slice(8, 10) + '-' + s.slice(5, 7) + '-' + s.slice(0, 4) : '';
+  function pvReset() { PV = null; $('pv').hidden = true; $('pv-in').replaceChildren(); }
+  function pvOpen() {
+    if (!PV) {
+      const P = session.p6; if (!P) { $('pv-in').replaceChildren(el('div', 'wk-empty', 'No Primavera data in this build.')); return; }
+      const flat = P.acts.map((a) => { const u = P.units[a[0]], g = P.groups[u[0]]; return { id: a[1], name: P.names[a[2]], g: tradeName(g.n), gi: u[0], t: areaName(g.areas[u[1]].n), unit: u[2], bu: a[3], eu: a[4], prev: a[5], wk: a[6], rem: a[7] }; });
+      const um = new Map();
+      P.units.forEach((u) => { if (u[2] === '(whole area)') return; const t = areaName(P.groups[u[0]].areas[u[1]].n), k = t + '|' + u[2]; let r = um.get(k); if (!r) { r = { unit: u[2], t, bu: 0, eu: 0, prev: 0, wk: 0, rem: 0 }; um.set(k, r); } r.bu += u[3]; r.eu += u[4]; r.prev += u[5]; r.wk += u[6]; r.rem += u[7]; });
+      const groups = P.groups.map((g, i) => { const s = { n: tradeName(g.n), gi: i, areas: g.areas, bu: 0, eu: 0, prev: 0, wk: 0, rem: 0, bc: 0, ec: 0 }; g.areas.forEach((a) => { ['bu', 'eu', 'prev', 'wk', 'rem', 'bc', 'ec'].forEach((k) => { s[k] += a[k]; }); }); return s; });
+      PV = { P, flat, units: [...um.values()], groups, view: 'ov', tr: { q: '', sort: 'bu', dir: -1, open: new Set() }, un: { q: '', t: '', sort: 'unit', dir: 1, page: 0 }, ac: { q: '', g: '', t: '', st: '', unit: '', sort: 'id', dir: 1, page: 0 } };
+    }
+    pvRender();
+  }
+  const pvPct = (r) => (r.bu > 0 ? r.eu / r.bu : null);
+  function pvBars(rows, o) { // rows: [{label, frac, val, sub, cls, click}]
+    const box = el('div', 'pv-bars');
+    rows.forEach((r) => {
+      const b = el(r.click ? 'button' : 'div', 'pv-bar'); if (r.click) { b.type = 'button'; b.addEventListener('click', r.click); b.title = 'Show these activities'; }
+      const l = el('span', 'pv-l', r.label); l.title = r.label;
+      const t = el('span', 'pv-t'); const i = el('i', r.cls || ''); i.style.width = Math.max(0, Math.min(100, r.frac * 100)) + '%'; t.append(i);
+      const v = el('span', 'pv-v'); const bb = el('b', null, r.val); v.append(bb); if (r.sub) v.append(' ' + r.sub);
+      b.append(l, t, v); box.append(b);
+    });
+    return box;
+  }
+  function pvCard(title, sub, body) { const c = el('section', 'pv-card'); c.append(el('h3', null, title)); if (sub) c.append(el('p', null, sub)); c.append(body); return c; }
+  const pvCls = (p) => (p >= 0.95 ? 'ok' : p >= 0.5 ? '' : 'warn');
+  function pvGoActs(f) { Object.assign(PV.ac, { q: '', g: '', t: '', st: '', unit: '', page: 0 }, f); PV.view = 'ac'; pvRender(); }
+
+  function pvRender() {
+    const root = $('pv-in'), P = PV.P, T = P.total; root.replaceChildren();
+    const top = el('div', 'pv-top'), tl = el('div');
+    tl.append(el('div', 'pv-eb', 'Primavera P6 · data date ' + dmyIso(P.date) + ' · labour units'), el('h1', 'pv-h', 'Primavera tracking'),
+      el('p', 'pv-sub', 'Earned value from the weekly P6 export (' + P.file + '): the project, every trade group, each villa and building, and the activities under them.'));
+    const seg = el('div', 'pv-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'View');
+    [['ov', 'Overview'], ['tr', 'Trades'], ['un', 'Villas & buildings'], ['ac', 'Activities']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(PV.view === k)); b.addEventListener('click', () => { PV.view = k; pvRender(); }); seg.append(b); });
+    top.append(tl, seg); root.append(top);
+    ({ ov: pvOverview, tr: pvTrades, un: pvUnits, ac: pvActs })[PV.view](root);
+    $('pv').scrollTop = 0;
+  }
+
+  function pvOverview(root) {
+    const P = PV.P, T = P.total, G = PV.groups, pts = T.wk / T.bu, prevPct = T.prev / T.bu;
+    const k = el('div', 'pv-kpis');
+    const kpi = (a, b, c, cls) => { const d = el('div', 'pv-kpi'); const s = el('span', null, a), bb = el('b', null, b), sm = el('small', null, c); if (cls) sm.className = cls; d.append(s, bb, sm); return d; };
+    const dn = el('div', 'pv-kpi'); const donut = el('div', 'pv-donut'); donut.dataset.v = pf(T.eu / T.bu); donut.style.background = 'conic-gradient(var(--ok) ' + (T.eu / T.bu * 360) + 'deg,color-mix(in srgb,var(--accent) 16%,var(--chip)) 0)';
+    dn.append(el('span', null, 'Progress (labour units)'), donut, el('small', null, 'Cost-weighted ' + pf(T.pc, 2)));
+    k.append(dn, kpi('Earned units', nf(T.eu), 'of ' + nf(T.bu) + ' budgeted'), kpi('Remaining units', nf(T.rem), pf(T.rem / T.bu) + ' of the budget'),
+      kpi('This week', '+' + nf(T.wk), '+' + (pts * 100).toFixed(2) + ' pts · ' + pf(prevPct, 2) + ' → ' + pf(T.eu / T.bu, 2), 'up'),
+      kpi('Budget cost', (T.bc / 1e6).toFixed(1) + 'M', 'earned ' + (T.ec / 1e6).toFixed(1) + 'M · remaining ' + (T.rc / 1e6).toFixed(1) + 'M'));
+    root.append(k);
+    const grid = el('div', 'pv-grid');
+    const byBu = G.filter((g) => g.bu > 0).sort((a, b) => b.bu - a.bu).slice(0, 18);
+    grid.append(pvCard('Progress by trade group', 'Percent complete, largest budgets first. Click a bar to list its activities.', pvBars(byBu.map((g) => ({ label: g.n, frac: g.eu / g.bu, cls: pvCls(g.eu / g.bu), val: pf(g.eu / g.bu), sub: nf(g.bu), click: () => pvGoActs({ g: g.n }) })))));
+    const wk = G.filter((g) => Math.abs(g.wk) >= 1).sort((a, b) => b.wk - a.wk).slice(0, 14), wm = Math.max(...wk.map((g) => g.wk), 1);
+    grid.append(pvCard('Earned this week', 'Units earned since the previous report, by trade group.', pvBars(wk.map((g) => ({ label: g.n, frac: g.wk / wm, val: '+' + nf(g.wk), sub: '+' + (g.wk / T.bu * 100).toFixed(2) + ' pts', click: () => pvGoActs({ g: g.n, st: 'wk' }) })))));
+    const rm = G.filter((g) => g.rem > 0).sort((a, b) => b.rem - a.rem).slice(0, 14), rmx = Math.max(...rm.map((g) => g.rem), 1);
+    grid.append(pvCard('Remaining work', 'Units still to earn, by trade group (largest first).', pvBars(rm.map((g) => ({ label: g.n, frac: g.rem / rmx, cls: 'warn', val: nf(g.rem), sub: pf(g.rem / T.rem, 0), click: () => pvGoActs({ g: g.n }) })))));
+    const ar = {}; G.forEach((g) => g.areas.forEach((a) => { const n = areaName(a.n); const r = ar[n] || (ar[n] = { n, bu: 0, eu: 0, wk: 0, rem: 0 }); r.bu += a.bu; r.eu += a.eu; r.wk += a.wk; r.rem += a.rem; }));
+    const arr = Object.values(ar).sort((a, b) => b.bu - a.bu);
+    const sb = pvBars(arr.map((a) => ({ label: a.n, frac: a.eu / a.bu, cls: pvCls(a.eu / a.bu), val: pf(a.eu / a.bu), sub: nf(a.bu) })));
+    grid.append(pvCard('Villas, buildings and project-wide', 'Percent earned, with budget units. Project-wide is infrastructure, material delivery, approvals and the lines P6 holds at project level.', sb));
+    const vil = PV.units.filter((u) => u.t === 'Villas' && u.bu > 0), bins = new Array(10).fill(0); vil.forEach((u) => { bins[Math.min(9, Math.max(0, Math.floor(u.eu / u.bu * 10)))]++; });
+    const hm = Math.max(...bins, 1), hist = el('div', 'pv-hist');
+    bins.forEach((c, i) => { const d = el('div'); const bb = el('b', null, String(c)); const bar = el('i'); bar.style.height = (c / hm * 100 * 0.78) + '%'; if (i >= 9) bar.style.background = 'var(--ok)'; d.append(bb, bar, el('span', null, i * 10 + '–' + (i + 1) * 10)); hist.append(d); });
+    grid.append(pvCard('Villas by % complete', vil.length + ' villas, all trades combined (bars show how many sit in each 10% band).', hist));
+    const nwf = G.find((g) => /No Work Feature/i.test(g.n));
+    const sum = el('div', 'pv-note'); sum.textContent = 'Activity-level detail is in the export only for the building trades (' + nf(PV.flat.length) + ' activities). Infrastructure groups' + (nwf ? ' and “No Work Feature” (' + nf(nwf.eu) + ' earned units, ' + pf(nwf.eu / T.eu, 0) + ' of all earned units)' : '') + ' are single lines in P6, so they are shown at group level.';
+    root.append(grid, sum);
+  }
+
+  function pvSort(arr, st, get) { const d = st.dir; return arr.sort((a, b) => { const x = get(a, st.sort), y = get(b, st.sort); return (typeof x === 'string' ? x.localeCompare(y) : (x == null ? -1e18 : x) - (y == null ? -1e18 : y)) * d; }); }
+  function pvTable(cols, rows, st, rerender, foot) {
+    const w = el('div', 'pv-tbl-w'), tb = el('table', 'pv-tbl'), th = el('thead'), hr = el('tr');
+    cols.forEach((c) => { const h = el('th', c.n ? 'n' : '', c.l); if (c.k) { h.tabIndex = 0; if (st.sort === c.k) h.setAttribute('aria-sort', st.dir > 0 ? 'ascending' : 'descending'); const go = () => { if (st.sort === c.k) st.dir = -st.dir; else { st.sort = c.k; st.dir = c.n ? -1 : 1; } if (st.page != null) st.page = 0; rerender(); }; h.addEventListener('click', go); h.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); }); } hr.append(h); });
+    th.append(hr); const body = el('tbody'); rows.forEach((r) => body.append(r)); tb.append(th, body); if (foot) tb.append(foot); w.append(tb); return w;
+  }
+  const td = (txt, cls) => el('td', cls || '', txt);
+  function pctCell(p) { const c = el('td', 'n'); if (p == null) { c.textContent = '—'; return c; } const m = el('span', 'pv-mini'), i = el('i'); i.style.width = Math.max(0, Math.min(100, p * 100)) + '%'; m.append(i); c.append(m, pf(p)); return c; }
+  const wkTxt = (v) => (Math.round(v) === 0 ? '–' : (v > 0 ? '+' : '') + nf(v));
+
+  function pvTrades(root) {
+    const S = PV.tr, G = PV.groups;
+    const tools = el('div', 'pv-tools'); const inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search trade groups'; inp.value = S.q; inp.setAttribute('aria-label', 'Search trade groups');
+    tools.append(inp); const cnt = el('span', 'pv-pg'); tools.append(cnt);
+    const holder = el('div'); root.append(tools, holder);
+    const draw = () => {
+      const q = S.q.trim().toLowerCase(); const rows = pvSort(G.filter((g) => !q || g.n.toLowerCase().includes(q)), S, (g, k) => (k === 'pct' ? (g.bu > 0 ? g.eu / g.bu : null) : g[k]));
+      const trs = [];
+      rows.forEach((g) => {
+        const tr = el('tr'), open = S.open.has(g.gi), c0 = el('td'); const tg = el('button', 'tg', open ? '▼' : '▶'); tg.type = 'button'; tg.setAttribute('aria-label', (open ? 'Hide ' : 'Show ') + g.n + ' areas'); tg.addEventListener('click', () => { if (open) S.open.delete(g.gi); else S.open.add(g.gi); draw(); });
+        const nm = el('button', 'go', g.n); nm.type = 'button'; nm.addEventListener('click', () => pvGoActs({ g: g.n })); c0.append(tg, nm);
+        tr.append(c0, td(nf(g.bu), 'n'), td(nf(g.eu), 'n'), pctCell(g.bu > 0 ? g.eu / g.bu : null), td(wkTxt(g.wk), 'n'), td(nf(g.rem), 'n'), td(g.bc > 0 ? pf(g.ec / g.bc) : '—', 'n')); trs.push(tr);
+        if (open) g.areas.forEach((a) => { const s = el('tr', 'sub'); s.append(td(areaName(a.n)), td(nf(a.bu), 'n'), td(nf(a.eu), 'n'), pctCell(a.bu > 0 ? a.eu / a.bu : null), td(wkTxt(a.wk), 'n'), td(nf(a.rem), 'n'), td(a.bc > 0 ? pf(a.ec / a.bc) : '—', 'n')); trs.push(s); });
+      });
+      const T = PV.P.total, f = el('tfoot'), fr = el('tr'); fr.append(td('Project total'), td(nf(T.bu), 'n'), td(nf(T.eu), 'n'), td(pf(T.eu / T.bu, 2), 'n'), td(wkTxt(T.wk), 'n'), td(nf(T.rem), 'n'), td(pf(T.pc, 2), 'n')); f.append(fr);
+      holder.replaceChildren(pvTable([{ l: 'Trade group', k: 'n' }, { l: 'Budget units', k: 'bu', n: 1 }, { l: 'Earned', k: 'eu', n: 1 }, { l: '% complete', k: 'pct', n: 1 }, { l: 'This week', k: 'wk', n: 1 }, { l: 'Remaining', k: 'rem', n: 1 }, { l: 'Cost %', k: 'ec', n: 1 }], trs, S, draw, f));
+      cnt.textContent = rows.length + ' of ' + G.length + ' groups · ▶ opens Villas / Buildings / Project-wide';
+    };
+    inp.addEventListener('input', () => { S.q = inp.value; draw(); });
+    draw();
+  }
+
+  function pvUnits(root) {
+    const S = PV.un, tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Find a villa or building (e.g. 105)'; inp.value = S.q; inp.setAttribute('aria-label', 'Find a villa or building');
+    const sel = el('select'); [['', 'Villas and buildings'], ['Villas', 'Villas only'], ['Buildings', 'Buildings only']].forEach(([v, t]) => { const o = el('option', null, t); o.value = v; sel.append(o); }); sel.value = S.t; sel.setAttribute('aria-label', 'Type');
+    const csv = el('button', 'wk-btn', 'Download CSV'); csv.type = 'button';
+    tools.append(inp, sel, csv); const holder = el('div'), pg = el('div', 'pv-pg'); root.append(tools, holder, pg);
+    let rows = [];
+    const draw = () => {
+      const q = S.q.trim().toLowerCase();
+      rows = pvSort(PV.units.filter((u) => (u.t === 'Villas' || u.t === 'Buildings') && (!S.t || u.t === S.t) && (!q || u.unit.toLowerCase().includes(q))), S, (u, k) => (k === 'pct' ? (u.bu > 0 ? u.eu / u.bu : null) : u[k]));
+      const N = 100, pages = Math.max(1, Math.ceil(rows.length / N)); S.page = Math.min(S.page, pages - 1);
+      const trs = rows.slice(S.page * N, S.page * N + N).map((u) => { const tr = el('tr'), c = el('td'); const b = el('button', 'go', u.unit); b.type = 'button'; b.addEventListener('click', () => pvGoActs({ unit: u.unit, t: u.t })); c.append(b); tr.append(c, td(u.t), td(nf(u.bu), 'n'), td(nf(u.eu), 'n'), pctCell(u.bu > 0 ? u.eu / u.bu : null), td(wkTxt(u.wk), 'n'), td(nf(u.rem), 'n')); return tr; });
+      holder.replaceChildren(pvTable([{ l: 'Villa / building', k: 'unit' }, { l: 'Type', k: 't' }, { l: 'Budget units', k: 'bu', n: 1 }, { l: 'Earned', k: 'eu', n: 1 }, { l: '% complete', k: 'pct', n: 1 }, { l: 'This week', k: 'wk', n: 1 }, { l: 'Remaining', k: 'rem', n: 1 }], trs, S, draw));
+      pvPager(pg, S, rows.length, N, draw, 'units');
+    };
+    inp.addEventListener('input', () => { S.q = inp.value; S.page = 0; draw(); }); sel.addEventListener('change', () => { S.t = sel.value; S.page = 0; draw(); });
+    csv.addEventListener('click', () => pvCsv('SBARC P6 villas and buildings', ['Villa / building', 'Type', 'Budget units', 'Earned units', '% complete', 'This week units', 'Remaining units'], rows.map((u) => [u.unit, u.t, Math.round(u.bu), Math.round(u.eu), u.bu > 0 ? +(u.eu / u.bu * 100).toFixed(2) : '', Math.round(u.wk), Math.round(u.rem)])));
+    draw();
+  }
+  function pvPager(pg, S, n, N, draw, what) {
+    const pages = Math.max(1, Math.ceil(n / N)); pg.replaceChildren();
+    const a = el('button', null, '‹ Previous'), b = el('button', null, 'Next ›'); a.type = b.type = 'button'; a.disabled = S.page <= 0; b.disabled = S.page >= pages - 1;
+    a.addEventListener('click', () => { S.page--; draw(); $('pv').scrollTop = 0; }); b.addEventListener('click', () => { S.page++; draw(); $('pv').scrollTop = 0; });
+    pg.append(el('span', null, n ? nf(n) + ' ' + what + ' · page ' + (S.page + 1) + ' of ' + pages : 'No ' + what + ' match'), el('span'), a, b);
+  }
+  function pvCsv(name, head, rows) {
+    const q = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    const txt = '﻿' + [head, ...rows].map((r) => r.map(q).join(',')).join('\r\n');
+    const u = URL.createObjectURL(new Blob([txt], { type: 'text/csv' })); const a = document.createElement('a'); a.href = u; a.download = name + ' ' + PV.P.date + '.csv'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+  }
+
+  function pvActs(root) {
+    const S = PV.ac, P = PV.P, tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search activity ID, name or villa / building'; inp.value = S.q; inp.setAttribute('aria-label', 'Search activities');
+    const sg = el('select'); sg.setAttribute('aria-label', 'Trade group'); const o0 = el('option', null, 'All trade groups'); o0.value = ''; sg.append(o0);
+    PV.groups.filter((g) => PV.flat.some((a) => a.gi === g.gi)).forEach((g) => { const o = el('option', null, g.n); o.value = g.n; sg.append(o); }); sg.value = S.g;
+    const stt = el('select'); stt.setAttribute('aria-label', 'Type'); [['', 'Villas and buildings'], ['Villas', 'Villas'], ['Buildings', 'Buildings']].forEach(([v, t]) => { const o = el('option', null, t); o.value = v; stt.append(o); }); stt.value = S.t;
+    const ss = el('select'); ss.setAttribute('aria-label', 'Status'); [['', 'Any status'], ['wk', 'Earned this week'], ['ip', 'In progress'], ['ns', 'Not started'], ['done', 'Complete'], ['open', 'Not complete']].forEach(([v, t]) => { const o = el('option', null, t); o.value = v; ss.append(o); }); ss.value = S.st;
+    const csv = el('button', 'wk-btn', 'Download CSV'); csv.type = 'button'; tools.append(inp, sg, stt, ss, csv);
+    const chip = el('div', 'pv-pg'), holder = el('div'), pg = el('div', 'pv-pg'); root.append(tools, chip, holder, pg);
+    let rows = [];
+    const draw = () => {
+      const q = S.q.trim().toLowerCase();
+      rows = PV.flat.filter((a) => (!S.g || a.g === S.g) && (!S.t || a.t === S.t) && (!S.unit || a.unit === S.unit) && (!q || a.id.toLowerCase().includes(q) || a.name.toLowerCase().includes(q) || a.unit.toLowerCase().includes(q)) &&
+        (!S.st || (S.st === 'wk' ? Math.abs(a.wk) >= 0.5 : S.st === 'ip' ? a.eu > 0 && a.rem > 0 : S.st === 'ns' ? a.eu <= 0 && a.bu > 0 : S.st === 'done' ? a.bu > 0 && a.rem <= 0 : a.rem > 0)));
+      pvSort(rows, S, (a, k) => (k === 'pct' ? (a.bu > 0 ? a.eu / a.bu : null) : a[k]));
+      const N = 100, pages = Math.max(1, Math.ceil(rows.length / N)); S.page = Math.min(S.page, pages - 1);
+      const trs = rows.slice(S.page * N, S.page * N + N).map((a) => { const tr = el('tr'); const nm = td(a.name, 'nm'); tr.append(td(a.id), nm, td(a.g), td(a.unit + ' · ' + a.t), td(nf(a.bu), 'n'), td(nf(a.eu), 'n'), pctCell(a.bu > 0 ? a.eu / a.bu : null), td(wkTxt(a.wk), 'n'), td(nf(a.rem), 'n')); return tr; });
+      holder.replaceChildren(pvTable([{ l: 'Activity ID', k: 'id' }, { l: 'Activity', k: 'name' }, { l: 'Trade group', k: 'g' }, { l: 'Villa / building', k: 'unit' }, { l: 'Budget', k: 'bu', n: 1 }, { l: 'Earned', k: 'eu', n: 1 }, { l: '% complete', k: 'pct', n: 1 }, { l: 'This week', k: 'wk', n: 1 }, { l: 'Remaining', k: 'rem', n: 1 }], trs, S, draw));
+      const sum = rows.reduce((s, a) => { s.bu += a.bu; s.eu += a.eu; s.wk += a.wk; s.rem += a.rem; return s; }, { bu: 0, eu: 0, wk: 0, rem: 0 });
+      chip.replaceChildren(el('span', null, 'Selection: ' + nf(sum.bu) + ' budget · ' + nf(sum.eu) + ' earned (' + (sum.bu > 0 ? pf(sum.eu / sum.bu) : '—') + ') · ' + wkTxt(sum.wk) + ' this week · ' + nf(sum.rem) + ' remaining'));
+      if (S.unit) { const c = el('button', null, 'Showing ' + S.unit + ' only · clear'); c.type = 'button'; c.addEventListener('click', () => { S.unit = ''; S.page = 0; draw(); }); chip.append(c); }
+      pvPager(pg, S, rows.length, N, draw, 'activities');
+    };
+    inp.addEventListener('input', () => { S.q = inp.value; S.page = 0; draw(); });
+    [[sg, 'g'], [stt, 't'], [ss, 'st']].forEach(([s, k]) => s.addEventListener('change', () => { S[k] = s.value; S.page = 0; draw(); }));
+    csv.addEventListener('click', () => pvCsv('SBARC P6 activities', ['Activity ID', 'Activity', 'Trade group', 'Villa / building', 'Type', 'Budget units', 'Earned units', '% complete', 'This week units', 'Remaining units'], rows.map((a) => [a.id, a.name, a.g, a.unit, a.t, Math.round(a.bu), Math.round(a.eu), a.bu > 0 ? +(a.eu / a.bu * 100).toFixed(2) : '', Math.round(a.wk), Math.round(a.rem)])));
+    draw();
+  }
 
   // ---------- this week: earned value targets with % done, breakdown and tick boxes ----------
   // Figures come from the Management Tracking dashboard's own calculations (same numbers as its Weekly targets tab):
