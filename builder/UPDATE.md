@@ -51,3 +51,8 @@ This writes `builder/p6/p6.bin` (encrypted with the portal password; the reposit
 The build then (a) sets the earned value of that reporting week in Management Tracking from the export, for all 81 activities, unless the dashboard
 already holds a later week, and (b) shows the Primavera tab (overview charts, trade groups, villas and buildings, activity list).
 Commit `builder/p6/p6.bin` together with `docs/`. The daily scheduled rebuild keeps using the committed file.
+
+## Weekly P6 schedule (.xer) for the Gantt
+`SBARC_PASSWORD='<password>' python3 builder/tools/xer_import.py <schedule.xer>` writes `builder/p6/gantt.bin` (encrypted). The build copies it to
+`docs/p6/gantt.bin`, and the Primavera tab's Gantt fetches and decrypts it when opened (WBS tree, activity bars from actual / forecast dates, baseline = target
+dates, critical = total float <= 0, % complete from the weekly export's earned units where the activity ID matches). Commit `builder/p6/gantt.bin` with `docs/`.

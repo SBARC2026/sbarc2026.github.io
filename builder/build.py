@@ -136,21 +136,6 @@ def apply_p6(dash, data):
     data['actuals'] = [r for r in data['actuals'] if r.get('week_end') != we] + p6['actuals']
     return data
 
-def gantt_rows():
-    """Schedule bars for the Primavera tab: the recovery plan's start / finish per activity (the P6 export itself carries no dates),
-    with the latest earned units per activity so each bar can show its % complete."""
-    plan = blob_rows('p02b', 'recovery_plan')
-    acts = {a['activity']: a for a in blob_rows('p02b', 'activities')}
-    ev = apply_p6('p02b', {'actuals': blob_rows('p02b', 'actuals')})['actuals']
-    last = max(r['week_end'] for r in ev)
-    earned = {r['activity']: r['earned_to_date'] for r in ev if r['week_end'] == last}
-    out = []
-    for r in plan:
-        a = acts.get(r['activity'], {})
-        out.append({k: r.get(k) for k in ('activity', 'area', 'front', 'step', 'logic', 'start', 'finish', 'rate_finish', 'group')} |
-                   {'bu': a.get('budget', 0), 'eu': earned.get(r['activity'], 0)})
-    return out
-
 def dash_frame(dash, glass=False):
     """glass=True: the site version (glass theme on by default); False: the PDF version (original look)."""
     page = doc(f'{DATA}/{dash}/files/index.html.json')['text']
@@ -272,7 +257,12 @@ def build():
     p6 = p6_data()
     if p6: tabs.append({'id': 'p6', 'title': 'Primavera', 'native': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
-    if p6: payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'} | {'gantt': gantt_rows()}
+    if p6:
+        payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
+        g = os.path.join(B, 'p6', 'gantt.bin')  # P6 schedule (.xer), encrypted; fetched by the browser when the Gantt opens
+        if os.path.exists(g):
+            os.makedirs(f'{SITE}/p6', exist_ok=True); shutil.copy(g, f'{SITE}/p6/gantt.bin')
+            payload['p6']['g'] = {'file': 'p6/gantt.bin', 'v': hashlib.sha256(rd(g, 'rb')).hexdigest()[:10]}
     tmp = os.path.join(B, '_data', 'payload.json')
     with open(tmp, 'w', encoding='utf-8') as f: json.dump(payload, f, ensure_ascii=False, separators=(',', ':'))
     vault_p = os.path.join(B, '_data', 'vault.json')
