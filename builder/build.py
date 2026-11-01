@@ -133,7 +133,9 @@ def apply_p6(dash, data):
     if dash != 'p02b' or not p6 or 'actuals' not in data: return data
     we = p6['week_end']
     if any(r.get('week_end', '') > we for r in data['actuals']): return data
-    data['actuals'] = [r for r in data['actuals'] if r.get('week_end') != we] + p6['actuals']
+    # P6 rows win over any dashboard row for the same activity and week (older P6 weeks are kept in p6.bin and may also be in the dashboard)
+    mine = {(r['activity'], r['week_end']) for r in p6['actuals']}
+    data['actuals'] = [r for r in data['actuals'] if (r.get('activity'), r.get('week_end')) not in mine] + p6['actuals']
     return data
 
 def dash_frame(dash, glass=False):

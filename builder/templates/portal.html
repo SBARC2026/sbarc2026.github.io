@@ -484,6 +484,8 @@
   .pv-eb{font:500 11px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
   .pv-h{margin:4px 0 0;font:800 40px/1 var(--disp);font-stretch:72%}
   .pv-sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:64em}
+  .wk-rev{margin:6px 0 22px}.wk-rev .pv-kpis,.wk-rev .pv-grid{margin-top:12px}.wk-rev .pv-tbl .nm small{color:var(--muted);font-size:11.5px}
+  .wk-rev .wk-nav{gap:8px;flex-wrap:wrap;max-width:100%}.wk-rev .wk-nav select{min-width:0;max-width:100%}@media (max-width:700px){.wk-rev .wk-nav{width:100%}.wk-rev .wk-nav select{flex:1}}.pv-bar .pv-t i.ok{background:var(--ok)}
   .pv-top-r{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
   .pv-pl{position:absolute;top:-2px;bottom:-2px;width:2px;margin-left:-1px;background:var(--fg);opacity:.85;border-radius:1px}
   .pv-meas .pv-t{height:10px;margin:4px 0}.pv-meas small.bad{color:var(--nok);font-weight:600}
@@ -626,6 +628,7 @@
   .wk-nav{display:flex;align-items:center;gap:6px}
   .wk-nav button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer}
   .wk-nav button:disabled{opacity:.4;cursor:default}
+  @media (max-width:700px){.wk-nav{width:100%}.wk-nav select{flex:1;min-width:0}}
   .wk-nav select{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:7px 12px;font-size:13px}
   .wk-meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:12px}
   .wk-m{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
@@ -1976,7 +1979,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
         const d = f.contentWindow.dash, g = (k) => d.data(k).data;
         const wt = g('weekly_totals'), la = (g('latest_actual') || [])[0];
         const weeks = []; const seen = {};
-        wt.filter((r) => r.scope === 'All').forEach((r) => { const k = r.month + '|' + r.wk; if (!seen[k]) { seen[k] = 1; weeks.push({ month: r.month, wk: r.wk, from: r.from, to: r.to, pts: r.pts }); } });
+        wt.filter((r) => r.scope === 'All').forEach((r) => { const k = r.month + '|' + r.wk; if (!seen[k]) { seen[k] = 1; weeks.push({ month: r.month, wk: r.wk, from: r.from, to: r.to, pts: r.pts, act: r.act_pts }); } });
         const T = g('activities').reduce((s, r) => s + Number(r.budget), 0);
         const act = {}; g('activities').forEach((r) => { act[r.activity] = { budget: Number(r.budget), e0: Number(r.earned) }; });
         g('actuals').forEach((r) => { if (r.week_end === la.date && act[r.activity]) act[r.activity].er = Number(r.earned_to_date); });
@@ -2055,6 +2058,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       meters.append(m); mref.push({ tot, val, tline, fl, c1, c2 });
     });
     box.append(meters);
+    wkReview(box);
 
     const tools = el('div', 'wk-tools'); const counts = el('div', 'wk-counts');
     const seg = el('div', 'seg'); [['all', 'All'], ['open', 'Not started'], ['p', 'Partly'], ['y', '✓'], ['n', '✗']].forEach(([k, l]) => { const b = el('button', null, l); b.type = 'button'; b.setAttribute('aria-pressed', String(wkFilter === k)); b.addEventListener('click', () => { wkFilter = k; wkRender(); }); seg.append(b); });
@@ -2156,6 +2160,70 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       });
     }
     wkUpdate();
+  }
+  // ----- This week: last reported weeks, target against achieved (shortfalls and top contributors) -----
+  const wkR = { wi: null, m: 'u' };
+  function wkReviewModel(wi, m) {
+    const w = WK.weeks[wi], T = WK.T, P = session.p6;
+    if (!WK.waIdx) { WK.waIdx = {}; WK.wa.forEach((q) => { WK.waIdx[q.activity + '|' + q.month] = q; }); }
+    const costOK = !!(P && P.cmap && w.to === P.week_end), Tc = costOK ? P.total.bc : 0;
+    const rows = [];
+    WK.wa.filter((r) => r.month === w.month && r[w.wk + '_act_pts'] != null).forEach((r) => {
+      const since = r[w.wk + '_act_since'] || w.from; let planPts = 0;
+      WK.weeks.forEach((x) => { if (x.from >= since && x.to <= w.to) { const q = WK.waIdx[r.activity + '|' + x.month]; if (q) planPts += q[x.wk + '_pts'] || 0; } });
+      const o = { since, activity: r.activity, group: r.group, area: r.area, planU: planPts * T, achU: r[w.wk + '_act_pts'] * T, plan: planPts, ach: r[w.wk + '_act_pts'] };
+      if (m === 'c') {
+        const cm = costOK && P.cmap[r.activity]; if (!cm) return;
+        const ar = cm[1] >= 0 ? [P.groups[cm[0]].areas[cm[1]]] : P.groups[cm[0]].areas;
+        const bc = ar.reduce((s, a) => s + a.bc, 0), bu = ar.reduce((s, a) => s + a.bu, 0), ach = ar.reduce((s, a) => s + a.ec - a.prevc, 0);
+        o.plan = bu > 0 ? o.planU * (bc / bu) / Tc : 0; o.ach = ach / Tc;
+      }
+      o.short = Math.max(0, o.plan - o.ach); rows.push(o);
+    });
+    return { w, rows, costOK };
+  }
+  function wkReview(box) {
+    const rep = WK.weeks.map((x, i) => ({ x, i })).filter((o) => o.x.wk !== 'month' && o.x.from && o.x.act != null);
+    if (!rep.length) return;
+    if (wkR.wi == null || !rep.some((o) => o.i === wkR.wi)) wkR.wi = rep[rep.length - 1].i;
+    const sec = el('section', 'wk-rev'); box.append(sec);
+    const draw = () => {
+      sec.replaceChildren();
+      let M = wkReviewModel(wkR.wi, wkR.m); if (wkR.m === 'c' && !M.costOK) { wkR.m = 'u'; M = wkReviewModel(wkR.wi, 'u'); }
+      const w = M.w, rows = M.rows, c = wkR.m === 'c', unit = c ? 'cost' : 'man-hours', since = rows.length ? rows[0].since : null;
+      const top = el('div', 'wk-top'), tl = el('div');
+      tl.append(el('div', 'wk-eb', 'Reported week · ' + dm(w.from) + ' – ' + dm(w.to) + ' · ' + unit), el('h2', 'wk-h', 'Target vs achieved'),
+        el('p', 'wk-sub', 'What the week was meant to earn against what was reported: the shortfalls, and the activities that delivered most. Points are % of the total project ' + unit + '.' + (since && since < w.from ? ' No report in between, so the target and the achievement both cover ' + dm(since) + ' – ' + dm(w.to) + '.' : '') + (c ? ' Planned cost is estimated: planned man-hours at each activity\'s average cost per man-hour in P6.' : '')));
+      const nav = el('div', 'wk-nav'), sel = document.createElement('select'); sel.setAttribute('aria-label', 'Reported week');
+      rep.forEach((o) => { const op = document.createElement('option'); op.value = o.i; op.textContent = MON[o.x.month].slice(0, 3) + ' ' + o.x.wk.toUpperCase() + ' · ' + dm(o.x.from) + '–' + dm(o.x.to); if (o.i === wkR.wi) op.selected = true; sel.append(op); });
+      sel.addEventListener('change', () => { wkR.wi = Number(sel.value); draw(); });
+      const ms = el('div', 'pv-seg'); [['u', 'Man-hours'], ['c', 'Cost']].forEach(([k, l]) => { const b = el('button', null, l); b.type = 'button'; b.setAttribute('aria-pressed', String(wkR.m === k)); const ok = k === 'u' || wkReviewModel(wkR.wi, 'u').costOK; if (!ok) { b.disabled = true; b.title = 'Cost is available for the latest Primavera week only'; } b.addEventListener('click', () => { wkR.m = k; draw(); }); ms.append(b); });
+      nav.append(sel, ms); top.append(tl, nav); sec.append(top);
+      const plan = rows.reduce((s, r) => s + r.plan, 0), ach = rows.reduce((s, r) => s + r.ach, 0), short = rows.reduce((s, r) => s + r.short, 0);
+      const kp = el('div', 'pv-kpis'); const kpi = (a, b, s, cls) => { const d = el('div', 'pv-kpi'); const sm = el('small', cls || '', s); d.append(el('span', null, a), el('b', null, b), sm); return d; };
+      const nShort = rows.filter((r) => r.short > 1e-7).length, nMet = rows.filter((r) => r.plan > 1e-9 && r.ach >= r.plan - 1e-9).length;
+      kp.append(kpi('Target', '+' + pts(plan), 'pts for the week'), kpi('Achieved', (ach >= 0 ? '+' : '') + pts(ach), plan > 0 ? Math.round(ach / plan * 100) + '% of target' : '', ach >= plan ? 'up' : 'bad'),
+        kpi('Net gap', (ach - plan >= 0 ? '+' : '') + pts(ach - plan), 'achieved minus target', ach - plan >= 0 ? 'up' : 'bad'), kpi('Shortfalls', '−' + pts(short), nShort + ' of ' + rows.length + ' activities short', 'bad'), kpi('Target met', String(nMet), 'activities at or above target', 'up'));
+      sec.append(kp);
+      const grid = el('div', 'pv-grid');
+      const byG = {}; rows.forEach((r) => { const g = byG[r.group] || (byG[r.group] = { n: r.group, plan: 0, ach: 0, short: 0 }); g.plan += r.plan; g.ach += r.ach; g.short += r.short; });
+      const G = Object.values(byG), P2 = (v) => (v >= 0 ? '+' : '−') + pts(Math.abs(v));
+      const gs = G.filter((g) => g.short > 1e-7).sort((a, b) => b.short - a.short).slice(0, 10), gsm = Math.max(...gs.map((g) => g.short), 1e-9);
+      grid.append(pvCard('Shortfalls by group', 'Target minus achieved where an activity fell short (points), largest first. Activities that beat their target do not offset these.',
+        gs.length ? pvBars(gs.map((g) => ({ label: g.n, frac: g.short / gsm, cls: 'warn', val: '−' + pts(g.short), sub: g.plan > 0 ? Math.round(Math.max(0, g.ach) / g.plan * 100) + '% of target' : '' }))) : el('p', null, 'No shortfalls in this week.')));
+      const as = rows.filter((r) => r.short > 1e-7).sort((a, b) => b.short - a.short).slice(0, 10);
+      const tw = el('div', 'pv-tbl-w'), tb = el('table', 'pv-tbl'), th = el('thead'), hr = el('tr'); ['Activity', 'Target', 'Achieved', 'Shortfall', '% of target'].forEach((x, i) => hr.append(el('th', i ? 'n' : '', x))); th.append(hr);
+      const bd = el('tbody'); as.forEach((r) => { const tr = el('tr'); const nm = el('td', 'nm'); nm.append(r.activity, el('small', null, ' · ' + r.group)); tr.append(nm, td(pts(r.plan), 'n'), td(P2(r.ach), 'n'), td('−' + pts(r.short), 'n'), td(r.plan > 0 ? Math.round(Math.max(0, r.ach) / r.plan * 100) + '%' : '–', 'n')); bd.append(tr); }); tb.append(th, bd); tw.append(tb);
+      grid.append(pvCard('Largest shortfalls by activity', 'Top ' + as.length + ' activities furthest below target.', as.length ? tw : el('p', null, 'None.')));
+      const gc = G.filter((g) => g.ach > 1e-7).sort((a, b) => b.ach - a.ach).slice(0, 8), gcm = Math.max(...gc.map((g) => g.ach), 1e-9);
+      grid.append(pvCard('Top contributors by group', 'Points achieved this week, by activity group (share of the week\'s total in brackets).',
+        pvBars(gc.map((g) => ({ label: g.n, frac: g.ach / gcm, cls: 'ok', val: '+' + pts(g.ach), sub: ach > 0 ? '(' + Math.round(g.ach / ach * 100) + '%)' : '' })))));
+      const ac = rows.filter((r) => r.ach > 1e-7).sort((a, b) => b.ach - a.ach).slice(0, 10), acm = Math.max(...ac.map((r) => r.ach), 1e-9);
+      grid.append(pvCard('Top contributors by activity', 'The ' + ac.length + ' activities that earned the most this week; the tick marks the target.',
+        pvBars(ac.map((r) => ({ label: r.activity, frac: r.ach / acm, plan: r.plan > 0 ? Math.min(1, r.plan / acm) : null, cls: r.ach >= r.plan - 1e-9 ? 'ok' : '', val: '+' + pts(r.ach), sub: ach > 0 ? '(' + Math.round(r.ach / ach * 100) + '%)' : '' })))));
+      sec.append(grid);
+    };
+    draw();
   }
   function wkMail(w, M, st, A, B) {
     const rows = M.rows, got = rows.reduce((s, r) => s + rowGain(r, st), 0);

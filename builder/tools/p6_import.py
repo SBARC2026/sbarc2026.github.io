@@ -91,6 +91,17 @@ def unit_map(groups, dash_activities):
             if area in names: out[act['activity']] = [gi[GROUP_OF[base]], names.index(area)]
     return out
 
+def cost_map(groups, dash_activities):
+    """Dashboard activity -> [group index, area index or -1 for the whole group], for every activity with a P6 row (used for weekly cost)."""
+    gi = {g['n']: i for i, g in enumerate(groups)}; out = {}
+    for act in dash_activities:
+        name = act['activity']; base, _, area = name.partition(' - ') if False else name.partition(' — ')
+        if name in gi and not area: out[name] = [gi[name], -1]
+        elif area and base in GROUP_OF and GROUP_OF[base] in gi:
+            names = [x['n'] for x in groups[gi[GROUP_OF[base]]]['areas']]
+            if area in names: out[name] = [gi[GROUP_OF[base]], names.index(area)]
+    return out
+
 def ev_rows(groups, dash_activities, week_end):
     """Exact earned labor units per dashboard activity from the P6 group / area rows."""
     byname = {g['n']: g for g in groups}
@@ -148,7 +159,7 @@ def main():
             old = [r for r in json.load(open(tmp0)).get('actuals', []) if r['week_end'] != we]; os.remove(tmp0)
     doc = {'date': args.date, 'week_end': we, 'file': args.name or os.path.basename(args.xlsx), 'total': total,
            'groups': groups, 'units': [[r0(x) if isinstance(x, float) else x for x in u] for u in units], 'names': names,
-           'acts': [[u, i, n] + [r0(x) for x in rest] for u, i, n, *rest in acts], 'actuals': old + rows, 'amap': unit_map(groups, dash)}
+           'acts': [[u, i, n] + [r0(x) for x in rest] for u, i, n, *rest in acts], 'actuals': old + rows, 'amap': unit_map(groups, dash), 'cmap': cost_map(groups, dash)}
     os.makedirs(OUT, exist_ok=True)
     tmp = os.path.join(OUT, '.p6.json')
     with open(tmp, 'w', encoding='utf-8') as f: json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
