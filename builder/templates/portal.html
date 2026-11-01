@@ -486,7 +486,34 @@
   .pv-sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:64em}
   .wk-plan{margin-top:12px}.wk-plan .pv-tbl td:last-child{white-space:normal;min-width:200px}.wk-plan-n{font-size:12px;color:var(--muted);margin:10px 0 0}
   .pv-tip{position:fixed;z-index:200;max-width:min(360px,92vw);background:#0C1D38;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:9px 12px;font-size:12px;line-height:1.5;box-shadow:0 10px 30px rgba(0,0,0,.4);pointer-events:none}.pv-tip b{display:block;font-size:13px;margin-bottom:3px}.pv-tip .kv{display:flex;justify-content:space-between;gap:14px}.pv-tip .kv i{font-style:normal;font-family:var(--mono);white-space:nowrap}.pv-bar[tabindex]{outline-offset:2px}
-  .wk-sum{margin-top:12px}.wk-pre{white-space:pre-wrap;word-break:break-word;font:13px/1.55 var(--mono);margin:0 0 12px;user-select:text}.wk-sumbar{display:flex;gap:8px;flex-wrap:wrap}
+  .wk-sum{margin-top:14px;border:1px solid var(--line);border-radius:20px;background:var(--panel);overflow:hidden}
+  .sm-body{padding:0 0 6px}
+  .sm-head{padding:22px 26px 6px;background:linear-gradient(135deg,rgba(60,140,255,.16),rgba(120,90,255,.08) 55%,transparent)}
+  .sm-eb{font:600 11px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .sm-head h3{margin:6px 0 4px;font:800 28px/1.1 var(--disp);font-stretch:80%;letter-spacing:.01em}
+  .sm-head p{margin:0;font-size:12.5px;color:var(--muted);max-width:70ch}
+  .sm-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:16px}
+  .sm-tile{background:var(--panel);padding:14px 22px;display:flex;flex-direction:column;gap:4px}
+  .sm-tile span{font:600 10.5px/1.2 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+  .sm-tile b{font:800 30px/1 var(--disp);font-stretch:76%;font-variant-numeric:tabular-nums}
+  .sm-tile small{font-size:12px;color:var(--muted)}
+  .sm-tile.ok b{color:var(--ok)}.sm-tile.warn b{color:#E8A33A}.sm-tile.bad b{color:var(--nok)}
+  .sm-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:0 26px;padding:0 26px}
+  .sm-sec{padding:20px 26px 4px}.sm-two .sm-sec{padding:20px 0 4px}
+  .sm-h{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+  .sm-h h4{margin:0;font:700 15px var(--body)}.sm-h small{font-size:12px;color:var(--muted)}
+  .sm-tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+  .sm-t{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+  .sm-t th{position:static;text-align:left;font:600 10.5px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:10px 12px;background:rgba(127,140,170,.09);white-space:nowrap;border-bottom:1px solid var(--line)}
+  .sm-t td{padding:9px 12px;border-bottom:1px solid rgba(127,140,170,.14);vertical-align:middle}
+  .sm-t tbody tr:last-child td{border-bottom:0}.sm-t tbody tr:nth-child(even){background:rgba(127,140,170,.05)}.sm-t tbody tr:hover{background:rgba(80,150,255,.09)}
+  .sm-t .n{text-align:right;white-space:nowrap}.sm-t .rk{width:34px;color:var(--muted);font-family:var(--mono)}
+  .sm-t .nm{font-weight:600;min-width:150px}.sm-t .nm small{display:block;font-weight:400;font-size:11px;color:var(--muted)}.sm-t .fx{min-width:220px;font-size:12px;color:var(--muted)}
+  .sm-neg{color:var(--nok);font-weight:700}.sm-pos{color:var(--ok);font-weight:700}
+  .sm-pc{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}.sm-bar{display:inline-block;width:56px;height:6px;border-radius:99px;background:rgba(127,140,170,.22);overflow:hidden}.sm-bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}.sm-bar i.ok{background:var(--ok)}.sm-bar i.warn{background:#E8A33A}
+  .sm-chip{display:inline-block;padding:2px 10px;border-radius:99px;font-size:11px;font-weight:700;letter-spacing:.03em}.sm-chip.ok{background:rgba(60,190,120,.16);color:var(--ok)}.sm-chip.warn{background:rgba(232,163,58,.16);color:#E8A33A}
+  .wk-sumbar{padding:14px 26px 20px}
+  @media (max-width:700px){.sm-head,.sm-sec,.wk-sumbar,.sm-two{padding-left:14px;padding-right:14px}.sm-two .sm-sec{padding-left:0;padding-right:0}.sm-head h3{font-size:22px}.sm-tile{padding:12px 14px}}
   @media print{body.print-sum .app{position:static!important;display:block!important}body.print-sum .side,body.print-sum .topbar,body.print-sum .stage>iframe,body.print-sum .wk-nav,body.print-sum .wk-sumbar,body.print-sum .wk-meters,body.print-sum .wk-tools,body.print-sum .wk-list,body.print-sum .wk-top:first-child,body.print-sum .pv-grid,body.print-sum .pv-kpis{display:none!important}body.print-sum .stage,body.print-sum .wk{position:static!important;overflow:visible!important;height:auto!important}}
   .wk-rev{margin:6px 0 22px}.wk-rev .pv-kpis,.wk-rev .pv-grid{margin-top:12px}.wk-rev .pv-tbl .nm small{color:var(--muted);font-size:11.5px}
   .wk-rev .wk-nav{gap:8px;flex-wrap:wrap;max-width:100%}.wk-rev .wk-nav select{min-width:0;max-width:100%}@media (max-width:700px){.wk-rev .wk-nav{width:100%}.wk-rev .wk-nav select{flex:1}}.pv-bar .pv-t i.ok{background:var(--ok)}
@@ -2237,7 +2264,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const byG = {}; rows.forEach((r) => { const g = byG[r.group] || (byG[r.group] = { n: r.group, plan: 0, ach: 0, short: 0 }); g.plan += r.plan; g.ach += r.ach; g.short += r.short; });
     const G = Object.values(byG), pctOf = (a, b) => (b > 0 ? Math.round(Math.max(0, a) / b * 100) + '%' : '–');
     const L = ['SBARC – target vs achieved, ' + dmy(since && since < w.from ? since : w.from) + ' to ' + dmy(w.to) + ' (' + unit + ', points = % of total project ' + unit + ')', '',
-      'Target ' + S(plan) + ' pts · achieved ' + S(ach) + ' pts (' + pctOf(ach, plan) + ' of target) · net gap ' + S(ach - plan) + ' pts', ''];
+      'Target ' + S(plan) + ' pts · achieved ' + S(ach) + ' pts (' + pctOf(ach, plan) + ' of target)', ''];
     L.push('SHORTFALLS BY GROUP');
     const gs = G.filter((g) => g.short > 1e-7).sort((a, b) => b.short - a.short).slice(0, 8);
     gs.forEach((g, i) => L.push((i + 1) + '. ' + g.n + ': −' + pts(g.short) + ' pts (' + pctOf(g.ach, g.plan) + ' of its target)'));
@@ -2256,8 +2283,34 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       R.items.forEach((x, i) => L.push((i + 1) + '. ' + x.activity + ': make up −' + pts(x.short) + ' pts · Plan A +' + pts(x.a) + ' → Plan B +' + pts(x.b) + (x.x ? ' (×' + x.x.toFixed(1) + ')' : '') + ' · or +' + pts(x.s) + ' a week spread over the month' + (x.focus ? ' · finish first: ' + x.focus.names.join(', ') + ' (' + x.focus.n + ' of ' + x.focus.of + ' ' + x.focus.kind + '; ' + x.focus.left + ' still have work)' : ''))); } }
     if (c) L.push('', 'Planned cost is estimated from planned man-hours at each activity\'s average cost per man-hour in P6.');
     const txt = L.join('\n');
-    const box = el('section', 'pv-card wk-sum'); box.append(el('h3', null, 'Summary'));
-    const pre = el('pre', 'wk-pre'); pre.textContent = txt; box.append(pre);
+    const box = el('section', 'wk-sum'); const pre = el('div', 'sm-body');
+    const mk = (cols, rws, cls) => { const w2 = el('div', 'sm-tw'), tb = el('table', 'sm-t' + (cls ? ' ' + cls : '')), th = el('thead'), hr = el('tr'); cols.forEach((cc) => hr.append(el('th', cc.n ? 'n' : '', cc.l))); th.append(hr); const bd = el('tbody'); rws.forEach((r2) => bd.append(r2)); tb.append(th, bd); w2.append(tb); return w2; };
+    const mbar = (frac, cls) => { const s = el('span', 'sm-bar'), i2 = el('i', cls || ''); i2.style.width = Math.max(0, Math.min(100, frac * 100)) + '%'; s.append(i2); return s; };
+    const cell = (x, cls) => { const c2 = el('td', cls || ''); if (x instanceof Node) c2.append(x); else c2.textContent = x; return c2; };
+    const rk = (i) => cell(String(i + 1), 'rk');
+    const sec = (title, note, tbl) => { const s = el('section', 'sm-sec'); const h = el('div', 'sm-h'); h.append(el('h4', null, title)); if (note) h.append(el('small', null, note)); s.append(h, tbl); return s; };
+    // header band and tiles
+    const head = el('div', 'sm-head'), hl = el('div');
+    hl.append(el('span', 'sm-eb', 'Target vs achieved · ' + unit), el('h3', null, dmy(since && since < w.from ? since : w.from) + '  →  ' + dmy(w.to)), el('p', null, 'Points are % of the total project ' + unit + '.' + (c ? ' Planned cost is estimated from planned man-hours at each activity\'s average cost per man-hour in P6.' : '')));
+    head.append(hl);
+    const tiles = el('div', 'sm-tiles'); const tile = (k, v, s2, cls) => { const d = el('div', 'sm-tile' + (cls ? ' ' + cls : '')); d.append(el('span', null, k), el('b', null, v), el('small', null, s2)); return d; };
+    tiles.append(tile('Target', '+' + pts(plan), 'pts for the week'), tile('Achieved', S(ach), pctOf(ach, plan) + ' of target', ach >= plan ? 'ok' : 'warn'), tile('Shortfalls', '−' + pts(short), rows.filter((r) => r.short > 1e-7).length + ' of ' + rows.length + ' activities short', 'bad'), tile('Target met', String(rows.filter((r) => r.plan > 1e-9 && r.ach >= r.plan - 1e-9).length), 'activities at or above target', 'ok'));
+    const g2 = el('div', 'sm-two');
+    const gsm = Math.max(...gs.map((g) => g.short), 1e-9);
+    g2.append(sec('Shortfalls by group', 'largest first', mk([{ l: '#' }, { l: 'Group' }, { l: 'Target', n: 1 }, { l: 'Achieved', n: 1 }, { l: 'Short', n: 1 }, { l: '% of target', n: 1 }],
+      gs.map((g, i) => { const r2 = el('tr'); r2.append(rk(i), cell(g.n, 'nm'), cell(pts(g.plan), 'n'), cell(S(g.ach), 'n'), cell(el('span', 'sm-neg', '−' + pts(g.short)), 'n'), cell((() => { const d = el('span', 'sm-pc'); d.append(mbar(g.plan > 0 ? Math.max(0, g.ach) / g.plan : 0, 'warn'), pctOf(g.ach, g.plan)); return d; })(), 'n')); return r2; }))));
+    const gcm = Math.max(...gc.map((g) => g.ach), 1e-9);
+    g2.append(sec('Top contributors by group', 'share of the week', mk([{ l: '#' }, { l: 'Group' }, { l: 'Achieved', n: 1 }, { l: 'Share', n: 1 }],
+      gc.map((g, i) => { const r2 = el('tr'); r2.append(rk(i), cell(g.n, 'nm'), cell(el('span', 'sm-pos', '+' + pts(g.ach)), 'n'), cell((() => { const d = el('span', 'sm-pc'); d.append(mbar(g.ach / gcm, 'ok'), (ach > 0 ? Math.round(g.ach / ach * 100) : 0) + '%'); return d; })(), 'n')); return r2; }))));
+    const actRow = (r, i, kind) => { const r2 = el('tr'); const nm = el('td', 'nm'); nm.append(r.activity, el('small', null, r.group === r.activity ? '' : r.group)); r2.append(rk(i), nm);
+      if (kind === 'short') r2.append(cell(pts(r.plan), 'n'), cell(S(r.ach), 'n'), cell(el('span', 'sm-neg', '−' + pts(r.short)), 'n'), cell(pctOf(r.ach, r.plan), 'n'));
+      else r2.append(cell(pts(r.plan), 'n'), cell(el('span', 'sm-pos', '+' + pts(r.ach)), 'n'), cell(ach > 0 ? Math.round(r.ach / ach * 100) + '%' : '–', 'n'), cell(el('span', 'sm-chip ' + (r.ach >= r.plan - 1e-9 ? 'ok' : 'warn'), r.ach >= r.plan - 1e-9 ? 'Met' : 'Below'), 'n')); return r2; };
+    const sA = sec('Largest shortfalls by activity', 'furthest below target', mk([{ l: '#' }, { l: 'Activity' }, { l: 'Target', n: 1 }, { l: 'Achieved', n: 1 }, { l: 'Short', n: 1 }, { l: '% of target', n: 1 }], as.map((r, i) => actRow(r, i, 'short'))));
+    const cA = sec('Top contributors by activity', 'who delivered the week', mk([{ l: '#' }, { l: 'Activity' }, { l: 'Target', n: 1 }, { l: 'Achieved', n: 1 }, { l: 'Share', n: 1 }, { l: 'Status', n: 1 }], ac.map((r, i) => actRow(r, i, 'ach'))));
+    pre.append(head, tiles, g2, sA, cA);
+    if (!c) { const R = wkRecovery(M, rows); if (R && R.items.length) { const pl = R.items; pre.append(sec('Plan to recover the shortfalls', 'week ' + dm(R.nw.from) + ' – ' + dm(R.nw.to) + ' · man-hours', mk([{ l: '#' }, { l: 'Activity' }, { l: 'Short', n: 1 }, { l: 'Plan A', n: 1 }, { l: 'Plan B', n: 1 }, { l: '× pace', n: 1 }, { l: 'Spread / week', n: 1 }, { l: 'Finish first' }],
+      pl.map((x, i) => { const r2 = el('tr'); r2.append(rk(i), cell(x.activity, 'nm'), cell(el('span', 'sm-neg', '−' + pts(x.short)), 'n'), cell('+' + pts(x.a), 'n'), cell(el('b', null, '+' + pts(x.b)), 'n'), cell(x.x ? '×' + x.x.toFixed(1) : '–', 'n'), cell('+' + pts(x.s), 'n'), cell(x.focus ? x.focus.names.join(', ') + (x.focus.n > 5 ? '…' : '') + ' (' + x.focus.n + ' of ' + x.focus.of + ' ' + x.focus.kind + ')' : 'Not split in P6', 'fx')); return r2; })))); } }
+    box.append(pre);
     const bar = el('div', 'wk-sumbar');
     const cp = el('button', 'wk-btn', 'Copy'); cp.type = 'button';
     cp.addEventListener('click', () => { const ok = () => { cp.textContent = 'Copied'; setTimeout(() => { cp.textContent = 'Copy'; }, 1500); }; try { navigator.clipboard.writeText(txt).then(ok, () => { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent = 'Selected: press copy'; }); } catch (e) { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } });
@@ -2289,7 +2342,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       const kp = el('div', 'pv-kpis'); const kpi = (a, b, s, cls) => { const d = el('div', 'pv-kpi'); const sm = el('small', cls || '', s); d.append(el('span', null, a), el('b', null, b), sm); return d; };
       const nShort = rows.filter((r) => r.short > 1e-7).length, nMet = rows.filter((r) => r.plan > 1e-9 && r.ach >= r.plan - 1e-9).length;
       kp.append(kpi('Target', '+' + pts(plan), 'pts for the week'), kpi('Achieved', (ach >= 0 ? '+' : '') + pts(ach), plan > 0 ? Math.round(ach / plan * 100) + '% of target' : '', ach >= plan ? 'up' : 'bad'),
-        kpi('Net gap', (ach - plan >= 0 ? '+' : '') + pts(ach - plan), 'achieved minus target', ach - plan >= 0 ? 'up' : 'bad'), kpi('Shortfalls', '−' + pts(short), nShort + ' of ' + rows.length + ' activities short', 'bad'), kpi('Target met', String(nMet), 'activities at or above target', 'up'));
+        kpi('Shortfalls', '−' + pts(short), nShort + ' of ' + rows.length + ' activities short', 'bad'), kpi('Target met', String(nMet), 'activities at or above target', 'up'));
       sec.append(kp);
       if (wkR.sum) sec.append(wkSummary(M, rows, c, plan, ach, short));
       const grid = el('div', 'pv-grid');
