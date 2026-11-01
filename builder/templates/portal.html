@@ -484,6 +484,7 @@
   .pv-eb{font:500 11px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
   .pv-h{margin:4px 0 0;font:800 40px/1 var(--disp);font-stretch:72%}
   .pv-sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:64em}
+  .wk-plan{margin-top:12px}.wk-plan .pv-tbl td:last-child{white-space:normal;min-width:200px}.wk-plan-n{font-size:12px;color:var(--muted);margin:10px 0 0}
   .wk-sum{margin-top:12px}.wk-pre{white-space:pre-wrap;word-break:break-word;font:13px/1.55 var(--mono);margin:0 0 12px;user-select:text}.wk-sumbar{display:flex;gap:8px;flex-wrap:wrap}
   @media print{body.print-sum .app{position:static!important;display:block!important}body.print-sum .side,body.print-sum .topbar,body.print-sum .stage>iframe,body.print-sum .wk-nav,body.print-sum .wk-sumbar,body.print-sum .wk-meters,body.print-sum .wk-tools,body.print-sum .wk-list,body.print-sum .wk-top:first-child,body.print-sum .pv-grid,body.print-sum .pv-kpis{display:none!important}body.print-sum .stage,body.print-sum .wk{position:static!important;overflow:visible!important;height:auto!important}}
   .wk-rev{margin:6px 0 22px}.wk-rev .pv-kpis,.wk-rev .pv-grid{margin-top:12px}.wk-rev .pv-tbl .nm small{color:var(--muted);font-size:11.5px}
@@ -2184,6 +2185,31 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     });
     return { w, rows, costOK };
   }
+  // Short plan to make up the shortfalls: next week's Plan B (plan + shortfall to date) for the activities that fell short, with the villas / buildings to finish first
+  function wkRecovery(M, rows) {
+    const w = M.w, T = WK.T, latest = WK.weeks.filter((x) => x.from && x.act != null).pop();
+    if (!latest || latest.to !== w.to) return null; // only for the latest reported week
+    const nw = WK.weeks.find((x) => x.from && x.from > w.to); if (!nw) return null;
+    const sh = rows.filter((r) => r.short > 1e-7).sort((a, b) => b.short - a.short); if (!sh.length) return { nw, items: [], total: 0 };
+    const total = sh.reduce((s, r) => s + r.short, 0); let cum = 0; const items = [];
+    for (const r of sh) { if (items.length >= 6 || cum >= 0.85 * total) break; cum += r.short; const q = WK.waIdx[r.activity + '|' + nw.month]; if (!q) continue;
+      const a = q[nw.wk + '_pts'] || 0, b = q[nw.wk + '_pbn_pts'] || 0, s = q[nw.wk + '_pbs_pts'] || 0, row = { activity: r.activity, area: r.area, a, b, s, short: r.short, x: a > 0 ? b / a : null, focus: null };
+      const us = wkP6Units({ activity: r.activity }); if (us) { const pl = wkP6Plan({ activity: r.activity, area: r.area, a, b }, us), n = pl.open.filter((u) => u.b > 0); if (n.length) row.focus = { n: n.length, of: pl.open.length, names: pl.open.slice(0, 5).map((u) => u.n), kind: r.area === 'Buildings' ? 'buildings' : 'villas' }; }
+      items.push(row); }
+    return { nw, items, total, covered: cum / total, T };
+  }
+  function wkPlanCard(R) {
+    const box = el('section', 'pv-card wk-plan'); box.append(el('h3', null, 'Plan to recover the shortfalls'));
+    if (!R) { box.append(el('p', null, 'Choose the latest reported week to see the recovery plan.')); return box; }
+    if (!R.items.length) { box.append(el('p', null, 'No shortfalls to recover.')); return box; }
+    const nw = R.nw, A = R.items.reduce((s, x) => s + x.a, 0), B = R.items.reduce((s, x) => s + x.b, 0);
+    box.append(el('p', null, 'Make up the ' + pts(R.items.reduce((s, x) => s + x.short, 0)) + ' pts of shortfall on these ' + R.items.length + ' activities (' + Math.round(R.covered * 100) + '% of the total) in the week ' + dm(nw.from) + ' – ' + dm(nw.to) + ': Plan B asks +' + pts(B) + ' pts against Plan A +' + pts(A) + ' (×' + (A > 0 ? (B / A).toFixed(1) : '–') + '). Spreading the catch-up over the rest of the month instead lowers the weekly ask (last column). Man-hours basis.'));
+    const w = el('div', 'pv-tbl-w'), tb = el('table', 'pv-tbl'), th = el('thead'), hr = el('tr'); ['Activity', 'Short', 'Plan A', 'Plan B', '× pace', 'Spread over month', 'Finish first'].forEach((x, i) => hr.append(el('th', i && i < 6 ? 'n' : '', x))); th.append(hr);
+    const bd = el('tbody'); R.items.forEach((x) => { const tr = el('tr'); tr.append(td(x.activity, 'nm'), td('−' + pts(x.short), 'n'), td('+' + pts(x.a), 'n'), td('+' + pts(x.b), 'n'), td(x.x ? '×' + x.x.toFixed(1) : '–', 'n'), td('+' + pts(x.s), 'n'), td(x.focus ? x.focus.n + ' of ' + x.focus.of + ' ' + x.focus.kind + ' with work left: ' + x.focus.names.join(', ') + (x.focus.n > 5 ? '…' : '') : 'Not split by villa / building in P6')); bd.append(tr); });
+    tb.append(th, bd); w.append(tb); box.append(w);
+    box.append(el('p', 'wk-plan-n', 'Plan B = the week\'s plan plus the shortfall to date, as in the Management Tracking dashboard (shortfall to date, so where earlier weeks were ahead of plan Plan B can equal Plan A even though this week fell short). Villas / buildings are listed most advanced first, so they close before new ones start (P6 export of ' + dmy(session.p6 ? session.p6.date : '') + ').'));
+    return box;
+  }
   // Plain-text summary of the reported week: shortfalls and top contributors, to read, copy, email or print
   function wkSummary(M, rows, c, plan, ach, short) {
     const w = M.w, unit = c ? 'cost' : 'man-hours', S = (v) => (v >= 0 ? '+' : '−') + pts(Math.abs(v)), since = rows.length ? rows[0].since : null;
@@ -2205,6 +2231,8 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     L.push('', 'TOP CONTRIBUTORS BY ACTIVITY');
     const ac = rows.filter((r) => r.ach > 1e-7).sort((a, b) => b.ach - a.ach).slice(0, 8);
     ac.forEach((r, i) => L.push((i + 1) + '. ' + r.activity + ': +' + pts(r.ach) + ' pts (target ' + pts(r.plan) + (r.ach >= r.plan - 1e-9 ? ', met' : '') + ')'));
+    if (!c) { const R = wkRecovery(M, rows); if (R && R.items.length) { L.push('', 'PLAN TO RECOVER THE SHORTFALLS (week ' + dm(R.nw.from) + ' – ' + dm(R.nw.to) + ', man-hours)');
+      R.items.forEach((x, i) => L.push((i + 1) + '. ' + x.activity + ': make up −' + pts(x.short) + ' pts · Plan A +' + pts(x.a) + ' → Plan B +' + pts(x.b) + (x.x ? ' (×' + x.x.toFixed(1) + ')' : '') + ' · or +' + pts(x.s) + ' a week spread over the month' + (x.focus ? ' · finish first: ' + x.focus.names.join(', ') + ' (' + x.focus.n + ' of ' + x.focus.of + ' ' + x.focus.kind + ')' : ''))); } }
     if (c) L.push('', 'Planned cost is estimated from planned man-hours at each activity\'s average cost per man-hour in P6.');
     const txt = L.join('\n');
     const box = el('section', 'pv-card wk-sum'); box.append(el('h3', null, 'Summary'));
@@ -2260,6 +2288,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       grid.append(pvCard('Top contributors by activity', 'The ' + ac.length + ' activities that earned the most this week; the tick marks the target.',
         pvBars(ac.map((r) => ({ label: r.activity, frac: r.ach / acm, plan: r.plan > 0 ? Math.min(1, r.plan / acm) : null, cls: r.ach >= r.plan - 1e-9 ? 'ok' : '', val: '+' + pts(r.ach), sub: ach > 0 ? '(' + Math.round(r.ach / ach * 100) + '%)' : '' })))));
       sec.append(grid);
+      if (wkR.m === 'u') sec.append(wkPlanCard(wkRecovery(M, rows)));
     };
     draw();
   }
