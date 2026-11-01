@@ -713,6 +713,33 @@
   .wk-items .wk-row .t b{font-weight:500}
   .wk-items .more{padding:8px 14px 10px 72px;font-size:12.5px;color:var(--muted)}
   .wk-items .more button{border:0;background:none;color:var(--accent);font-weight:600;cursor:pointer;padding:0}
+  /* premium targets table */
+  .wk-list{border-radius:20px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+  .wk-head,.wk-row{grid-template-columns:56px minmax(0,1fr) 128px 108px 108px 104px;gap:12px;padding:12px 20px}
+  .wk-head{padding:14px 20px;background:linear-gradient(180deg,rgba(127,150,190,.16),rgba(127,150,190,.07));font-size:10.5px;letter-spacing:.14em;position:sticky;top:0;z-index:2;backdrop-filter:blur(8px)}
+  .wk-grp{padding:12px 20px 8px;margin-top:0;background:linear-gradient(90deg,rgba(60,140,255,.12),transparent 70%);border-top:1px solid var(--line);position:relative;color:var(--fg);font-size:11.5px}
+  .wk-grp::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#5AA9FF,#7C6CFF)}
+  .wk-grp span:last-child{color:var(--muted);font-weight:500}
+  .wk-row{border-top:1px solid rgba(127,140,170,.13);transition:background .15s}
+  .wk-list .wk-row:nth-of-type(even){background-image:linear-gradient(rgba(127,140,170,.045),rgba(127,140,170,.045))}
+  .wk-row:hover{background-color:rgba(80,150,255,.08)!important}
+  .wk-row .t b{font-size:14px;letter-spacing:.005em}
+  .wk-trk{position:relative;height:6px;border-radius:99px;background:rgba(127,140,170,.2);margin:7px 0 3px;max-width:340px}
+  .wk-trk i{position:absolute;left:0;top:0;bottom:0;border-radius:99px;background:linear-gradient(90deg,#3C8CFF,#7CC4F2);transition:width .25s}
+  .wk-trk u{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;border-radius:2px;text-decoration:none}
+  .wk-trk u.a{background:#E8A33A}.wk-trk u.b{background:#B07CFF}
+  .wk-row .num{font:600 14px var(--mono);font-variant-numeric:tabular-nums}
+  .wk-row .num small{font:500 11px var(--mono);color:var(--muted);margin-top:2px}
+  .wk-row .num.na{color:#E8B25A}.wk-row .num.nb{color:#B99CFF}
+  .wk-row .gain{justify-self:end;min-width:64px;padding:5px 10px;border-radius:999px;background:rgba(127,140,170,.12);font-size:13px!important}
+  .wk-row .gain.up{background:rgba(60,190,120,.16)}
+  .wk-pct input{width:88px;border-radius:10px;font-size:15px;background:rgba(127,140,170,.08)}
+  .tick{width:40px;height:40px;border-radius:12px}
+  .wk-row.y{box-shadow:inset 3px 0 0 var(--ok)}.wk-row.n{box-shadow:inset 3px 0 0 var(--nok)}.wk-row.p{box-shadow:inset 3px 0 0 #E8A33A}
+  .wk-items .wk-row{box-shadow:none;padding-left:84px}
+  .wk-legend{display:flex;gap:16px;padding:10px 20px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line)}
+  .wk-legend span::before{content:"";display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle;background:#3C8CFF}.wk-legend .a::before{background:#E8A33A}.wk-legend .b::before{background:#B07CFF}
+  @media (max-width:700px){.wk-head,.wk-row{padding:10px 12px}.wk-grp{padding:10px 12px 6px}.wk-list > .wk-row .num.na::before{content:"Target A  ";font:500 10.5px var(--mono);color:var(--muted)}.wk-list > .wk-row .num.nb::before{content:"Target B  ";font:500 10.5px var(--mono);color:var(--muted)}}
   .tick{width:38px;height:38px;border-radius:10px;border:2px solid var(--line);background:var(--bg);cursor:pointer;display:grid;place-items:center;padding:0;transition:transform .12s,background .15s,border-color .15s;color:var(--muted)}
   .tick:active{transform:scale(.92)}
   .tick svg{width:22px;height:22px;display:none}
@@ -2120,7 +2147,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     box.append(tools);
 
     const list = el('div', 'wk-list');
-    const hd = el('div', 'wk-head'); ['Done?', 'Activity', '% done', 'Target A', 'Target B', 'EV gained'].forEach((t) => hd.append(el('span', null, t))); list.append(hd);
+    const hd = el('div', 'wk-head'); ['Done', 'Activity · progress', '% done', 'Target A', 'Target B', 'EV gained'].forEach((t) => hd.append(el('span', null, t))); list.append(hd);
     const shown = rows.filter((r) => { const s = rowState(r, st); return wkFilter === 'all' || (wkFilter === 'open' ? !s : s === wkFilter); });
     if (!rows.length) list.append(el('div', 'wk-empty', 'No planned earned value in this week.'));
     else if (!shown.length) list.append(el('div', 'wk-empty', 'Nothing in this view.'));
@@ -2136,7 +2163,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     };
     groups.forEach((g) => {
       const gr = shown.filter((r) => r.group === g);
-      const gh = el('div', 'wk-grp'); gh.append(el('span', null, g), el('span', null, 'A +' + pts(gr.reduce((s, r) => s + r.a, 0)) + ' · B +' + pts(gr.reduce((s, r) => s + r.b, 0)) + ' pts')); list.append(gh);
+      const gh = el('div', 'wk-grp'); gh.append(el('span', null, g + ' · ' + gr.length), el('span', null, 'A +' + pts(gr.reduce((s, r) => s + r.a, 0)) + ' · B +' + pts(gr.reduce((s, r) => s + r.b, 0)) + ' pts')); list.append(gh);
       gr.forEach((r) => {
         const row = el('div', 'wk-row');
         const tk = el('button', 'tick'); tk.type = 'button'; tk.innerHTML = svgs;
@@ -2149,16 +2176,17 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
           wkSave(w, o); wkUpdate();
         });
         const t = el('div', 't'); t.append(el('b', null, r.activity), el('small', null, r.area + ' · now ' + pc1(r.start) + '% · finish ' + dmy(r.finish) + (r.start < 0 ? ' · revised programme is above the old budget, so % done starts below zero' : '')));
+        const trk = el('div', 'wk-trk'), tfl = el('i'); tfl.style.width = clamp(r.start, 0, 1) * 100 + '%'; const mA = el('u', 'a'), mB = el('u', 'b'); mA.style.left = clamp(r.tA, 0, 1) * 100 + '%'; mB.style.left = clamp(r.tB, 0, 1) * 100 + '%'; mA.title = 'Target A ' + pc1(r.tA) + '%'; mB.title = 'Target B ' + pc1(r.tB) + '%'; trk.append(tfl, mA, mB); t.append(trk);
         let exp = null;
         if (r.items.length) { exp = el('button', 'wk-exp', 'Breakdown (' + r.items.length + ')'); exp.type = 'button'; exp.setAttribute('aria-expanded', String(wkOpenItems.has(r.activity))); t.append(exp); }
         const p6u = wkP6Units(r); let exp6 = null;
         if (p6u) { exp6 = el('button', 'wk-exp wk-p6', 'By ' + (r.area === 'Buildings' ? 'building' : 'villa') + ' (P6)'); exp6.type = 'button'; exp6.setAttribute('aria-expanded', String(wkOpenP6.has(r.activity))); t.append(exp6); }
         const pb = pctBox(r.activity + ' % done', (v) => { const o = wkLoad(w); r.items.forEach((x) => { delete o.i[x.id]; }); delete o.n[r.activity]; if (v == null) delete o.a[r.activity]; else o.a[r.activity] = v; wkSave(w, o); wkUpdate(pb.inp); }, r.start);
-        const na = el('div', 'num na'); na.append(el('small', null, 'Target A'), pc1(r.tA) + '%');
-        const nb = el('div', 'num nb'); nb.append(el('small', null, 'Target B'), pc1(r.tB) + '%');
+        const na = el('div', 'num na'); na.append(pc1(r.tA) + '%', el('small', null, '+' + ((r.tA - r.start) * 100).toFixed(1) + ' pts'));
+        const nb = el('div', 'num nb'); nb.append(pc1(r.tB) + '%', el('small', null, '+' + ((r.tB - r.start) * 100).toFixed(1) + ' pts'));
         const ng = el('div', 'num gain');
         row.append(tk, t, pb.wrap, na, nb, ng); list.append(row);
-        const ref = { r, row, tk, inp: pb.inp, ng, items: [] }; refs.push(ref);
+        const ref = { r, row, tk, inp: pb.inp, ng, fill: tfl, items: [] }; refs.push(ref);
         if (p6u) {
           const box3 = el('div', 'wk-p6box'); box3.hidden = !wkOpenP6.has(r.activity); list.append(box3); if (!box3.hidden) wkP6Panel(r, p6u, box3);
           exp6.addEventListener('click', () => { const open = box3.hidden; box3.hidden = !open; exp6.setAttribute('aria-expanded', String(open)); if (open) { wkOpenP6.add(r.activity); wkP6Panel(r, p6u, box3); } else wkOpenP6.delete(r.activity); });
@@ -2183,6 +2211,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
         }
       });
     });
+    { const lg = el('div', 'wk-legend'); lg.append(el('span', null, 'Done so far'), el('span', 'a', 'Target A'), el('span', 'b', 'Target B')); list.append(lg); }
     box.append(list);
     box.append(el('p', 'wk-note', 'Earned value points are % of the total project, from the Management Tracking dashboard. "% done" is the activity\'s overall % complete; a breakdown item\'s % is the share of that item\'s remaining work that is done, and the items roll up into the activity. Your entries are saved on this device only. Use Email summary to share them.'));
 
@@ -2201,7 +2230,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       counts.replaceChildren(el('span', 'wk-pill y', cy + ' ✓'), el('span', 'wk-pill p', cp + ' partly'), el('span', 'wk-pill n', cn + ' ✗'), el('span', 'wk-pill', (rows.length - cy - cp - cn) + ' not started'), el('span', 'wk-pill', rows.length + ' activities'));
       refs.forEach((f) => {
         const s = rowState(f.r, o), p = rowPct(f.r, o), g2 = rowGain(f.r, o), fromItems = f.r.items.some((x) => o.i[x.id] != null);
-        f.row.className = 'wk-row' + (s ? ' ' + s : ''); f.tk.className = 'tick' + (s ? ' ' + s : '');
+        f.row.className = 'wk-row' + (s ? ' ' + s : ''); f.fill.style.width = clamp(p, 0, 1) * 100 + '%'; f.tk.className = 'tick' + (s ? ' ' + s : '');
         f.tk.querySelector('.ip').textContent = s === 'p' ? Math.round(p * 100) + '%' : '';
         f.tk.setAttribute('aria-label', f.r.activity + ': ' + (s === 'y' ? 'Plan A target reached' : s === 'n' ? 'missed' : s === 'p' ? 'partly done' : 'not started this week') + '. Tap to change.');
         if (f.inp !== skip) { f.inp.value = pc1(p); }
