@@ -33,28 +33,49 @@ GROUP_OF = {
 def num(v):
     return float(v) if isinstance(v, (int, float)) else 0.0
 
+# Column headers (first match wins; the 30-Oct layout has a cost block then a man-hours block with repeated names)
+COLS = {
+    'bc': ['Budgeted Total Cost'], 'pvc': ['Planned Value Cost'], 'ec': ['Cumm This Week EV', 'Earned Value Cost'],
+    'prevc': ['Previous Week Cumm EV', 'Previous Week Cumm EV Cost'], 'bu': ['Budgeted Labor Units'], 'pvu': ['Planned Value Labor Units'],
+    'eu': ['This Week Cumm Earned Value Labor Units', 'Earned Value Labor Units'], 'prev': ['Previous Week Cumm EV Units'],
+    'wk': ['This Week EV Unit'], 'rem': ['Remaining Units'],
+}
+
+def sheet_rows(path):
+    wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
+    for ws in wb.worksheets:
+        if ws.sheet_state != 'visible': continue
+        it = ws.iter_rows(values_only=True); head = None
+        for r in it:
+            if r and r[0] == 'Activity ID': head = [str(x).strip() if x is not None else '' for x in r]; break
+            if r and r[0] and str(r[0]).startswith('Data Date'): continue
+        if head and 'Budgeted Labor Units' in head: return head, it
+    sys.exit('No sheet with an "Activity ID" header and Budgeted Labor Units found.')
+
 def parse(path):
-    ws = openpyxl.load_workbook(path, data_only=True, read_only=True).active
+    head, it = sheet_rows(path)
+    ix = {k: next((head.index(n) for n in names if n in head), None) for k, names in COLS.items()}
+    assert ix['bu'] is not None and ix['eu'] is not None, 'unexpected layout'
     total = None; groups = []; units = []; names = []; nidx = {}; acts = []
     g = a = u = None
-    for r in ws.iter_rows(min_row=2, values_only=True):
+    for r in it:
         if not r or not r[0]: continue
         raw = str(r[0]); ind = len(raw) - len(raw.lstrip()); n = raw.strip()
-        v = [num(x) for x in r[2:13]]  # pct, bud cost, ev cost, rem cost, lab pct, bud u, ev u, prev u, wk u, wk %, rem u
+        v = {k: (num(r[i]) if i is not None and i < len(r) else 0.0) for k, i in ix.items()}
         if ind == 0:
-            total = {'pc': v[0], 'bc': v[1], 'ec': v[2], 'rc': v[3], 'pu': v[4], 'bu': v[5], 'eu': v[6], 'prev': v[7], 'wk': v[8], 'rem': v[10]}
+            total = dict(v)
         elif ind == 2:
             g = {'n': n, 'areas': []}; groups.append(g); a = u = None
         elif ind == 4:
-            a = {'n': n, 'pc': v[0], 'bc': v[1], 'ec': v[2], 'rc': v[3], 'bu': v[5], 'eu': v[6], 'prev': v[7], 'wk': v[8], 'rem': v[10]}; g['areas'].append(a); u = None
+            a = {'n': n, **v}; g['areas'].append(a); u = None
         elif ind == 6:
-            u = len(units); units.append([len(groups) - 1, len(g['areas']) - 1, n, v[5], v[6], v[7], v[8], v[10]])
+            u = len(units); units.append([len(groups) - 1, len(g['areas']) - 1, n, v['bu'], v['eu'], v['prev'], v['wk'], v['rem'], v['bc'], v['ec'], v['prevc'], v['pvu'], v['pvc']])
         elif ind == 8:
             if u is None:  # activity straight under an area: give it a unit of its own
-                u = len(units); units.append([len(groups) - 1, len(g['areas']) - 1, '(whole area)', 0, 0, 0, 0, 0]); a['_pseudo'] = u
+                u = len(units); units.append([len(groups) - 1, len(g['areas']) - 1, '(whole area)', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); a['_pseudo'] = u
             nm = str(r[1] or '').strip()
             if nm not in nidx: nidx[nm] = len(names); names.append(nm)
-            acts.append([u, n, nidx[nm], v[5], v[6], v[7], v[8], v[10]])
+            acts.append([u, n, nidx[nm], v['bu'], v['eu'], v['prev'], v['wk'], v['rem'], v['bc'], v['ec'], v['prevc'], v['pvu'], v['pvc']])
     return total, groups, units, names, acts
 
 def r0(x):
@@ -99,9 +120,9 @@ def main():
     total, groups, units, names, acts = parse(args.xlsx)
     assert total and groups and acts, 'unexpected layout'
     # the hierarchy must add up to the total
-    for k in ('bu', 'eu', 'rem'):
+    for k in ('bu', 'eu', 'bc', 'ec'):
         s = sum(a[k] for g in groups for a in g['areas'])
-        assert abs(s - total[k]) < 5, f'{k}: groups add to {s:.0f}, total says {total[k]:.0f}'
+        assert abs(s - total[k]) < (5 if k in ('bu', 'eu') else 50), f'{k}: groups add to {s:.0f}, total says {total[k]:.0f}'
     # Activity rows exist only for the building trades; infrastructure and "No Work Feature" are single lines. Where activities exist
     # they must agree with their group to within 0.5%.
     ga = {}
@@ -114,21 +135,28 @@ def main():
     for p in problems: print('WARNING', p)
     for g in groups:
         for a in g['areas']: a.pop('_pseudo', None)
+    KEYS = ('bc', 'pvc', 'ec', 'prevc', 'bu', 'pvu', 'eu', 'prev', 'wk', 'rem')
+    for x in [total] + [a for g in groups for a in g['areas']]:
+        for k in KEYS: x[k] = r0(x[k])
+        x['rc'] = x['bc'] - x['ec']; x['pc'] = round(x['ec'] / x['bc'], 4) if x['bc'] else 0
+    # the last report's rows for earlier weeks stay (exact figures), this week's replace any with the same week end
+    old = []
+    prev_f = os.path.join(OUT, 'p6.bin')
+    if os.path.exists(prev_f):
+        tmp0 = os.path.join(OUT, '.old.json')
+        if subprocess.run(['node', os.path.join(B, 'decrypt.js'), prev_f, pw, tmp0]).returncode == 0:
+            old = [r for r in json.load(open(tmp0)).get('actuals', []) if r['week_end'] != we]; os.remove(tmp0)
     doc = {'date': args.date, 'week_end': we, 'file': args.name or os.path.basename(args.xlsx), 'total': total,
            'groups': groups, 'units': [[r0(x) if isinstance(x, float) else x for x in u] for u in units], 'names': names,
-           'acts': [[u, i, n] + [r0(x) for x in rest] for u, i, n, *rest in acts], 'actuals': rows, 'amap': unit_map(groups, dash)}
-    for g in groups:
-        for a in g['areas']:
-            for k in ('bc', 'ec', 'rc', 'bu', 'eu', 'prev', 'wk', 'rem'): a[k] = r0(a[k])
-            a['pc'] = round(a['pc'], 4)
-    for k in ('bc', 'ec', 'rc', 'bu', 'eu', 'prev', 'wk', 'rem'): total[k] = r0(total[k])
+           'acts': [[u, i, n] + [r0(x) for x in rest] for u, i, n, *rest in acts], 'actuals': old + rows, 'amap': unit_map(groups, dash)}
     os.makedirs(OUT, exist_ok=True)
     tmp = os.path.join(OUT, '.p6.json')
     with open(tmp, 'w', encoding='utf-8') as f: json.dump(doc, f, ensure_ascii=False, separators=(',', ':'))
     subprocess.run(['node', os.path.join(B, 'encrypt.js'), '--bin', tmp, pw, os.path.join(OUT, 'p6.bin')], check=True)
     os.remove(tmp)
     print(f'{len(groups)} groups, {len(units)} units, {len(acts)} activities, {len(rows)} dashboard activities mapped; week end {we}; '
-          f'earned {total["eu"]:,} of {total["bu"]:,} units ({total["eu"] / total["bu"]:.2%})')
+          f'man-hours earned {total["eu"]:,} of {total["bu"]:,} ({total["eu"] / total["bu"]:.2%}), planned {total["pvu"] / total["bu"]:.2%}; '
+          f'cost earned {total["ec"]:,} of {total["bc"]:,} ({total["ec"] / total["bc"]:.2%}), planned {total["pvc"] / total["bc"]:.2%}')
 
 if __name__ == '__main__':
     main()
