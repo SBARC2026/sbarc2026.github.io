@@ -492,6 +492,8 @@
   .pv-eb{font:500 11px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
   .pv-h{margin:4px 0 0;font:800 40px/1 var(--disp);font-stretch:72%}
   .pv-sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:64em}
+  .wk-sum{margin-top:12px}.wk-pre{white-space:pre-wrap;word-break:break-word;font:13px/1.55 var(--mono);margin:0 0 12px;user-select:text}.wk-sumbar{display:flex;gap:8px;flex-wrap:wrap}
+  @media print{body.print-sum .app{position:static!important;display:block!important}body.print-sum .side,body.print-sum .topbar,body.print-sum .stage>iframe,body.print-sum .wk-nav,body.print-sum .wk-sumbar,body.print-sum .wk-meters,body.print-sum .wk-tools,body.print-sum .wk-list,body.print-sum .wk-top:first-child,body.print-sum .pv-grid,body.print-sum .pv-kpis{display:none!important}body.print-sum .stage,body.print-sum .wk{position:static!important;overflow:visible!important;height:auto!important}}
   .wk-rev{margin:6px 0 22px}.wk-rev .pv-kpis,.wk-rev .pv-grid{margin-top:12px}.wk-rev .pv-tbl .nm small{color:var(--muted);font-size:11.5px}
   .wk-rev .wk-nav{gap:8px;flex-wrap:wrap;max-width:100%}.wk-rev .wk-nav select{min-width:0;max-width:100%}@media (max-width:700px){.wk-rev .wk-nav{width:100%}.wk-rev .wk-nav select{flex:1}}.pv-bar .pv-t i.ok{background:var(--ok)}
   .pv-top-r{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
@@ -8846,6 +8848,40 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     });
     return { w, rows, costOK };
   }
+  // Plain-text summary of the reported week: shortfalls and top contributors, to read, copy, email or print
+  function wkSummary(M, rows, c, plan, ach, short) {
+    const w = M.w, unit = c ? 'cost' : 'man-hours', S = (v) => (v >= 0 ? '+' : '−') + pts(Math.abs(v)), since = rows.length ? rows[0].since : null;
+    const byG = {}; rows.forEach((r) => { const g = byG[r.group] || (byG[r.group] = { n: r.group, plan: 0, ach: 0, short: 0 }); g.plan += r.plan; g.ach += r.ach; g.short += r.short; });
+    const G = Object.values(byG), pctOf = (a, b) => (b > 0 ? Math.round(Math.max(0, a) / b * 100) + '%' : '–');
+    const L = ['SBARC – target vs achieved, ' + dmy(since && since < w.from ? since : w.from) + ' to ' + dmy(w.to) + ' (' + unit + ', points = % of total project ' + unit + ')', '',
+      'Target ' + S(plan) + ' pts · achieved ' + S(ach) + ' pts (' + pctOf(ach, plan) + ' of target) · net gap ' + S(ach - plan) + ' pts', ''];
+    L.push('SHORTFALLS BY GROUP');
+    const gs = G.filter((g) => g.short > 1e-7).sort((a, b) => b.short - a.short).slice(0, 8);
+    gs.forEach((g, i) => L.push((i + 1) + '. ' + g.n + ': −' + pts(g.short) + ' pts (' + pctOf(g.ach, g.plan) + ' of its target)'));
+    if (!gs.length) L.push('None.');
+    L.push('', 'LARGEST SHORTFALLS BY ACTIVITY');
+    const as = rows.filter((r) => r.short > 1e-7).sort((a, b) => b.short - a.short).slice(0, 8);
+    as.forEach((r, i) => L.push((i + 1) + '. ' + r.activity + ': target ' + pts(r.plan) + ', achieved ' + S(r.ach) + ', short −' + pts(r.short) + ' pts'));
+    if (!as.length) L.push('None.');
+    L.push('', 'TOP CONTRIBUTORS BY GROUP');
+    const gc = G.filter((g) => g.ach > 1e-7).sort((a, b) => b.ach - a.ach).slice(0, 6);
+    gc.forEach((g, i) => L.push((i + 1) + '. ' + g.n + ': +' + pts(g.ach) + ' pts (' + (ach > 0 ? Math.round(g.ach / ach * 100) : 0) + '% of the week)'));
+    L.push('', 'TOP CONTRIBUTORS BY ACTIVITY');
+    const ac = rows.filter((r) => r.ach > 1e-7).sort((a, b) => b.ach - a.ach).slice(0, 8);
+    ac.forEach((r, i) => L.push((i + 1) + '. ' + r.activity + ': +' + pts(r.ach) + ' pts (target ' + pts(r.plan) + (r.ach >= r.plan - 1e-9 ? ', met' : '') + ')'));
+    if (c) L.push('', 'Planned cost is estimated from planned man-hours at each activity\'s average cost per man-hour in P6.');
+    const txt = L.join('\n');
+    const box = el('section', 'pv-card wk-sum'); box.append(el('h3', null, 'Summary'));
+    const pre = el('pre', 'wk-pre'); pre.textContent = txt; box.append(pre);
+    const bar = el('div', 'wk-sumbar');
+    const cp = el('button', 'wk-btn', 'Copy'); cp.type = 'button';
+    cp.addEventListener('click', () => { const ok = () => { cp.textContent = 'Copied'; setTimeout(() => { cp.textContent = 'Copy'; }, 1500); }; try { navigator.clipboard.writeText(txt).then(ok, () => { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); cp.textContent = 'Selected: press copy'; }); } catch (e) { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); } });
+    const ml = el('button', 'wk-btn', 'Email'); ml.type = 'button';
+    ml.addEventListener('click', () => { location.href = 'mailto:' + ((session.upload && session.upload.email) || '') + '?subject=' + encodeURIComponent('SBARC target vs achieved ' + dm(w.from) + '–' + dm(w.to)) + '&body=' + encodeURIComponent(L.join('\r\n') + '\r\n\r\n— Sent from the SBARC Project Portal'); });
+    bar.append(cp, ml);
+    if (!isWebView && typeof window.print === 'function') { const pr = el('button', 'wk-btn', 'Print'); pr.type = 'button'; pr.addEventListener('click', () => { document.body.classList.add('print-sum'); const done = () => { document.body.classList.remove('print-sum'); window.removeEventListener('afterprint', done); }; window.addEventListener('afterprint', done); setTimeout(() => { window.print(); setTimeout(done, 1500); }, 60); }); bar.append(pr); }
+    box.append(bar); return box;
+  }
   function wkReview(box) {
     const rep = WK.weeks.map((x, i) => ({ x, i })).filter((o) => o.x.wk !== 'month' && o.x.from && o.x.act != null);
     if (!rep.length) return;
@@ -8862,13 +8898,15 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       rep.forEach((o) => { const op = document.createElement('option'); op.value = o.i; op.textContent = MON[o.x.month].slice(0, 3) + ' ' + o.x.wk.toUpperCase() + ' · ' + dm(o.x.from) + '–' + dm(o.x.to); if (o.i === wkR.wi) op.selected = true; sel.append(op); });
       sel.addEventListener('change', () => { wkR.wi = Number(sel.value); draw(); });
       const ms = el('div', 'pv-seg'); [['u', 'Man-hours'], ['c', 'Cost']].forEach(([k, l]) => { const b = el('button', null, l); b.type = 'button'; b.setAttribute('aria-pressed', String(wkR.m === k)); const ok = k === 'u' || wkReviewModel(wkR.wi, 'u').costOK; if (!ok) { b.disabled = true; b.title = 'Cost is available for the latest Primavera week only'; } b.addEventListener('click', () => { wkR.m = k; draw(); }); ms.append(b); });
-      nav.append(sel, ms); top.append(tl, nav); sec.append(top);
+      const sb = el('button', 'wk-btn', wkR.sum ? 'Hide summary' : 'Summary'); sb.type = 'button'; sb.addEventListener('click', () => { wkR.sum = !wkR.sum; draw(); });
+      nav.append(sel, ms, sb); top.append(tl, nav); sec.append(top);
       const plan = rows.reduce((s, r) => s + r.plan, 0), ach = rows.reduce((s, r) => s + r.ach, 0), short = rows.reduce((s, r) => s + r.short, 0);
       const kp = el('div', 'pv-kpis'); const kpi = (a, b, s, cls) => { const d = el('div', 'pv-kpi'); const sm = el('small', cls || '', s); d.append(el('span', null, a), el('b', null, b), sm); return d; };
       const nShort = rows.filter((r) => r.short > 1e-7).length, nMet = rows.filter((r) => r.plan > 1e-9 && r.ach >= r.plan - 1e-9).length;
       kp.append(kpi('Target', '+' + pts(plan), 'pts for the week'), kpi('Achieved', (ach >= 0 ? '+' : '') + pts(ach), plan > 0 ? Math.round(ach / plan * 100) + '% of target' : '', ach >= plan ? 'up' : 'bad'),
         kpi('Net gap', (ach - plan >= 0 ? '+' : '') + pts(ach - plan), 'achieved minus target', ach - plan >= 0 ? 'up' : 'bad'), kpi('Shortfalls', '−' + pts(short), nShort + ' of ' + rows.length + ' activities short', 'bad'), kpi('Target met', String(nMet), 'activities at or above target', 'up'));
       sec.append(kp);
+      if (wkR.sum) sec.append(wkSummary(M, rows, c, plan, ach, short));
       const grid = el('div', 'pv-grid');
       const byG = {}; rows.forEach((r) => { const g = byG[r.group] || (byG[r.group] = { n: r.group, plan: 0, ach: 0, short: 0 }); g.plan += r.plan; g.ach += r.ach; g.short += r.short; });
       const G = Object.values(byG), P2 = (v) => (v >= 0 ? '+' : '−') + pts(Math.abs(v));
