@@ -56,3 +56,12 @@ Commit `builder/p6/p6.bin` together with `docs/`. The daily scheduled rebuild ke
 `SBARC_PASSWORD='<password>' python3 builder/tools/xer_import.py <schedule.xer>` writes `builder/p6/gantt.bin` (encrypted). The build copies it to
 `docs/p6/gantt.bin`, and the Primavera tab's Gantt fetches and decrypts it when opened (WBS tree, activity bars from actual / forecast dates, baseline = target
 dates, critical = total float <= 0, % complete from the weekly export's earned units where the activity ID matches). Commit `builder/p6/gantt.bin` with `docs/`.
+
+## Daily Progress Report (DPR) workbook -> Executive Summary data
+`python3 builder/tools/dpr_import.py <DPR.xlsx> --src builder/_data/exec/blobs --out <dir> --date DD-MM-YYYY` rewrites the villas,
+villa_activities, buildings, manpower, activities (villa rows) and layouts (villa rows, building statuses) blobs from the Villa Status,
+Building Status and MP sheets, and cross-checks every count against the workbook's own summary sheets. Upload each result to the exec
+dashboard (Artifact `publish` asset:true, then ArtifactData `update` of the dataset doc: source.url, description, updated), because the
+daily task re-downloads from there. Landscape rows and the building-only rows are not in the DPR and stay as they were. The villa sheet
+may carry a duplicate villa code (R1-03 twice, the second is R1-04); the tool keeps the dashboard's villa list and reports it.
+Hard-coded dates in the page (`files/index.html`: site-status chip, buildings note, footer) are edited with ArtifactData str_replace.
