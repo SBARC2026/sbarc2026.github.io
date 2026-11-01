@@ -485,6 +485,7 @@
   .pv-h{margin:4px 0 0;font:800 40px/1 var(--disp);font-stretch:72%}
   .pv-sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:64em}
   .wk-plan{margin-top:12px}.wk-plan .pv-tbl td:last-child{white-space:normal;min-width:200px}.wk-plan-n{font-size:12px;color:var(--muted);margin:10px 0 0}
+  .pv-tip{position:fixed;z-index:200;max-width:min(360px,92vw);background:#0C1D38;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:9px 12px;font-size:12px;line-height:1.5;box-shadow:0 10px 30px rgba(0,0,0,.4);pointer-events:none}.pv-tip b{display:block;font-size:13px;margin-bottom:3px}.pv-tip .kv{display:flex;justify-content:space-between;gap:14px}.pv-tip .kv i{font-style:normal;font-family:var(--mono);white-space:nowrap}.pv-bar[tabindex]{outline-offset:2px}
   .wk-sum{margin-top:12px}.wk-pre{white-space:pre-wrap;word-break:break-word;font:13px/1.55 var(--mono);margin:0 0 12px;user-select:text}.wk-sumbar{display:flex;gap:8px;flex-wrap:wrap}
   @media print{body.print-sum .app{position:static!important;display:block!important}body.print-sum .side,body.print-sum .topbar,body.print-sum .stage>iframe,body.print-sum .wk-nav,body.print-sum .wk-sumbar,body.print-sum .wk-meters,body.print-sum .wk-tools,body.print-sum .wk-list,body.print-sum .wk-top:first-child,body.print-sum .pv-grid,body.print-sum .pv-kpis{display:none!important}body.print-sum .stage,body.print-sum .wk{position:static!important;overflow:visible!important;height:auto!important}}
   .wk-rev{margin:6px 0 22px}.wk-rev .pv-kpis,.wk-rev .pv-grid{margin-top:12px}.wk-rev .pv-tbl .nm small{color:var(--muted);font-size:11.5px}
@@ -1623,11 +1624,31 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   }
   const pvPct = (r) => (r.bu > 0 ? r.eu / r.bu : null);
   const plPct = (r) => (r.pv != null && r.bu > 0 ? r.pv / r.bu : null);
+  // Hover (or tap) tooltip for bars: tip = { head, lines: [text | [label, value]] }
+  let pvTipEl = null;
+  function pvTipHide() { if (pvTipEl) pvTipEl.hidden = true; }
+  function pvTipShow(x, y, tip) {
+    if (!pvTipEl) { pvTipEl = el('div', 'pv-tip'); pvTipEl.setAttribute('role', 'tooltip'); pvTipEl.hidden = true; document.body.append(pvTipEl); }
+    const d = pvTipEl; d.replaceChildren(el('b', null, tip.head));
+    tip.lines.forEach((l) => { const r = el('div', Array.isArray(l) ? 'kv' : null); if (Array.isArray(l)) r.append(el('span', null, l[0]), el('i', null, l[1])); else r.textContent = l; d.append(r); });
+    d.hidden = false; const w = d.offsetWidth, h = d.offsetHeight;
+    let L = x + 14, T = y + 16; if (L + w > innerWidth - 8) L = Math.max(8, x - w - 14); if (T + h > innerHeight - 8) T = Math.max(8, y - h - 12);
+    d.style.left = L + 'px'; d.style.top = T + 'px';
+  }
+  function pvTipBind(node, tip) {
+    node.addEventListener('mouseenter', (e) => pvTipShow(e.clientX, e.clientY, tip)); node.addEventListener('mousemove', (e) => pvTipShow(e.clientX, e.clientY, tip)); node.addEventListener('mouseleave', pvTipHide);
+    node.addEventListener('focus', () => { const r = node.getBoundingClientRect(); pvTipShow(r.left + 20, r.bottom - 6, tip); }); node.addEventListener('blur', pvTipHide);
+    if (!node.matches('button')) { node.tabIndex = 0; node.addEventListener('click', (e) => { if (pvTipEl && !pvTipEl.hidden && pvTipEl._for === node) { pvTipHide(); pvTipEl._for = null; } else { pvTipShow(e.clientX, e.clientY, tip); pvTipEl._for = node; } }); }
+    document.addEventListener('scroll', pvTipHide, { capture: true, passive: true });
+  }
+  function pvTipG(g) { const p = g.bu > 0 ? g.eu / g.bu : 0, pl = g.bu > 0 && g.pv != null ? g.pv / g.bu : null;
+    return { head: g.n, lines: [['Budget', vf(g.bu)], ['Earned', vf(g.eu) + ' (' + pf(p) + ')'], ...(pl != null ? [['Planned to date', pf(pl) + ' · gap ' + ((p - pl) * 100 >= 0 ? '+' : '') + ((p - pl) * 100).toFixed(1) + ' pts']] : []), ['This week', (g.wk >= 0 ? '+' : '') + vf(g.wk)], ['Remaining', vf(g.rem)], 'Measure: ' + mLabel()] }; }
   function pvBars(rows, o) { // rows: [{label, frac, val, sub, cls, plan, click}]
     const box = el('div', 'pv-bars');
     rows.forEach((r) => {
       const b = el(r.click ? 'button' : 'div', 'pv-bar'); if (r.click) { b.type = 'button'; b.addEventListener('click', r.click); b.title = 'Show these activities'; }
-      const l = el('span', 'pv-l', r.label); l.title = r.label;
+      if (r.tip) pvTipBind(b, r.tip);
+      const l = el('span', 'pv-l', r.label); l.title = r.tip ? '' : r.label;
       const t = el('span', 'pv-t'); const i = el('i', r.cls || ''); i.style.width = Math.max(0, Math.min(100, r.frac * 100)) + '%'; t.append(i);
       if (r.plan != null) { const pl = el('b', 'pv-pl'); pl.style.left = Math.max(0, Math.min(100, r.plan * 100)) + '%'; pl.title = 'Planned ' + pf(r.plan); t.append(pl); }
       const v = el('span', 'pv-v'); const bb = el('b', null, r.val); v.append(bb); if (r.sub) v.append(' ' + r.sub);
@@ -1670,17 +1691,17 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     root.append(k);
     const grid = el('div', 'pv-grid');
     const byBu = G.filter((g) => g.bu > 0).sort((a, b) => b.bu - a.bu).slice(0, 18);
-    grid.append(pvCard('Progress by trade group', 'Percent of ' + mLabel() + ' earned, largest budgets first; the tick marks the plan. Click a bar to list its activities.', pvBars(byBu.map((g) => ({ label: g.n, frac: g.eu / g.bu, plan: g.pv / g.bu, cls: pvCls(g.eu / g.bu), val: pf(g.eu / g.bu), sub: vf(g.bu), click: () => pvGoActs({ g: g.n }) })))));
+    grid.append(pvCard('Progress by trade group', 'Percent of ' + mLabel() + ' earned, largest budgets first; the tick marks the plan. Click a bar to list its activities.', pvBars(byBu.map((g) => ({ label: g.n, frac: g.eu / g.bu, plan: g.pv / g.bu, cls: pvCls(g.eu / g.bu), val: pf(g.eu / g.bu), sub: vf(g.bu), click: () => pvGoActs({ g: g.n }), tip: pvTipG(g) })))));
     const wk = G.filter((g) => Math.abs(g.wk) >= 1).sort((a, b) => b.wk - a.wk).slice(0, 14), wm = Math.max(...wk.map((g) => g.wk), 1);
     grid.append(pvCard('Earned this week', 'Earned since the previous report, by trade group.', pvBars(wk.map((g) => ({ label: g.n, frac: Math.max(0, g.wk) / wm, val: (g.wk >= 0 ? '+' : '') + vf(g.wk), sub: (g.wk / T.bu * 100 >= 0 ? '+' : '') + (g.wk / T.bu * 100).toFixed(2) + ' pts', click: () => pvGoActs({ g: g.n, st: 'wk' }) })))));
     const gp = G.filter((g) => g.pv - g.eu > 0.5).sort((a, b) => (b.pv - b.eu) - (a.pv - a.eu)).slice(0, 14), gm = Math.max(...gp.map((g) => g.pv - g.eu), 1);
-    grid.append(pvCard('Behind plan', 'Planned minus earned to date, by trade group (largest gap first).', pvBars(gp.map((g) => ({ label: g.n, frac: (g.pv - g.eu) / gm, cls: 'warn', val: vf(g.pv - g.eu), sub: '−' + ((g.pv - g.eu) / T.bu * 100).toFixed(2) + ' pts', click: () => pvGoActs({ g: g.n }) })))));
+    grid.append(pvCard('Behind plan', 'Planned minus earned to date, by trade group (largest gap first).', pvBars(gp.map((g) => ({ label: g.n, frac: (g.pv - g.eu) / gm, cls: 'warn', val: vf(g.pv - g.eu), sub: '−' + ((g.pv - g.eu) / T.bu * 100).toFixed(2) + ' pts', click: () => pvGoActs({ g: g.n }), tip: pvTipG(g) })))));
     const rm = G.filter((g) => g.rem > 0).sort((a, b) => b.rem - a.rem).slice(0, 14), rmx = Math.max(...rm.map((g) => g.rem), 1);
-    grid.append(pvCard('Remaining work', 'Still to earn, by trade group (largest first).', pvBars(rm.map((g) => ({ label: g.n, frac: g.rem / rmx, cls: 'warn', val: vf(g.rem), sub: pf(g.rem / T.rem, 0), click: () => pvGoActs({ g: g.n }) })))));
+    grid.append(pvCard('Remaining work', 'Still to earn, by trade group (largest first).', pvBars(rm.map((g) => ({ label: g.n, frac: g.rem / rmx, cls: 'warn', val: vf(g.rem), sub: pf(g.rem / T.rem, 0), click: () => pvGoActs({ g: g.n }), tip: pvTipG(g) })))));
     const ar = {}; G.forEach((g) => g.areas.forEach((a) => { const n = areaName(a.n); const r = ar[n] || (ar[n] = { n, bu: 0, eu: 0, wk: 0, rem: 0, pv: 0 }); r.bu += a.bu; r.eu += a.eu; r.wk += a.wk; r.rem += a.rem; r.pv += a.pv; }));
     const arr = Object.values(ar).sort((a, b) => b.bu - a.bu);
     grid.append(pvCard('Villas, buildings and project-wide', 'Percent earned (tick = plan), with budget. Project-wide is infrastructure, material delivery, approvals and the lines P6 holds at project level.',
-      pvBars(arr.map((a) => ({ label: a.n, frac: a.eu / a.bu, plan: a.pv / a.bu, cls: pvCls(a.eu / a.bu), val: pf(a.eu / a.bu), sub: vf(a.bu) })))));
+      pvBars(arr.map((a) => ({ label: a.n, frac: a.eu / a.bu, plan: a.pv / a.bu, cls: pvCls(a.eu / a.bu), val: pf(a.eu / a.bu), sub: vf(a.bu), tip: pvTipG(a) })))));
     const vil = PV.units.filter((u) => u.t === 'Villas' && u.bu > 0), bins = new Array(10).fill(0); vil.forEach((u) => { bins[Math.min(9, Math.max(0, Math.floor(u.eu / u.bu * 10)))]++; });
     const hm = Math.max(...bins, 1), hist = el('div', 'pv-hist');
     bins.forEach((c, i) => { const d = el('div'); const bb = el('b', null, String(c)); const bar = el('i'); bar.style.height = (c / hm * 100 * 0.78) + '%'; if (i >= 9) bar.style.background = 'var(--ok)'; d.append(bb, bar, el('span', null, i * 10 + '–' + (i + 1) * 10)); hist.append(d); });
@@ -2194,7 +2215,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const total = sh.reduce((s, r) => s + r.short, 0); let cum = 0; const items = [];
     for (const r of sh) { if (items.length >= 6 || cum >= 0.85 * total) break; cum += r.short; const q = WK.waIdx[r.activity + '|' + nw.month]; if (!q) continue;
       const a = q[nw.wk + '_pts'] || 0, b = q[nw.wk + '_pbn_pts'] || 0, s = q[nw.wk + '_pbs_pts'] || 0, row = { activity: r.activity, area: r.area, a, b, s, short: r.short, x: a > 0 ? b / a : null, focus: null };
-      const us = wkP6Units({ activity: r.activity }); if (us) { const pl = wkP6Plan({ activity: r.activity, area: r.area, a, b }, us), n = pl.open.filter((u) => u.b > 0); if (n.length) row.focus = { n: n.length, of: pl.open.length, names: pl.open.slice(0, 5).map((u) => u.n), kind: r.area === 'Buildings' ? 'buildings' : 'villas' }; }
+      const us = wkP6Units({ activity: r.activity }); if (us) { const pl = wkP6Plan({ activity: r.activity, area: r.area, a, b }, us), n = pl.open.filter((u) => u.b > 0); if (n.length) row.focus = { n: n.length, of: us.length, left: pl.open.length, names: pl.open.slice(0, 5).map((u) => u.n), kind: r.area === 'Buildings' ? 'buildings' : 'villas' }; }
       items.push(row); }
     return { nw, items, total, covered: cum / total, T };
   }
@@ -2205,7 +2226,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const nw = R.nw, A = R.items.reduce((s, x) => s + x.a, 0), B = R.items.reduce((s, x) => s + x.b, 0);
     box.append(el('p', null, 'Make up the ' + pts(R.items.reduce((s, x) => s + x.short, 0)) + ' pts of shortfall on these ' + R.items.length + ' activities (' + Math.round(R.covered * 100) + '% of the total) in the week ' + dm(nw.from) + ' – ' + dm(nw.to) + ': Plan B asks +' + pts(B) + ' pts against Plan A +' + pts(A) + ' (×' + (A > 0 ? (B / A).toFixed(1) : '–') + '). Spreading the catch-up over the rest of the month instead lowers the weekly ask (last column). Man-hours basis.'));
     const w = el('div', 'pv-tbl-w'), tb = el('table', 'pv-tbl'), th = el('thead'), hr = el('tr'); ['Activity', 'Short', 'Plan A', 'Plan B', '× pace', 'Spread over month', 'Finish first'].forEach((x, i) => hr.append(el('th', i && i < 6 ? 'n' : '', x))); th.append(hr);
-    const bd = el('tbody'); R.items.forEach((x) => { const tr = el('tr'); tr.append(td(x.activity, 'nm'), td('−' + pts(x.short), 'n'), td('+' + pts(x.a), 'n'), td('+' + pts(x.b), 'n'), td(x.x ? '×' + x.x.toFixed(1) : '–', 'n'), td('+' + pts(x.s), 'n'), td(x.focus ? x.focus.n + ' of ' + x.focus.of + ' ' + x.focus.kind + ' with work left: ' + x.focus.names.join(', ') + (x.focus.n > 5 ? '…' : '') : 'Not split by villa / building in P6')); bd.append(tr); });
+    const bd = el('tbody'); R.items.forEach((x) => { const tr = el('tr'); tr.append(td(x.activity, 'nm'), td('−' + pts(x.short), 'n'), td('+' + pts(x.a), 'n'), td('+' + pts(x.b), 'n'), td(x.x ? '×' + x.x.toFixed(1) : '–', 'n'), td('+' + pts(x.s), 'n'), td(x.focus ? x.focus.n + ' of ' + x.focus.of + ' ' + x.focus.kind + ' (' + x.focus.left + ' still have work): ' + x.focus.names.join(', ') + (x.focus.n > 5 ? '…' : '') : 'Not split by villa / building in P6')); bd.append(tr); });
     tb.append(th, bd); w.append(tb); box.append(w);
     box.append(el('p', 'wk-plan-n', 'Plan B = the week\'s plan plus the shortfall to date, as in the Management Tracking dashboard (shortfall to date, so where earlier weeks were ahead of plan Plan B can equal Plan A even though this week fell short). Villas / buildings are listed most advanced first, so they close before new ones start (P6 export of ' + dmy(session.p6 ? session.p6.date : '') + ').'));
     return box;
@@ -2232,7 +2253,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const ac = rows.filter((r) => r.ach > 1e-7).sort((a, b) => b.ach - a.ach).slice(0, 8);
     ac.forEach((r, i) => L.push((i + 1) + '. ' + r.activity + ': +' + pts(r.ach) + ' pts (target ' + pts(r.plan) + (r.ach >= r.plan - 1e-9 ? ', met' : '') + ')'));
     if (!c) { const R = wkRecovery(M, rows); if (R && R.items.length) { L.push('', 'PLAN TO RECOVER THE SHORTFALLS (week ' + dm(R.nw.from) + ' – ' + dm(R.nw.to) + ', man-hours)');
-      R.items.forEach((x, i) => L.push((i + 1) + '. ' + x.activity + ': make up −' + pts(x.short) + ' pts · Plan A +' + pts(x.a) + ' → Plan B +' + pts(x.b) + (x.x ? ' (×' + x.x.toFixed(1) + ')' : '') + ' · or +' + pts(x.s) + ' a week spread over the month' + (x.focus ? ' · finish first: ' + x.focus.names.join(', ') + ' (' + x.focus.n + ' of ' + x.focus.of + ' ' + x.focus.kind + ')' : ''))); } }
+      R.items.forEach((x, i) => L.push((i + 1) + '. ' + x.activity + ': make up −' + pts(x.short) + ' pts · Plan A +' + pts(x.a) + ' → Plan B +' + pts(x.b) + (x.x ? ' (×' + x.x.toFixed(1) + ')' : '') + ' · or +' + pts(x.s) + ' a week spread over the month' + (x.focus ? ' · finish first: ' + x.focus.names.join(', ') + ' (' + x.focus.n + ' of ' + x.focus.of + ' ' + x.focus.kind + '; ' + x.focus.left + ' still have work)' : ''))); } }
     if (c) L.push('', 'Planned cost is estimated from planned man-hours at each activity\'s average cost per man-hour in P6.');
     const txt = L.join('\n');
     const box = el('section', 'pv-card wk-sum'); box.append(el('h3', null, 'Summary'));
@@ -2274,19 +2295,26 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       const grid = el('div', 'pv-grid');
       const byG = {}; rows.forEach((r) => { const g = byG[r.group] || (byG[r.group] = { n: r.group, plan: 0, ach: 0, short: 0 }); g.plan += r.plan; g.ach += r.ach; g.short += r.short; });
       const G = Object.values(byG), P2 = (v) => (v >= 0 ? '+' : '−') + pts(Math.abs(v));
+      const pc0 = (a2, b2) => (b2 > 0 ? Math.round(Math.max(0, a2) / b2 * 100) + '%' : '–');
+      const p6s = (act) => { const us = wkP6Units({ activity: act }); if (!us) return null; let d = 0, ip = 0, ns = 0, bu = 0, eu = 0; us.forEach((u) => { bu += u[3]; eu += u[4]; if (u[7] <= 0.5) d++; else if (u[4] <= 0) ns++; else ip++; }); return { n: us.length, d, ip, ns, p: bu > 0 ? eu / bu : 0 }; };
+      const actTip = (r) => { const s = p6s(r.activity), lines = [['Target', P2(r.plan) + ' pts'], ['Achieved', P2(r.ach) + ' pts'], [r.short > 1e-7 ? 'Shortfall' : 'Ahead of target', (r.short > 1e-7 ? '−' + pts(r.short) : '+' + pts(r.ach - r.plan)) + ' pts'], ['% of target', pc0(r.ach, r.plan)], ['Group · area', r.group + ' · ' + r.area]];
+        if (s) { const k = r.area === 'Buildings' ? 'buildings' : 'villas'; lines.push(['Overall % complete (P6)', pf(s.p)], [k.charAt(0).toUpperCase() + k.slice(1), s.n + ': ' + s.d + ' complete · ' + s.ip + ' in progress · ' + s.ns + ' not started']); } return { head: r.activity, lines }; };
+      const grpTip = (g, by) => { const L2 = rows.filter((r) => r.group === g.n).sort((a, b) => (by === 'ach' ? b.ach - a.ach : b.short - a.short)).slice(0, 6);
+        return { head: g.n, lines: [['Target', P2(g.plan) + ' pts'], ['Achieved', P2(g.ach) + ' pts'], ['Shortfalls (sum)', '−' + pts(g.short) + ' pts'], ['% of target', pc0(g.ach, g.plan)], by === 'ach' ? 'Top activities:' : 'Biggest shortfalls:',
+          ...L2.map((r) => [r.activity, by === 'ach' ? P2(r.ach) + ' (target ' + pts(r.plan) + ')' : '−' + pts(r.short) + ' (got ' + P2(r.ach) + ' of ' + pts(r.plan) + ')'])] }; };
       const gs = G.filter((g) => g.short > 1e-7).sort((a, b) => b.short - a.short).slice(0, 10), gsm = Math.max(...gs.map((g) => g.short), 1e-9);
       grid.append(pvCard('Shortfalls by group', 'Target minus achieved where an activity fell short (points), largest first. Activities that beat their target do not offset these.',
-        gs.length ? pvBars(gs.map((g) => ({ label: g.n, frac: g.short / gsm, cls: 'warn', val: '−' + pts(g.short), sub: g.plan > 0 ? Math.round(Math.max(0, g.ach) / g.plan * 100) + '% of target' : '' }))) : el('p', null, 'No shortfalls in this week.')));
+        gs.length ? pvBars(gs.map((g) => ({ label: g.n, frac: g.short / gsm, cls: 'warn', val: '−' + pts(g.short), sub: g.plan > 0 ? Math.round(Math.max(0, g.ach) / g.plan * 100) + '% of target' : '', tip: grpTip(g, 'short') }))) : el('p', null, 'No shortfalls in this week.')));
       const as = rows.filter((r) => r.short > 1e-7).sort((a, b) => b.short - a.short).slice(0, 10);
       const tw = el('div', 'pv-tbl-w'), tb = el('table', 'pv-tbl'), th = el('thead'), hr = el('tr'); ['Activity', 'Target', 'Achieved', 'Shortfall', '% of target'].forEach((x, i) => hr.append(el('th', i ? 'n' : '', x))); th.append(hr);
       const bd = el('tbody'); as.forEach((r) => { const tr = el('tr'); const nm = el('td', 'nm'); nm.append(r.activity, el('small', null, ' · ' + r.group)); tr.append(nm, td(pts(r.plan), 'n'), td(P2(r.ach), 'n'), td('−' + pts(r.short), 'n'), td(r.plan > 0 ? Math.round(Math.max(0, r.ach) / r.plan * 100) + '%' : '–', 'n')); bd.append(tr); }); tb.append(th, bd); tw.append(tb);
       grid.append(pvCard('Largest shortfalls by activity', 'Top ' + as.length + ' activities furthest below target.', as.length ? tw : el('p', null, 'None.')));
       const gc = G.filter((g) => g.ach > 1e-7).sort((a, b) => b.ach - a.ach).slice(0, 8), gcm = Math.max(...gc.map((g) => g.ach), 1e-9);
       grid.append(pvCard('Top contributors by group', 'Points achieved this week, by activity group (share of the week\'s total in brackets).',
-        pvBars(gc.map((g) => ({ label: g.n, frac: g.ach / gcm, cls: 'ok', val: '+' + pts(g.ach), sub: ach > 0 ? '(' + Math.round(g.ach / ach * 100) + '%)' : '' })))));
+        pvBars(gc.map((g) => ({ label: g.n, frac: g.ach / gcm, cls: 'ok', val: '+' + pts(g.ach), sub: ach > 0 ? '(' + Math.round(g.ach / ach * 100) + '%)' : '', tip: grpTip(g, 'ach') })))));
       const ac = rows.filter((r) => r.ach > 1e-7).sort((a, b) => b.ach - a.ach).slice(0, 10), acm = Math.max(...ac.map((r) => r.ach), 1e-9);
       grid.append(pvCard('Top contributors by activity', 'The ' + ac.length + ' activities that earned the most this week; the tick marks the target.',
-        pvBars(ac.map((r) => ({ label: r.activity, frac: r.ach / acm, plan: r.plan > 0 ? Math.min(1, r.plan / acm) : null, cls: r.ach >= r.plan - 1e-9 ? 'ok' : '', val: '+' + pts(r.ach), sub: ach > 0 ? '(' + Math.round(r.ach / ach * 100) + '%)' : '' })))));
+        pvBars(ac.map((r) => ({ label: r.activity, frac: r.ach / acm, plan: r.plan > 0 ? Math.min(1, r.plan / acm) : null, cls: r.ach >= r.plan - 1e-9 ? 'ok' : '', val: '+' + pts(r.ach), sub: ach > 0 ? '(' + Math.round(r.ach / ach * 100) + '%)' : '', tip: actTip(r) })))));
       sec.append(grid);
       if (wkR.m === 'u') sec.append(wkPlanCard(wkRecovery(M, rows)));
     };
