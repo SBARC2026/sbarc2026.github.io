@@ -25,6 +25,10 @@ IDS = {  # activities dataset id -> (villa group, villa activity)
 }
 MARBLE = ['60×60 floor', '40×40 wet area', 'Stairs']
 
+# BOQ weights (% of the villa index) from the 'Progress method' page of Daily Report 686; keys are the 29 activity columns of Villa Status (0-based).
+BOQ_W = {16: 12.6, 13: 6.2, 19: 4.4, 17: 3.7, 18: 3.7, 0: 3.4, 15: 3.2, 20: 2.4, 1: 2.1, 14: 1.9, 4: 1.7, 5: 1.7, 6: 1.7, 7: 1.6, 10: 1.6, 12: 1.4, 3: 1.4, 9: 1.2, 2: 1.1, 11: 0.9, 8: 0.8,
+         25: 7.7, 26: 7.7, 27: 4.5, 28: 4.5, 21: 4.2, 22: 4.2, 23: 4.2, 24: 4.2}
+
 def jl(p): return json.load(open(p, encoding='utf-8'))
 def find(src, key):  # blob by a field it holds
     for f in glob.glob(os.path.join(src, '*.json')):
@@ -69,8 +73,9 @@ def main():
             cells = ov[v0['villa']]['v']
             for j in range(29): r[3 + j] = cells[str(j)]
             n = [0 if x is None else x for x in r[3:32]]
-            fin_l = [n[0], n[1], n[4], n[5], n[6], n[2], n[3], (2 * n[7] + n[8] + n[9]) / 4, n[10], n[11], n[12], n[13], n[14], n[15], n[16], sum(1 for x in n[17:21] if x >= 0.9999) / 4]
-            r[col['Finishes %']] = sum(fin_l) / 16; r[col['MEP %']] = sum(n[21:29]) / 8; r[col['TOTAL %']] = (sum(fin_l) + sum(n[21:29])) / 24
+            fin_w = [i for i in BOQ_W if i < 21]; mep_w = [i for i in BOQ_W if i >= 21]  # report 686 (final): BOQ-weighted index
+            wavg = lambda ids: sum(BOQ_W[i] * n[i] for i in ids) / sum(BOQ_W[i] for i in ids)
+            r[col['Finishes %']] = wavg(fin_w); r[col['MEP %']] = wavg(mep_w); r[col['TOTAL %']] = wavg(fin_w + mep_w)
     fin_i, mep_i, tot_i = col['Finishes %'], col['MEP %'], col['TOTAL %']
     acts0 = [(r['group'], r['activity']) for r in vacts0 if r['villa'] == villas0[0]['villa']]
     assert len(acts0) == 29
