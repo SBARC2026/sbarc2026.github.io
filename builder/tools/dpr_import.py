@@ -44,7 +44,7 @@ def code_pct(v):  # sheet value -> (code, pct)
     return 'P', min(99, max(1, round(v * 100)))
 
 def main():
-    ap = argparse.ArgumentParser(); ap.add_argument('xlsx'); ap.add_argument('--src', required=True); ap.add_argument('--out', required=True); ap.add_argument('--date', required=True)
+    ap = argparse.ArgumentParser(); ap.add_argument('xlsx'); ap.add_argument('--src', required=True); ap.add_argument('--out', required=True); ap.add_argument('--date', required=True); ap.add_argument('--override', help='JSON {villa:{v:{col idx:value}}} read from the report PDF; replaces the villa status cells of the workbook')
     a = ap.parse_args()
     wb = openpyxl.load_workbook(a.xlsx, data_only=True)
     os.makedirs(a.out, exist_ok=True)
@@ -63,6 +63,14 @@ def main():
         if hdr and r[1] and r[2]: rows.append(r)
     assert len(rows) == len(villas0) == 104, (len(rows), len(villas0))
     col = {h: i for i, h in enumerate(hdr) if h}
+    if a.override:  # the PDF is newer than the workbook: take the 29 activity cells from it and recompute the three % columns
+        ov = json.load(open(a.override)); rows = [list(r) for r in rows]
+        for k, (r, v0) in enumerate(zip(rows, villas0)):
+            cells = ov[v0['villa']]['v']
+            for j in range(29): r[3 + j] = cells[str(j)]
+            n = [0 if x is None else x for x in r[3:32]]
+            fin_l = [n[0], n[1], n[4], n[5], n[6], n[2], n[3], (2 * n[7] + n[8] + n[9]) / 4, n[10], n[11], n[12], n[13], n[14], n[15], n[16], sum(1 for x in n[17:21] if x >= 0.9999) / 4]
+            r[col['Finishes %']] = sum(fin_l) / 16; r[col['MEP %']] = sum(n[21:29]) / 8; r[col['TOTAL %']] = (sum(fin_l) + sum(n[21:29])) / 24
     fin_i, mep_i, tot_i = col['Finishes %'], col['MEP %'], col['TOTAL %']
     acts0 = [(r['group'], r['activity']) for r in vacts0 if r['villa'] == villas0[0]['villa']]
     assert len(acts0) == 29
@@ -97,7 +105,7 @@ def main():
             else:
                 g, name = IDS[key]; cs = [vm[code][(g, name)][0] for code in vm]
                 s = summ.get((g.lower(), name.lower().replace(' floor', '').replace(' wet area', '')))
-                if s:
+                if s and not a.override:
                     d, ip, ns = counts(cs)
                     if (d, ip, ns) != tuple(s[:3]): problems.append(f'{name}: computed {d}/{ip}/{ns}, workbook summary {tuple(s[:3])}')
             d, ip, ns = counts(cs); n = len(cs)
