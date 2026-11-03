@@ -65,3 +65,8 @@ dashboard (Artifact `publish` asset:true, then ArtifactData `update` of the data
 daily task re-downloads from there. Landscape rows and the building-only rows are not in the DPR and stay as they were. The villa sheet
 may carry a duplicate villa code (R1-03 twice, the second is R1-04); the tool keeps the dashboard's villa list and reports it.
 Hard-coded dates in the page (`files/index.html`: site-status chip, buildings note, footer) are edited with ArtifactData str_replace.
+
+## BOQ tab (items and amounts)
+`SBARC_PASSWORD=... python3 builder/tools/boq_import.py <"SBARC Rules of Credit" artifact .html or boq.json>` rewrites `builder/boq/boq.bin`
+(encrypted with the portal password; the repo is public, so amounts are never committed readable). `build.py` adds the "BOQ items & amounts" tab
+when the file exists. Source: artifact https://claude.ai/artifact/Ps17om7Dv51covX5eGw4gz (BOQ 5.3 - IPA 24 B.O.Q. Break R00). Re-run only when the BOQ changes.

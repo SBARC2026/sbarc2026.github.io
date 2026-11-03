@@ -855,6 +855,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     </div>
     <div class="wk" id="wk" hidden><div class="wk-in" id="wk-in"><div class="wk-empty">Loading this week's targets…</div></div></div>
     <div class="pv" id="pv" hidden><div class="pv-in" id="pv-in"></div></div>
+    <div class="pv" id="bq" hidden><div class="pv-in" id="bq-in"></div></div>
     <div class="pv" id="bk" hidden><div class="pv-in" id="bk-in"></div></div>
   </main>
   </div>
@@ -974,7 +975,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const tabs = $('tabs'); tabs.replaceChildren();
     [...session.dashboards].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).forEach((d) => {
       const b = document.createElement('button'); b.className = 'tab' + (d.pinned ? ' pinned' : ''); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
-      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown' };
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh); if (d.pinned) { const pn = document.createElement('span'); pn.className = 'pin'; pn.title = 'Pinned'; pn.setAttribute('aria-hidden', 'true'); pn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M14.5 3.5l6 6-2 .8-3.3 3.3.3 4.2-1.4 1.4-4-4-5.3 5.3-1-1 5.3-5.3-4-4 1.4-1.4 4.2.3 3.3-3.3z"/></svg>'; b.append(pn); }
       b.addEventListener('click', () => { show(d.id); drawer(false); }); tabs.append(b);
     });
@@ -990,7 +991,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
     session = null; current = null; secret = ''; $('up').hidden = true;
-    xpReset(); wkReset(); pvReset(); bkReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
+    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -1011,6 +1012,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     p02b: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"/><path d="M5 16l4.5-5 3.5 3 6-7"/><path d="M15 7h4v4"/></svg>',
     week: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>',
     p6: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M4 12h13M4 18h7"/><rect x="13" y="4" width="7" height="4" rx="1.2"/><rect x="17" y="10" width="3.5" height="4" rx="1.2"/><rect x="11" y="16" width="9" height="4" rx="1.2"/></svg>',
+    boq: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7h4"/><path d="M9 11h6M9 14.5h6M9 18h3.5"/></svg>',
     bk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M9 9.5V20"/><path d="M12.5 13h5M12.5 16.5h3"/></svg>',
     explorer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg>',
   };
@@ -1036,10 +1038,12 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('wk').hidden = id !== 'week';
     $('pv').hidden = id !== 'p6';
     $('bk').hidden = id !== 'bk';
+    $('bq').hidden = id !== 'boq';
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
     if (id === 'week') { $('loading').hidden = true; wkOpen(); return; }
     if (id === 'p6') { $('loading').hidden = true; pvOpen(); return; }
     if (id === 'bk') { $('loading').hidden = true; bkOpen(); return; }
+    if (id === 'boq') { $('loading').hidden = true; bqOpen(); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
   function makeFrame(id) {
@@ -1839,6 +1843,89 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const q = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     const txt = '﻿' + [head, ...rows].map((r) => r.map(q).join(',')).join('\r\n');
     const u = URL.createObjectURL(new Blob([txt], { type: 'text/csv' })); const a = document.createElement('a'); a.href = u; a.download = name + ' ' + PV.P.date + '.csv'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+  }
+
+  // ---------- BOQ tab ----------
+  // session.boq: { rules:[{c, g, n, s:[[stage, %]], l: lines, v: amount, b: note}], lines:[[bill, item, description, unit, amount, work-type code, section]], bills:[[bill, title, lines, amount]] }
+  let BQ = null;
+  const bqF = (n) => Math.round(n).toLocaleString('en-US');
+  const bqM = (n) => (n / 1e6).toFixed(2) + 'M';
+  function bqReset() { BQ = null; $('bq').hidden = true; $('bq-in').replaceChildren(); }
+  function bqOpen() {
+    if (!BQ) {
+      const D = session.boq; if (!D) { $('bq-in').replaceChildren(el('div', 'wk-empty', 'No BOQ data in this build.')); return; }
+      const R = {}; D.rules.forEach((r) => { R[r.c] = r; });
+      BQ = { D, R, total: D.rules.reduce((a, r) => a + r.v, 0), view: 'wt', wt: { q: '', g: '' }, bl: { q: '' }, ln: { q: '', bill: '', code: '', page: 0 } };
+    }
+    bqRender();
+  }
+  const bqKind = (r) => (r.s.length === 3 ? '65 / 30 / 5' : r.s.length === 2 && r.s[0][1] === 65 ? '65 / 35' : 'Own sequence');
+  function bqRender() {
+    const root = $('bq-in'), D = BQ.D; root.replaceChildren();
+    const top = el('div', 'pv-top'), tl = el('div');
+    tl.append(el('div', 'pv-eb', 'Contract BOQ 5.3 · IPA 24 B.O.Q. Break R00'), el('h1', 'pv-h', 'BOQ items and amounts'),
+      el('p', 'pv-sub', 'Every priced BOQ line with its amount, grouped by work type and by bill. Amounts are the BOQ amounts before discount (SAR).'));
+    const seg = el('div', 'pv-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'View');
+    [['wt', 'By work type'], ['bl', 'By bill'], ['ln', 'All lines']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(BQ.view === k)); b.addEventListener('click', () => { BQ.view = k; bqRender(); }); seg.append(b); });
+    const rt = el('div', 'pv-top-r'); rt.append(seg); top.append(tl, rt); root.append(top);
+    const kp = el('div', 'pv-kpis'), kpi = (a, b, c) => { const d = el('div', 'pv-kpi'); d.append(el('span', null, a), el('b', null, b), el('small', null, c)); return d; };
+    kp.append(kpi('BOQ value', bqM(BQ.total), 'SAR ' + bqF(BQ.total)), kpi('Priced lines', bqF(D.lines.length), 'bills 1 to 5b'), kpi('Bills', String(D.bills.length), 'general, buildings, villas, external'), kpi('Work types', String(D.rules.length), 'each with its rule of credit'));
+    root.append(kp);
+    ({ wt: bqWorkTypes, bl: bqBills, ln: bqLines })[BQ.view](root);
+    $('bq').scrollTop = 0;
+  }
+  function bqTable(heads, rows, foot) {
+    const t = el('table', 'pv-tbl'), hd = el('thead'), hr = el('tr'); heads.forEach(([l, n]) => hr.append(el('th', n ? 'n' : '', l))); hd.append(hr);
+    const tb = el('tbody'); rows.forEach((r) => tb.append(r)); t.append(hd, tb); if (foot) t.append(foot); const w = el('div', 'pv-tbl-w'); w.append(t); return w;
+  }
+  const bqShare = (v) => { const c = el('td', 'n'), m = el('span', 'pv-mini'), i = el('i'); i.style.width = Math.min(100, (v / BQ.total) * 100 * 4) + '%'; m.append(i); c.append(m, (v / BQ.total * 100).toFixed(1) + '%'); return c; };
+  function bqGo(f) { Object.assign(BQ.ln, { q: '', bill: '', code: '', page: 0 }, f); BQ.view = 'ln'; bqRender(); }
+  function bqWorkTypes(root) {
+    const S = BQ.wt, D = BQ.D, groups = [...new Set(D.rules.map((r) => r.g))];
+    const tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search work types, e.g. doors, cables, paving'; inp.value = S.q; inp.setAttribute('aria-label', 'Search work types');
+    const sel = el('select'); sel.append(new Option('All groups', '')); groups.forEach((g) => sel.append(new Option(g, g))); sel.value = S.g;
+    const cnt = el('span', 'pv-pg'); tools.append(inp, sel, cnt); const holder = el('div'); root.append(tools, holder);
+    const draw = () => {
+      const q = S.q.trim().toLowerCase(), rs = D.rules.filter((r) => (!S.g || r.g === S.g) && (!q || (r.n + ' ' + r.c + ' ' + r.g).toLowerCase().includes(q))).sort((a, b) => b.v - a.v);
+      const trs = rs.map((r) => { const tr = el('tr'), c0 = el('td'), b = el('button', 'go', r.n); b.type = 'button'; b.title = 'Show the BOQ lines of this work type'; b.addEventListener('click', () => bqGo({ code: r.c })); c0.append(b);
+        const st = el('td'); st.textContent = r.s.map((x) => x[1] + '% ' + x[0]).join(' · '); st.style.whiteSpace = 'normal'; st.style.minWidth = '260px'; st.style.color = 'var(--muted)'; st.style.fontSize = '12px';
+        tr.append(td(r.c), td(r.g), c0, td(bqF(r.l), 'n'), td(bqF(r.v), 'n'), bqShare(r.v), td(bqKind(r)), st); return tr; });
+      const sum = rs.reduce((a, r) => a + r.v, 0), nl = rs.reduce((a, r) => a + r.l, 0), f = el('tfoot'), fr = el('tr'); fr.append(td('Total'), td(''), td(''), td(bqF(nl), 'n'), td(bqF(sum), 'n'), td('', 'n'), td(''), td('')); f.append(fr);
+      holder.replaceChildren(bqTable([['Code'], ['Group'], ['Work type'], ['Lines', 1], ['Amount (SAR)', 1], ['Share', 1], ['Credit rule'], ['Stages']], trs, f));
+      cnt.textContent = rs.length + ' of ' + D.rules.length + ' work types · click a name to see its lines';
+    };
+    inp.addEventListener('input', () => { S.q = inp.value; draw(); }); sel.addEventListener('change', () => { S.g = sel.value; draw(); }); draw();
+  }
+  function bqBills(root) {
+    const D = BQ.D, trs = D.bills.map((b) => { const tr = el('tr'), c1 = el('td'), g = el('button', 'go', b[1]); g.type = 'button'; g.addEventListener('click', () => bqGo({ bill: b[0] })); c1.append(g); tr.append(td(b[0]), c1, td(bqF(b[2]), 'n'), td(bqF(b[3]), 'n'), bqShare(b[3])); return tr; });
+    const f = el('tfoot'), fr = el('tr'); fr.append(td('Total'), td(''), td(bqF(D.bills.reduce((a, b) => a + b[2], 0)), 'n'), td(bqF(D.bills.reduce((a, b) => a + b[3], 0)), 'n'), td('', 'n')); f.append(fr);
+    root.append(bqTable([['Bill'], ['Title'], ['Lines', 1], ['Amount (SAR)', 1], ['Share', 1]], trs, f));
+  }
+  function bqLines(root) {
+    const S = BQ.ln, D = BQ.D, PAGE = 100;
+    const tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search description or item, e.g. VRF, kerb, D02'; inp.value = S.q; inp.setAttribute('aria-label', 'Search BOQ lines');
+    const sb = el('select'); sb.append(new Option('All bills', '')); D.bills.forEach((b) => sb.append(new Option(b[0] + ' · ' + b[1], b[0]))); sb.value = S.bill;
+    const sc = el('select'); sc.append(new Option('All work types', '')); [...D.rules].sort((a, b) => a.n.localeCompare(b.n)).forEach((r) => sc.append(new Option(r.n, r.c))); sc.value = S.code;
+    const csv = el('button', 'wk-btn', 'Download CSV'); csv.type = 'button'; const cnt = el('span', 'pv-pg'); tools.append(inp, sb, sc, csv, cnt);
+    const holder = el('div'), pg = el('div', 'pv-tools'); root.append(tools, holder, pg);
+    const filt = () => { const q = S.q.trim().toLowerCase(); return D.lines.filter((l) => (!S.bill || l[0] === S.bill) && (!S.code || l[5] === S.code) && (!q || (l[2] + ' ' + l[1] + ' ' + l[6] + ' ' + l[5]).toLowerCase().includes(q))); };
+    const draw = () => {
+      const rs = filt(), n = rs.length, pages = Math.max(1, Math.ceil(n / PAGE)); if (S.page >= pages) S.page = pages - 1;
+      const sum = rs.reduce((a, l) => a + l[4], 0), trs = rs.slice(S.page * PAGE, S.page * PAGE + PAGE).map((l) => { const tr = el('tr'), d = el('td', null, l[2]); d.style.whiteSpace = 'normal'; d.style.minWidth = '320px'; if (l[6]) { const s = el('small', null, l[6]); s.style.display = 'block'; s.style.color = 'var(--muted)'; d.append(s); }
+        tr.append(td(l[0]), td(l[1]), d, td(l[3]), td(bqF(l[4]), 'n'), td((BQ.R[l[5]] || {}).n || l[5])); return tr; });
+      const f = el('tfoot'), fr = el('tr'); fr.append(td('Total of the ' + bqF(n) + ' lines shown'), td(''), td(''), td(''), td(bqF(sum), 'n'), td('')); f.append(fr);
+      holder.replaceChildren(bqTable([['Bill'], ['Item'], ['Description'], ['Unit'], ['Amount (SAR)', 1], ['Work type']], trs, f));
+      cnt.textContent = bqF(n) + ' of ' + bqF(D.lines.length) + ' lines · page ' + (S.page + 1) + ' of ' + pages;
+      pg.replaceChildren(); const pb = el('button', 'wk-btn', '‹ Previous'), nb = el('button', 'wk-btn', 'Next ›'); [pb, nb].forEach((b) => { b.type = 'button'; }); pb.disabled = S.page === 0; nb.disabled = S.page >= pages - 1;
+      pb.addEventListener('click', () => { S.page--; draw(); holder.scrollIntoView({ block: 'start' }); }); nb.addEventListener('click', () => { S.page++; draw(); holder.scrollIntoView({ block: 'start' }); }); pg.append(pb, nb);
+    };
+    inp.addEventListener('input', () => { S.q = inp.value; S.page = 0; draw(); }); sb.addEventListener('change', () => { S.bill = sb.value; S.page = 0; draw(); }); sc.addEventListener('change', () => { S.code = sc.value; S.page = 0; draw(); });
+    csv.addEventListener('click', () => {
+      const q = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+      const rows = [['Bill', 'Item', 'Description', 'Unit', 'Amount (SAR)', 'Work type code', 'Work type', 'Section'], ...filt().map((l) => [l[0], l[1], l[2], l[3], l[4], l[5], (BQ.R[l[5]] || {}).n || '', l[6]])];
+      const u = URL.createObjectURL(new Blob(['﻿' + rows.map((r) => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' })); const a = document.createElement('a'); a.href = u; a.download = 'SBARC BOQ lines.csv'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+    });
+    draw();
   }
 
   // ---------- P6 breakdown tab (pinned) ----------

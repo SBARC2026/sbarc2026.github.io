@@ -127,6 +127,14 @@ def p6_data():
     _p6.append(out)
     return out
 
+BOQ_FILE = os.path.join(B, 'boq', 'boq.bin')
+def boq_data():
+    """Contract BOQ items and amounts (builder/boq/boq.bin, encrypted with the portal password; see tools/boq_import.py). None if absent."""
+    if not os.path.exists(BOQ_FILE): return None
+    tmp = os.path.join(DATA, 'boq.json'); os.makedirs(DATA, exist_ok=True)
+    subprocess.run(['node', os.path.join(B, 'decrypt.js'), BOQ_FILE, os.environ['SBARC_PASSWORD'], tmp], check=True)
+    out = json.loads(rd(tmp)); os.remove(tmp); return out
+
 def apply_p6(dash, data):
     """Management Tracking: the P6 export sets the earned value of its reporting week, unless the dashboard already holds a later week."""
     p6 = p6_data()
@@ -260,7 +268,10 @@ def build():
     if p6:
         tabs.append({'id': 'p6', 'title': 'Primavera', 'native': True})
         tabs.append({'id': 'bk', 'title': 'P6 breakdown', 'native': True, 'pinned': True})  # pinned: listed first in the sidebar
+    boq = boq_data()
+    if boq: tabs.append({'id': 'boq', 'title': 'BOQ items & amounts', 'native': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
+    if boq: payload['boq'] = boq
     if p6:
         payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
         g = os.path.join(B, 'p6', 'gantt.bin')  # P6 schedule (.xer), encrypted; fetched by the browser when the Gantt opens
