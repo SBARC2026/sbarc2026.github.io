@@ -567,6 +567,35 @@
   .bk-d0 td{background:color-mix(in srgb,var(--chip) 85%,transparent);font-weight:700}.bk-d1 td.bk-n{font-weight:600}.bk-d3 td,.bk-d4 td{color:var(--muted);font-size:12.5px}.bk-d4 td.bk-n .bk-t{font-size:12px}
   .bk-tot td{font-weight:800;border-top:2px solid var(--line);background:var(--chip)}.bk-neg{color:var(--nok)!important}.bk-pos{color:var(--ok)!important}
   .bk-tbl td:nth-child(8),.bk-tbl th:nth-child(8){border-left:1px solid var(--line)}
+  .exp{appearance:none;display:inline-flex;align-items:center;gap:8px;flex:none;border:1px solid var(--line);background:var(--chip);color:var(--fg);border-radius:999px;padding:8px 14px;font:600 13px var(--body);cursor:pointer;transition:background .15s,border-color .15s}
+  .exp:hover,.exp[aria-expanded="true"]{background:color-mix(in srgb,var(--accent) 14%,transparent);border-color:var(--active-line)}
+  @media (max-width:520px){.exp span{display:none}.exp{padding:8px 10px}}
+  @media print{body.print-page .app{position:static!important;display:block!important;background:#fff!important}body.print-page .app::before{display:none}body.print-page .side,body.print-page .topbar,body.print-page .stage>iframe,body.print-page .menu,body.print-page .scrim,body.print-page .loading,body.print-page .pv-tools,body.print-page .pv-pg,body.print-page .pv-seg,body.print-page .wk-nav,body.print-page .wk-tools,body.print-page .bq-card p,body.print-page .exp{display:none!important}
+    body.print-page .stage,body.print-page .pv,body.print-page .wk,body.print-page .main{position:static!important;overflow:visible!important;height:auto!important;display:block!important}body.print-page .pv[hidden],body.print-page .wk[hidden],body.print-page .xp[hidden]{display:none!important}body.print-page .pv-tbl-w{overflow:visible!important}body.print-page *{color-scheme:light;-webkit-print-color-adjust:exact;print-color-adjust:exact}body.print-page .pv-card,body.print-page .pv-kpi,body.print-page .bq-row,body.print-page tr{break-inside:avoid}}
+  /* BOQ tab */
+  .pv-kpi.bq-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 20%,var(--panel)),var(--panel));border-color:color-mix(in srgb,var(--gold) 45%,var(--line))}.pv-kpi.bq-hero b{color:var(--gold)}
+  .bq-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}.bq-card h3{margin:0 0 2px;font:700 15px var(--body)}.bq-card p{margin:0 0 10px;font-size:12.5px;color:var(--muted)}
+  .bq-mixbar{display:flex;height:18px;border-radius:9px;overflow:hidden;gap:2px;margin:6px 0 12px}.bq-mixbar button{border:0;padding:0;cursor:pointer;min-width:4px;transition:filter .15s,transform .15s}.bq-mixbar button:hover{filter:brightness(1.18)}
+  .bq-leg{display:flex;flex-wrap:wrap;gap:4px 8px}.bq-leg button{appearance:none;border:1px solid transparent;background:none;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:7px;padding:3px 9px;border-radius:999px;font:inherit;font-size:12px}.bq-leg button b{color:var(--fg);font-weight:600}.bq-leg button:hover{background:var(--chip)}.bq-leg button[aria-pressed="true"]{border-color:var(--active-line);background:var(--active-bg);color:var(--fg)}.bq-leg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .bq-list{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .bq-row{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(190px,1fr) 64px 128px 130px;gap:6px 20px;align-items:center;padding:12px 18px;border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent);font-size:13px}
+  .bq-bills .bq-row{grid-template-columns:minmax(0,1.6fr) minmax(190px,1fr) 64px 128px 130px}
+  .bq-row:last-child{border-bottom:0}.bq-row:not(.bq-head):not(.bq-foot):hover{background:color-mix(in srgb,var(--accent) 6%,transparent)}
+  .bq-row .n{text-align:right;font-variant-numeric:tabular-nums}
+  .bq-head{background:var(--chip);font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-block:10px}
+  .bq-foot{background:color-mix(in srgb,var(--gold) 12%,var(--chip));font-weight:700;border-top:2px solid var(--line)}
+  .bq-nm{min-width:0;display:flex;flex-direction:column;gap:3px}.bq-nm .go{appearance:none;border:0;border-radius:0;background:transparent!important;box-shadow:none!important;color:var(--fg);cursor:pointer;font:600 14px/1.3 var(--body);padding:0;text-align:left;display:block;width:auto;justify-self:start}.bq-nm .go:hover{color:var(--accent);text-decoration:underline}
+  .bq-meta{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}.bq-meta i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}.bq-meta code{font:11px var(--mono);background:var(--chip);border-radius:4px;padding:0 5px}
+  .bq-sb{display:flex;height:9px;border-radius:5px;overflow:hidden;gap:2px}.bq-sb i{display:block;min-width:3px}.bq-st small{display:block;margin-top:5px;font-size:11.5px;color:var(--muted)}
+  .bq-amt{font-weight:700;font-size:14px}
+  .bq-sh{display:flex;align-items:center;gap:8px;justify-content:flex-end;min-width:0}.bq-sh small{font-size:12px;color:var(--muted);width:44px;text-align:right;font-variant-numeric:tabular-nums}
+  .bq-tr{display:block;flex:1;height:6px;border-radius:3px;background:color-mix(in srgb,var(--fg) 10%,transparent);overflow:hidden}.bq-tr i{display:block;height:100%;border-radius:3px;background:var(--gold)}
+  .bq-tbl th{cursor:default}.bq-tbl td{font-size:13px}.bq-tbl tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--chip) 40%,transparent)}
+  .bq-it{font:12px var(--mono);color:var(--muted);white-space:nowrap}.bq-un{color:var(--muted);white-space:nowrap}
+  .bq-d{white-space:normal;min-width:340px}.bq-d small{display:block;margin-top:2px;color:var(--muted);font-size:11.5px}
+  .bq-am b{display:block;font-weight:700}.bq-am .bq-tr{margin-top:4px;width:110px;margin-left:auto;flex:none;height:4px}
+  .bq-pill{display:inline-block;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;padding:2px 9px;border-radius:999px;background:color-mix(in srgb,var(--c,var(--accent)) 18%,transparent);border:1px solid color-mix(in srgb,var(--c,var(--accent)) 45%,transparent)}
+  @media (max-width:860px){.bq-row{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}.bq-head{display:none}.bq-row>.bq-st,.bq-row>.bq-sh:nth-child(2){grid-column:1/-1;order:3}.bq-row>.n:nth-child(3){display:none}.bq-row .bq-sh:last-child{grid-column:1/-1}}
   .pv-tbl tr.sub td{background:color-mix(in srgb,var(--chip) 60%,transparent);color:var(--muted);font-size:12.5px}
   .pv-tbl tr.sub td:first-child{padding-left:34px}
   .pv-tbl tfoot td{font-weight:700;background:var(--chip);border-top:2px solid var(--line)}
@@ -832,11 +861,13 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   </aside>
   <div class="scrim" id="scrim"></div>
   <div class="menu" id="pdf-menu" hidden role="menu" aria-label="Download PDF"></div>
+  <div class="menu" id="exp-menu" hidden role="menu" aria-label="Export this page"></div>
   <div class="main">
     <header class="topbar">
       <button class="hamb" id="side-open" type="button" aria-label="Open menu" aria-controls="side" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" width="20" height="20"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <div class="crumb"><span class="eb">SBARC · Phase 02-B</span><h1 id="page-title">Dashboards</h1></div>
       <div class="top-meta" id="top-meta"></div>
+      <button class="exp" id="exp-open" type="button" aria-haspopup="true" aria-expanded="false" title="Print as PDF or download Excel"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M5 19.5h14"/></svg><span>Export</span></button>
     </header>
   <main class="stage" id="stage"><div class="loading" id="loading">Loading</div>
     <div class="xp" id="xp" hidden>
@@ -1595,6 +1626,106 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     if (loaded) { try { frames.exec.contentWindow.go('villas'); } catch (e) { /* ignore */ } } else execGoPending = true;
   }
 
+  // ---------- Export: print / Save as PDF and Excel (.xlsx), on every page ----------
+  const crcT = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc32 = (u) => { let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = crcT[(c ^ u[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  function saveBlob(blob, name) {
+    const u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+  }
+  function zipStore(files) { // uncompressed zip; files: [[name, Uint8Array]]
+    const enc = new TextEncoder(), parts = [], cen = []; let off = 0;
+    files.forEach(([name, data]) => {
+      const nb = enc.encode(name), crc = crc32(data), h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(12, 0x21, true); h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, nb.length, true);
+      parts.push(new Uint8Array(h.buffer), nb, data);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(14, 0x21, true); c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, nb.length, true); c.setUint32(42, off, true);
+      cen.push(new Uint8Array(c.buffer), nb); off += 30 + nb.length + data.length;
+    });
+    const cs = cen.reduce((a, x) => a + x.length, 0), e = new DataView(new ArrayBuffer(22));
+    e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cs, true); e.setUint32(16, off, true);
+    return new Blob([...parts, ...cen, new Uint8Array(e.buffer)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  }
+  function xlsxBlob(sheets) { // sheets: [{ name, rows: [[value]] }]; the first row is the header
+    const enc = new TextEncoder(), X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+    const esc = (s) => String(s).replace(/[&<>"]|[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] || ''));
+    const colName = (i) => { let s = ''; for (i++; i > 0; i = Math.floor((i - 1) / 26)) s = String.fromCharCode(65 + (i - 1) % 26) + s; return s; };
+    const seen = new Set(), names = sheets.map((s, i) => { let n = String(s.name || 'Sheet ' + (i + 1)).replace(/[\\/?*[\]:]/g, ' ').trim().slice(0, 31) || 'Sheet ' + (i + 1), k = 2; while (seen.has(n.toLowerCase())) n = n.slice(0, 28) + ' ' + k++; seen.add(n.toLowerCase()); return n; });
+    const sx = sheets.map((s) => {
+      const w = []; s.rows.forEach((r) => r.forEach((v, j) => { const l = v == null ? 0 : String(v).length; w[j] = Math.min(60, Math.max(w[j] || 8, l + 2)); }));
+      let x = X + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>' + w.map((q, j) => '<col min="' + (j + 1) + '" max="' + (j + 1) + '" width="' + q + '" customWidth="1"/>').join('') + '</cols><sheetData>';
+      s.rows.forEach((r, i) => { x += '<row r="' + (i + 1) + '">'; r.forEach((v, j) => { if (v == null || v === '') return; const ref = colName(j) + (i + 1), st = i === 0 ? ' s="1"' : ''; x += typeof v === 'number' && isFinite(v) ? '<c r="' + ref + '"' + st + '><v>' + v + '</v></c>' : '<c r="' + ref + '" t="inlineStr"' + st + '><is><t xml:space="preserve">' + esc(v) + '</t></is></c>'; }); x += '</row>'; });
+      return x + '</sheetData></worksheet>';
+    });
+    const M = 'http://schemas.openxmlformats.org/', R = M + 'officeDocument/2006/relationships';
+    const files = [
+      ['[Content_Types].xml', X + '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' + sheets.map((s, i) => '<Override PartName="/xl/worksheets/sheet' + (i + 1) + '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('') + '</Types>'],
+      ['_rels/.rels', X + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="' + R + '/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+      ['xl/workbook.xml', X + '<workbook xmlns="' + M + 'spreadsheetml/2006/main" xmlns:r="' + R + '"><sheets>' + names.map((n, i) => '<sheet name="' + esc(n) + '" sheetId="' + (i + 1) + '" r:id="rId' + (i + 1) + '"/>').join('') + '</sheets></workbook>'],
+      ['xl/_rels/workbook.xml.rels', X + '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' + sheets.map((s, i) => '<Relationship Id="rId' + (i + 1) + '" Type="' + R + '/worksheet" Target="worksheets/sheet' + (i + 1) + '.xml"/>').join('') + '<Relationship Id="rId' + (sheets.length + 1) + '" Type="' + R + '/styles" Target="styles.xml"/></Relationships>'],
+      ['xl/styles.xml', X + '<styleSheet xmlns="' + M + 'spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0F2742"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs></styleSheet>'],
+      ...sx.map((x, i) => ['xl/worksheets/sheet' + (i + 1) + '.xml', x]),
+    ];
+    return zipStore(files.map(([n, t]) => [n, enc.encode(t)]));
+  }
+  // tables on the current page -> sheets (used where a page has no dedicated data export)
+  function tablesToSheets(root) {
+    const out = [];
+    root.querySelectorAll('table').forEach((t, i) => {
+      const rows = [...t.querySelectorAll('tr')].map((tr) => [...tr.children].map((c) => {
+        const x = c.textContent.replace(/\s+/g, ' ').replace(/^[▶▼]\s*/, '').trim();
+        return /^[+-]?\d[\d,]*(\.\d+)?$/.test(x) ? Number(x.replace(/,/g, '')) : x;
+      })).filter((r) => r.some((v) => v !== ''));
+      if (rows.length < 2) return;
+      const h = t.closest('section,article,.pv-card,.wk-card,div')?.querySelector('h1,h2,h3,h4');
+      out.push({ name: (h && h.textContent.trim()) || 'Table ' + (out.length + 1), rows });
+    });
+    return out;
+  }
+  // a dashboard's datasets (arrays of rows) -> one sheet each; map / path columns are left out
+  function dataToSheets(D) {
+    const out = [];
+    Object.keys(D || {}).forEach((k) => {
+      const a = D[k]; if (!Array.isArray(a) || !a.length || typeof a[0] !== 'object' || !a[0]) return;
+      const keys = []; a.slice(0, 200).forEach((r) => Object.keys(r).forEach((c) => { if (!keys.includes(c)) keys.push(c); }));
+      const big = new Set(keys.filter((c) => a.slice(0, 50).some((r) => String(r[c] == null ? '' : typeof r[c] === 'object' ? JSON.stringify(r[c]) : r[c]).length > 3000)));
+      const cols = keys.filter((c) => !big.has(c)); if (!cols.length) return;
+      const cell = (v) => (v == null ? '' : typeof v === 'number' ? v : typeof v === 'object' ? JSON.stringify(v) : String(v));
+      out.push({ name: k.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()), rows: [cols, ...a.map((r) => cols.map((c) => cell(r[c])))] });
+    });
+    return out;
+  }
+  const tabTitle = () => ((session.dashboards.find((d) => d.id === current) || {}).title || 'SBARC');
+  function exportSheets() {
+    if (current === 'bq' || current === 'boq') return bqSheets();
+    if (current === 'bk' || current === 'p6') return [{ name: 'P6 breakdown', rows: bkSheetRows() }];
+    if (current === 'week') return tablesToSheets($('wk-in'));
+    const f = frames[current], w = f && f.contentWindow; if (!w) return [];
+    const ds = dataToSheets(w.__DATA__); return ds.length ? ds : tablesToSheets(f.contentDocument.body);
+  }
+  function printPage() {
+    if (frames[current] && !frames[current].hidden && frames[current].contentWindow) { frames[current].contentWindow.focus(); frames[current].contentWindow.print(); return; }
+    document.body.classList.add('print-page');
+    const done = () => { document.body.classList.remove('print-page'); window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done); setTimeout(() => { window.print(); setTimeout(done, 1500); }, 60);
+  }
+  function closeExp() { $('exp-menu').hidden = true; $('exp-open').setAttribute('aria-expanded', 'false'); }
+  function openExp() {
+    const m = $('exp-menu'); m.replaceChildren(); m.append(el('h4', null, 'Export · ' + tabTitle()));
+    if (typeof window.print === 'function' && !isWebView) m.append(mItem('PDF', 'Print / Save as PDF', 'Opens the print window: choose “Save as PDF”', () => { closeExp(); printPage(); }, true));
+    else m.append(el('p', 'note', 'Printing is not available in this app. Open the portal in your browser to save a PDF.'));
+    m.append(mItem('XLS', 'Excel workbook (.xlsx)', 'The tables of this page', (b, st) => {
+      const sheets = exportSheets().filter((s) => s.rows && s.rows.length > 1);
+      if (!sheets.length) { st.textContent = 'No tables here'; return; }
+      saveBlob(xlsxBlob(sheets), 'SBARC ' + tabTitle() + ' ' + (new Date().toISOString().slice(0, 10)) + '.xlsx'); closeExp();
+    }));
+    m.hidden = false; $('exp-open').setAttribute('aria-expanded', 'true');
+    const r = $('exp-open').getBoundingClientRect(); m.style.top = (r.bottom + 8) + 'px'; m.style.left = Math.max(12, Math.min(r.right - m.offsetWidth, innerWidth - m.offsetWidth - 12)) + 'px'; m.style.right = 'auto';
+  }
+  $('exp-open').addEventListener('click', (e) => { e.stopPropagation(); if ($('exp-menu').hidden) { closeMenu(); openExp(); } else closeExp(); });
+  document.addEventListener('click', (e) => { if (!$('exp-menu').hidden && !$('exp-menu').contains(e.target)) closeExp(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeExp(); });
+
   // ---------- PDF menu ----------
   const pdfCache = {};
   const LIVE = 'http://sbarc2026.github.io/';
@@ -1849,83 +1980,119 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   // session.boq: { rules:[{c, g, n, s:[[stage, %]], l: lines, v: amount, b: note}], lines:[[bill, item, description, unit, amount, work-type code, section]], bills:[[bill, title, lines, amount]] }
   let BQ = null;
   const bqF = (n) => Math.round(n).toLocaleString('en-US');
-  const bqM = (n) => (n / 1e6).toFixed(2) + 'M';
+  const bqM = (n) => (n / 1e6).toFixed(n >= 1e8 ? 1 : 2) + 'M';
+  const BQ_COL = ['#E8C27A', '#62B2D6', '#5FD3B6', '#A78BFA', '#F07D66', '#7DD3FC', '#E3AA4E', '#62C48A', '#F29BC1', '#9AA9B8'];
   function bqReset() { BQ = null; $('bq').hidden = true; $('bq-in').replaceChildren(); }
-  function bqOpen() {
-    if (!BQ) {
-      const D = session.boq; if (!D) { $('bq-in').replaceChildren(el('div', 'wk-empty', 'No BOQ data in this build.')); return; }
-      const R = {}; D.rules.forEach((r) => { R[r.c] = r; });
-      BQ = { D, R, total: D.rules.reduce((a, r) => a + r.v, 0), view: 'wt', wt: { q: '', g: '' }, bl: { q: '' }, ln: { q: '', bill: '', code: '', page: 0 } };
-    }
-    bqRender();
+  function bqEnsure() {
+    if (BQ) return true;
+    const D = session.boq; if (!D) return false;
+    const R = {}; D.rules.forEach((r) => { R[r.c] = r; });
+    const gv = {}; D.rules.forEach((r) => { gv[r.g] = (gv[r.g] || 0) + r.v; });
+    const groups = Object.keys(gv).sort((a, b) => gv[b] - gv[a]), gcol = {}; groups.forEach((g, i) => { gcol[g] = BQ_COL[Math.min(i, BQ_COL.length - 1)]; });
+    BQ = { D, R, gv, groups, gcol, total: D.rules.reduce((a, r) => a + r.v, 0), view: 'wt', wt: { q: '', g: '', sort: 'v' }, ln: { q: '', bill: '', code: '', page: 0 } };
+    return true;
   }
-  const bqKind = (r) => (r.s.length === 3 ? '65 / 30 / 5' : r.s.length === 2 && r.s[0][1] === 65 ? '65 / 35' : 'Own sequence');
+  function bqOpen() { if (!bqEnsure()) { $('bq-in').replaceChildren(el('div', 'wk-empty', 'No BOQ data in this build.')); return; } bqRender(); }
+  const bqKind = (r) => (r.s.length === 3 ? '65 / 30 / 5' : r.s.length === 2 && r.s[0][1] === 65 ? '65 / 35' : 'Own stages');
   function bqRender() {
     const root = $('bq-in'), D = BQ.D; root.replaceChildren();
     const top = el('div', 'pv-top'), tl = el('div');
-    tl.append(el('div', 'pv-eb', 'Contract BOQ 5.3 · IPA 24 B.O.Q. Break R00'), el('h1', 'pv-h', 'BOQ items and amounts'),
-      el('p', 'pv-sub', 'Every priced BOQ line with its amount, grouped by work type and by bill. Amounts are the BOQ amounts before discount (SAR).'));
+    tl.append(el('div', 'pv-eb', 'Contract BOQ 5.3 · IPA 24 B.O.Q. Break R00'), el('h1', 'pv-h', 'BOQ items & amounts'),
+      el('p', 'pv-sub', 'Every priced BOQ line with its amount, grouped by work type and by bill. Amounts are the contract BOQ amounts before discount, in SAR.'));
     const seg = el('div', 'pv-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'View');
-    [['wt', 'By work type'], ['bl', 'By bill'], ['ln', 'All lines']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(BQ.view === k)); b.addEventListener('click', () => { BQ.view = k; bqRender(); }); seg.append(b); });
+    [['wt', 'Work types'], ['bl', 'Bills'], ['ln', 'All lines']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(BQ.view === k)); b.addEventListener('click', () => { BQ.view = k; bqRender(); }); seg.append(b); });
     const rt = el('div', 'pv-top-r'); rt.append(seg); top.append(tl, rt); root.append(top);
-    const kp = el('div', 'pv-kpis'), kpi = (a, b, c) => { const d = el('div', 'pv-kpi'); d.append(el('span', null, a), el('b', null, b), el('small', null, c)); return d; };
-    kp.append(kpi('BOQ value', bqM(BQ.total), 'SAR ' + bqF(BQ.total)), kpi('Priced lines', bqF(D.lines.length), 'bills 1 to 5b'), kpi('Bills', String(D.bills.length), 'general, buildings, villas, external'), kpi('Work types', String(D.rules.length), 'each with its rule of credit'));
+    const kp = el('div', 'pv-kpis'), kpi = (a, b, c, cls) => { const d = el('div', 'pv-kpi' + (cls ? ' ' + cls : '')); d.append(el('span', null, a), el('b', null, b), el('small', null, c)); return d; };
+    const big = BQ.groups[0];
+    kp.append(kpi('BOQ value', bqM(BQ.total), 'SAR ' + bqF(BQ.total), 'bq-hero'), kpi('Priced lines', bqF(D.lines.length), D.bills.length + ' bills, 1 to 5b'), kpi('Work types', String(D.rules.length), BQ.groups.length + ' groups'),
+      kpi('Largest group', big, bqM(BQ.gv[big]) + ' · ' + (BQ.gv[big] / BQ.total * 100).toFixed(0) + '% of the BOQ'));
     root.append(kp);
     ({ wt: bqWorkTypes, bl: bqBills, ln: bqLines })[BQ.view](root);
     $('bq').scrollTop = 0;
   }
-  function bqTable(heads, rows, foot) {
-    const t = el('table', 'pv-tbl'), hd = el('thead'), hr = el('tr'); heads.forEach(([l, n]) => hr.append(el('th', n ? 'n' : '', l))); hd.append(hr);
-    const tb = el('tbody'); rows.forEach((r) => tb.append(r)); t.append(hd, tb); if (foot) t.append(foot); const w = el('div', 'pv-tbl-w'); w.append(t); return w;
-  }
-  const bqShare = (v) => { const c = el('td', 'n'), m = el('span', 'pv-mini'), i = el('i'); i.style.width = Math.min(100, (v / BQ.total) * 100 * 4) + '%'; m.append(i); c.append(m, (v / BQ.total * 100).toFixed(1) + '%'); return c; };
   function bqGo(f) { Object.assign(BQ.ln, { q: '', bill: '', code: '', page: 0 }, f); BQ.view = 'ln'; bqRender(); }
+  function bqStages(r) {
+    const box = el('div', 'bq-st'), bar = el('div', 'bq-sb');
+    r.s.forEach((x, i) => { const sg = el('i'); sg.style.flex = x[1] + ' 1 0'; sg.style.background = /deliver/i.test(x[0]) ? '#E8C27A' : /test|commission/i.test(x[0]) ? '#5FD3B6' : i % 2 ? '#62B2D6' : '#4B7FB5'; sg.title = x[1] + '% ' + x[0]; bar.append(sg); });
+    const nm = (x) => (/deliver/i.test(x) ? 'delivered' : /test|commission/i.test(x) ? 'testing' : /install|connect|complete|erect|laid|place/i.test(x) ? 'installed' : x.replace(/\(.*\)/, '').trim().toLowerCase().slice(0, 22));
+    box.append(bar, el('small', null, r.s.length > 3 ? r.s.length + ' own stages' : r.s.map((x) => x[1] + '% ' + nm(x[0])).join(' · ')));
+    return box;
+  }
   function bqWorkTypes(root) {
-    const S = BQ.wt, D = BQ.D, groups = [...new Set(D.rules.map((r) => r.g))];
+    const S = BQ.wt, D = BQ.D;
+    const mix = el('section', 'bq-card'); mix.append(el('h3', null, 'Value by group'), el('p', null, 'Click a colour to list only that group.'));
+    const bar = el('div', 'bq-mixbar'), leg = el('div', 'bq-leg');
+    BQ.groups.forEach((g) => { const b = el('button'); b.type = 'button'; b.style.flex = BQ.gv[g] + ' 1 0'; b.style.background = BQ.gcol[g]; b.title = g + ' · SAR ' + bqF(BQ.gv[g]); b.setAttribute('aria-label', g); b.addEventListener('click', () => { S.g = S.g === g ? '' : g; draw(); }); bar.append(b);
+      const l = el('button'); l.type = 'button'; l.dataset.g = g; const dt = el('i'); dt.style.background = BQ.gcol[g]; l.append(dt, g + ' ', el('b', null, (BQ.gv[g] / BQ.total * 100).toFixed(1) + '%')); l.addEventListener('click', () => { S.g = S.g === g ? '' : g; draw(); }); leg.append(l); });
+    mix.append(bar, leg); root.append(mix);
     const tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search work types, e.g. doors, cables, paving'; inp.value = S.q; inp.setAttribute('aria-label', 'Search work types');
-    const sel = el('select'); sel.append(new Option('All groups', '')); groups.forEach((g) => sel.append(new Option(g, g))); sel.value = S.g;
+    const sel = el('select'); [['v', 'Sort: amount'], ['n', 'Sort: name'], ['l', 'Sort: lines']].forEach(([k, t]) => sel.append(new Option(t, k))); sel.value = S.sort;
     const cnt = el('span', 'pv-pg'); tools.append(inp, sel, cnt); const holder = el('div'); root.append(tools, holder);
     const draw = () => {
-      const q = S.q.trim().toLowerCase(), rs = D.rules.filter((r) => (!S.g || r.g === S.g) && (!q || (r.n + ' ' + r.c + ' ' + r.g).toLowerCase().includes(q))).sort((a, b) => b.v - a.v);
-      const trs = rs.map((r) => { const tr = el('tr'), c0 = el('td'), b = el('button', 'go', r.n); b.type = 'button'; b.title = 'Show the BOQ lines of this work type'; b.addEventListener('click', () => bqGo({ code: r.c })); c0.append(b);
-        const st = el('td'); st.textContent = r.s.map((x) => x[1] + '% ' + x[0]).join(' · '); st.style.whiteSpace = 'normal'; st.style.minWidth = '260px'; st.style.color = 'var(--muted)'; st.style.fontSize = '12px';
-        tr.append(td(r.c), td(r.g), c0, td(bqF(r.l), 'n'), td(bqF(r.v), 'n'), bqShare(r.v), td(bqKind(r)), st); return tr; });
-      const sum = rs.reduce((a, r) => a + r.v, 0), nl = rs.reduce((a, r) => a + r.l, 0), f = el('tfoot'), fr = el('tr'); fr.append(td('Total'), td(''), td(''), td(bqF(nl), 'n'), td(bqF(sum), 'n'), td('', 'n'), td(''), td('')); f.append(fr);
-      holder.replaceChildren(bqTable([['Code'], ['Group'], ['Work type'], ['Lines', 1], ['Amount (SAR)', 1], ['Share', 1], ['Credit rule'], ['Stages']], trs, f));
-      cnt.textContent = rs.length + ' of ' + D.rules.length + ' work types · click a name to see its lines';
+      const q = S.q.trim().toLowerCase(), rs = D.rules.filter((r) => (!S.g || r.g === S.g) && (!q || (r.n + ' ' + r.c + ' ' + r.g).toLowerCase().includes(q)));
+      rs.sort((a, b) => (S.sort === 'n' ? a.n.localeCompare(b.n) : S.sort === 'l' ? b.l - a.l : b.v - a.v));
+      leg.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.g === S.g)));
+      const mx = Math.max(1, ...rs.map((r) => r.v)), list = el('div', 'bq-list');
+      const hd = el('div', 'bq-row bq-head'); ['Work type', 'Rule of credit', 'Lines', 'Amount (SAR)', 'Share'].forEach((t, i) => hd.append(el('span', i > 1 ? 'n' : '', t))); list.append(hd);
+      rs.forEach((r) => {
+        const row = el('div', 'bq-row'), nm = el('div', 'bq-nm'), b = el('button', 'go', r.n); b.type = 'button'; b.title = 'Show the BOQ lines of this work type'; b.addEventListener('click', () => bqGo({ code: r.c }));
+        const meta = el('div', 'bq-meta'); const gd = el('i'); gd.style.background = BQ.gcol[r.g]; meta.append(gd, r.g + ' · ', el('code', null, r.c)); nm.append(b, meta);
+        const sh = el('div', 'bq-sh'), tr = el('span', 'bq-tr'), fi = el('i'); fi.style.width = (r.v / mx * 100) + '%'; fi.style.background = BQ.gcol[r.g]; tr.append(fi); sh.append(tr, el('small', null, (r.v / BQ.total * 100).toFixed(1) + '%'));
+        row.append(nm, bqStages(r), el('span', 'n', bqF(r.l)), el('b', 'n bq-amt', bqF(r.v)), sh); list.append(row);
+      });
+      const sum = rs.reduce((a, r) => a + r.v, 0), nl = rs.reduce((a, r) => a + r.l, 0), ft = el('div', 'bq-row bq-foot'); ft.append(el('span', null, 'Total · ' + rs.length + ' work types'), el('span'), el('span', 'n', bqF(nl)), el('b', 'n bq-amt', bqF(sum)), el('span', 'n', (sum / BQ.total * 100).toFixed(1) + '%')); list.append(ft);
+      holder.replaceChildren(list); cnt.textContent = rs.length + ' of ' + D.rules.length + ' work types · click a name to see its lines';
     };
-    inp.addEventListener('input', () => { S.q = inp.value; draw(); }); sel.addEventListener('change', () => { S.g = sel.value; draw(); }); draw();
+    inp.addEventListener('input', () => { S.q = inp.value; draw(); }); sel.addEventListener('change', () => { S.sort = sel.value; draw(); }); draw();
   }
   function bqBills(root) {
-    const D = BQ.D, trs = D.bills.map((b) => { const tr = el('tr'), c1 = el('td'), g = el('button', 'go', b[1]); g.type = 'button'; g.addEventListener('click', () => bqGo({ bill: b[0] })); c1.append(g); tr.append(td(b[0]), c1, td(bqF(b[2]), 'n'), td(bqF(b[3]), 'n'), bqShare(b[3])); return tr; });
-    const f = el('tfoot'), fr = el('tr'); fr.append(td('Total'), td(''), td(bqF(D.bills.reduce((a, b) => a + b[2], 0)), 'n'), td(bqF(D.bills.reduce((a, b) => a + b[3], 0)), 'n'), td('', 'n')); f.append(fr);
-    root.append(bqTable([['Bill'], ['Title'], ['Lines', 1], ['Amount (SAR)', 1], ['Share', 1]], trs, f));
+    const D = BQ.D, mx = Math.max(...D.bills.map((b) => b[3])), list = el('div', 'bq-list bq-bills');
+    const hd = el('div', 'bq-row bq-head'); ['Bill', 'Value', 'Lines', 'Amount (SAR)', 'Share'].forEach((t, i) => hd.append(el('span', i > 1 ? 'n' : '', t))); list.append(hd);
+    D.bills.forEach((b) => {
+      const row = el('div', 'bq-row'), nm = el('div', 'bq-nm'), g = el('button', 'go', b[1]); g.type = 'button'; g.title = 'Show the lines of this bill'; g.addEventListener('click', () => bqGo({ bill: b[0] }));
+      nm.append(g, el('div', 'bq-meta', 'Bill ' + b[0]));
+      const bar = el('div', 'bq-sh'), tr = el('span', 'bq-tr'), fi = el('i'); fi.style.width = (b[3] / mx * 100) + '%'; tr.append(fi); bar.append(tr);
+      const sh = el('div', 'bq-sh'), tr2 = el('span', 'bq-tr'), f2 = el('i'); f2.style.width = Math.min(100, b[3] / BQ.total * 100 * 4) + '%'; tr2.append(f2); sh.append(tr2, el('small', null, (b[3] / BQ.total * 100).toFixed(1) + '%'));
+      row.append(nm, bar, el('span', 'n', bqF(b[2])), el('b', 'n bq-amt', bqF(b[3])), sh); list.append(row);
+    });
+    const ft = el('div', 'bq-row bq-foot'); ft.append(el('span', null, 'Total · ' + D.bills.length + ' bills'), el('span'), el('span', 'n', bqF(D.bills.reduce((a, b) => a + b[2], 0))), el('b', 'n bq-amt', bqF(D.bills.reduce((a, b) => a + b[3], 0))), el('span', 'n', '100%')); list.append(ft);
+    root.append(list);
   }
   function bqLines(root) {
     const S = BQ.ln, D = BQ.D, PAGE = 100;
     const tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search description or item, e.g. VRF, kerb, D02'; inp.value = S.q; inp.setAttribute('aria-label', 'Search BOQ lines');
     const sb = el('select'); sb.append(new Option('All bills', '')); D.bills.forEach((b) => sb.append(new Option(b[0] + ' · ' + b[1], b[0]))); sb.value = S.bill;
     const sc = el('select'); sc.append(new Option('All work types', '')); [...D.rules].sort((a, b) => a.n.localeCompare(b.n)).forEach((r) => sc.append(new Option(r.n, r.c))); sc.value = S.code;
-    const csv = el('button', 'wk-btn', 'Download CSV'); csv.type = 'button'; const cnt = el('span', 'pv-pg'); tools.append(inp, sb, sc, csv, cnt);
+    const clr = el('button', 'wk-btn', 'Clear filters'); clr.type = 'button'; const cnt = el('span', 'pv-pg'); tools.append(inp, sb, sc, clr, cnt);
     const holder = el('div'), pg = el('div', 'pv-tools'); root.append(tools, holder, pg);
     const filt = () => { const q = S.q.trim().toLowerCase(); return D.lines.filter((l) => (!S.bill || l[0] === S.bill) && (!S.code || l[5] === S.code) && (!q || (l[2] + ' ' + l[1] + ' ' + l[6] + ' ' + l[5]).toLowerCase().includes(q))); };
     const draw = () => {
       const rs = filt(), n = rs.length, pages = Math.max(1, Math.ceil(n / PAGE)); if (S.page >= pages) S.page = pages - 1;
-      const sum = rs.reduce((a, l) => a + l[4], 0), trs = rs.slice(S.page * PAGE, S.page * PAGE + PAGE).map((l) => { const tr = el('tr'), d = el('td', null, l[2]); d.style.whiteSpace = 'normal'; d.style.minWidth = '320px'; if (l[6]) { const s = el('small', null, l[6]); s.style.display = 'block'; s.style.color = 'var(--muted)'; d.append(s); }
-        tr.append(td(l[0]), td(l[1]), d, td(l[3]), td(bqF(l[4]), 'n'), td((BQ.R[l[5]] || {}).n || l[5])); return tr; });
-      const f = el('tfoot'), fr = el('tr'); fr.append(td('Total of the ' + bqF(n) + ' lines shown'), td(''), td(''), td(''), td(bqF(sum), 'n'), td('')); f.append(fr);
-      holder.replaceChildren(bqTable([['Bill'], ['Item'], ['Description'], ['Unit'], ['Amount (SAR)', 1], ['Work type']], trs, f));
+      const sum = rs.reduce((a, l) => a + l[4], 0), mx = Math.max(1, ...rs.map((l) => l[4]));
+      const t = el('table', 'pv-tbl bq-tbl'), hd = el('thead'), hr = el('tr'); [['Bill'], ['Item'], ['Description'], ['Unit'], ['Amount (SAR)', 1], ['Work type']].forEach(([l, nn]) => hr.append(el('th', nn ? 'n' : '', l))); hd.append(hr);
+      const tb = el('tbody'); rs.slice(S.page * PAGE, S.page * PAGE + PAGE).forEach((l) => {
+        const tr = el('tr'), d = el('td', 'bq-d', l[2]); if (l[6]) d.append(el('small', null, l[6]));
+        const wt = el('td'), r = BQ.R[l[5]], pill = el('span', 'bq-pill', r ? r.n : l[5]); if (r) pill.style.setProperty('--c', BQ.gcol[r.g]); wt.append(pill);
+        const am = el('td', 'n bq-am'); am.append(el('b', null, bqF(l[4]))); const m = el('span', 'bq-tr'), fi = el('i'); fi.style.width = Math.max(2, l[4] / mx * 100) + '%'; m.append(fi); am.append(m);
+        tr.append(el('td', null, l[0]), el('td', 'bq-it', l[1]), d, el('td', 'bq-un', l[3]), am, wt); tb.append(tr);
+      });
+      const f = el('tfoot'), fr = el('tr'); fr.append(td('Total of the ' + bqF(n) + ' lines'), td(''), td(''), td(''), td(bqF(sum), 'n'), td('')); f.append(fr); t.append(hd, tb, f);
+      const w = el('div', 'pv-tbl-w'); w.append(t); holder.replaceChildren(w);
       cnt.textContent = bqF(n) + ' of ' + bqF(D.lines.length) + ' lines · page ' + (S.page + 1) + ' of ' + pages;
       pg.replaceChildren(); const pb = el('button', 'wk-btn', '‹ Previous'), nb = el('button', 'wk-btn', 'Next ›'); [pb, nb].forEach((b) => { b.type = 'button'; }); pb.disabled = S.page === 0; nb.disabled = S.page >= pages - 1;
       pb.addEventListener('click', () => { S.page--; draw(); holder.scrollIntoView({ block: 'start' }); }); nb.addEventListener('click', () => { S.page++; draw(); holder.scrollIntoView({ block: 'start' }); }); pg.append(pb, nb);
     };
     inp.addEventListener('input', () => { S.q = inp.value; S.page = 0; draw(); }); sb.addEventListener('change', () => { S.bill = sb.value; S.page = 0; draw(); }); sc.addEventListener('change', () => { S.code = sc.value; S.page = 0; draw(); });
-    csv.addEventListener('click', () => {
-      const q = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-      const rows = [['Bill', 'Item', 'Description', 'Unit', 'Amount (SAR)', 'Work type code', 'Work type', 'Section'], ...filt().map((l) => [l[0], l[1], l[2], l[3], l[4], l[5], (BQ.R[l[5]] || {}).n || '', l[6]])];
-      const u = URL.createObjectURL(new Blob(['﻿' + rows.map((r) => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' })); const a = document.createElement('a'); a.href = u; a.download = 'SBARC BOQ lines.csv'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
-    });
+    clr.addEventListener('click', () => { Object.assign(S, { q: '', bill: '', code: '', page: 0 }); inp.value = ''; sb.value = ''; sc.value = ''; draw(); });
     draw();
+  }
+  function bqSheets() {
+    bqEnsure(); const D = BQ.D, share = (v) => Math.round(v / BQ.total * 10000) / 100;
+    return [
+      { name: 'Work types', rows: [['Code', 'Group', 'Work type', 'Lines', 'Amount (SAR)', 'Share %', 'Rule of credit', 'Stages'], ...[...D.rules].sort((a, b) => b.v - a.v).map((r) => [r.c, r.g, r.n, r.l, r.v, share(r.v), bqKind(r), r.s.map((x) => x[1] + '% ' + x[0]).join(' · ')])] },
+      { name: 'Bills', rows: [['Bill', 'Title', 'Lines', 'Amount (SAR)', 'Share %'], ...D.bills.map((b) => [b[0], b[1], b[2], b[3], share(b[3])])] },
+      { name: 'All lines', rows: [['Bill', 'Item', 'Description', 'Unit', 'Amount (SAR)', 'Work type code', 'Work type', 'Section'], ...D.lines.map((l) => [l[0], l[1], l[2], l[3], l[4], l[5], (BQ.R[l[5]] || {}).n || '', l[6]])] },
+    ];
   }
 
   // ---------- P6 breakdown tab (pinned) ----------
@@ -1979,6 +2146,21 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       BK = { P, m: bkBuild(P), q: '', open: new Set() };
     }
     bkRender();
+  }
+  // P6 breakdown as flat rows (all levels), used by the CSV button, the Excel export and the Primavera page export
+  function bkSheetRows() {
+    if (!BK) BK = { P: session.p6, m: bkBuild(session.p6), q: '', open: new Set() };
+    const M = BK.m, head = ['Level', 'Section', 'P6 group', 'Area', 'Villa / building', 'Activity ID', 'Activity', 'Budget man-hours', 'Planned man-hours', 'Earned man-hours', 'Planned %', 'Earned %', 'Man-hour variance', 'This week MH', 'Remaining MH', 'Budget cost', 'Planned cost', 'Earned cost', 'Planned cost %', 'Earned cost %', 'Cost variance'];
+    const lv = ['Section', 'Group', 'Area', 'Villa / building', 'Activity'], out = [head];
+    const pc = (v) => (v == null ? '' : Math.round(v * 10000) / 100);
+    const emit = (r) => { const lf = r.leaf ? 4 : r.d;
+      out.push([lv[lf], r.sec || (r.d === 0 ? r.n : ''), r.g || (r.d === 1 ? r.n : ''), r.area || (r.d === 2 ? r.n : ''), r.unit || (r.d === 3 && !r.leaf ? r.n : ''), r.aid || '', r.aname || '', Math.round(r.bu), Math.round(r.pvu), Math.round(r.eu), pc(bkPl(r, 0)), pc(bkEa(r, 0)), Math.round(r.eu - r.pvu), Math.round(r.wk), Math.round(r.rem), Math.round(r.bc), Math.round(r.pvc), Math.round(r.ec), pc(bkPl(r, 1)), pc(bkEa(r, 1)), Math.round(r.ec - r.pvc)]); };
+    const all = (n) => { emit(n); bkKids(n).forEach(all); }; M.secs.forEach(all);
+    return out;
+  }
+  function csvDownload(name, rows) {
+    const q = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    saveBlob(new Blob(['﻿' + rows.map((r) => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' }), name + '.csv');
   }
   function bkRender() {
     const root = $('bk-in'), P = BK.P, M = BK.m, T = M.T; root.replaceChildren();
@@ -2036,15 +2218,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     inp.addEventListener('input', () => { BK.q = inp.value; draw(); });
     bAll.addEventListener('click', () => { BK.open.clear(); BK.q = ''; inp.value = ''; draw(); });
     bG.addEventListener('click', () => { M.secs.forEach((s) => { BK.open.add(s.id); }); draw(); });
-    bCsv.addEventListener('click', () => {
-      const head = ['Level', 'Section', 'P6 group', 'Area', 'Villa / building', 'Activity ID', 'Activity', 'Budget man-hours', 'Planned man-hours', 'Earned man-hours', 'Planned %', 'Earned %', 'Man-hour variance', 'This week MH', 'Remaining MH', 'Budget cost', 'Planned cost', 'Earned cost', 'Planned cost %', 'Earned cost %', 'Cost variance'];
-      const lv = ['Section', 'Group', 'Area', 'Villa / building', 'Activity'], out = [];
-      const emit = (r) => { const e0 = bkEa(r, 0), p0 = bkPl(r, 0), e1 = bkEa(r, 1), p1 = bkPl(r, 1), lf = r.leaf ? 4 : r.d;
-        out.push([lv[lf], r.sec || (r.d === 0 ? r.n : ''), r.g || (r.d === 1 ? r.n : ''), r.area || (r.d === 2 ? r.n : ''), r.unit || (r.d === 3 && !r.leaf ? r.n : ''), r.aid || '', r.aname || '', Math.round(r.bu), Math.round(r.pvu), Math.round(r.eu), p0 == null ? '' : (p0 * 100).toFixed(2), e0 == null ? '' : (e0 * 100).toFixed(2), Math.round(r.eu - r.pvu), Math.round(r.wk), Math.round(r.rem), Math.round(r.bc), Math.round(r.pvc), Math.round(r.ec), p1 == null ? '' : (p1 * 100).toFixed(2), e1 == null ? '' : (e1 * 100).toFixed(2), Math.round(r.ec - r.pvc)]); };
-      const all = (n) => { emit(n); bkKids(n).forEach(all); }; M.secs.forEach(all);
-      const q = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-      const u = URL.createObjectURL(new Blob(['﻿' + [head, ...out].map((r) => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' })); const a = document.createElement('a'); a.href = u; a.download = 'P6 breakdown ' + P.date + '.csv'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
-    });
+    bCsv.addEventListener('click', () => csvDownload('P6 breakdown ' + P.date, bkSheetRows()));
     draw(); $('bk').scrollTop = 0;
   }
 

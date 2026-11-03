@@ -267,9 +267,9 @@ def build():
     p6 = p6_data()
     if p6:
         tabs.append({'id': 'p6', 'title': 'Primavera', 'native': True})
-        tabs.append({'id': 'bk', 'title': 'P6 breakdown', 'native': True, 'pinned': True})  # pinned: listed first in the sidebar
+        tabs.append({'id': 'bk', 'title': 'P6 breakdown', 'native': True})
     boq = boq_data()
-    if boq: tabs.append({'id': 'boq', 'title': 'BOQ items & amounts', 'native': True})
+    if boq: tabs.append({'id': 'boq', 'title': 'BOQ & amounts', 'native': True, 'pinned': True})  # pinned: listed first in the sidebar
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     if boq: payload['boq'] = boq
     if p6:
