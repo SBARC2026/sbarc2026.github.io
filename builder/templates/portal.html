@@ -561,6 +561,12 @@
   .pv-tbl th[aria-sort]::after{content:" ▲";font-size:9px}.pv-tbl th[aria-sort=descending]::after{content:" ▼"}
   .pv-tbl td.n{white-space:nowrap}.pv-tbl td{padding:8px 12px;border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);vertical-align:top}
   .pv-tbl tr:hover td{background:color-mix(in srgb,var(--accent) 5%,transparent)}
+  .tab .pin{margin-left:auto;display:flex;color:var(--accent);opacity:.9}.app.collapsed .tab .pin{display:none}.tab.pinned{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent)}
+  .bk-tbl th{cursor:default}.bk-tbl th.bk-grp{text-align:center;border-left:1px solid var(--line);letter-spacing:.14em}.bk-tbl thead tr:first-child th{top:0}.bk-tbl thead tr:nth-child(2) th{top:34px}
+  .bk-tbl td.bk-n{white-space:nowrap;max-width:420px}.bk-tbl .bk-t{overflow:hidden;text-overflow:ellipsis;vertical-align:middle}.bk-sp{display:inline-block;width:22px}
+  .bk-d0 td{background:color-mix(in srgb,var(--chip) 85%,transparent);font-weight:700}.bk-d1 td.bk-n{font-weight:600}.bk-d3 td,.bk-d4 td{color:var(--muted);font-size:12.5px}.bk-d4 td.bk-n .bk-t{font-size:12px}
+  .bk-tot td{font-weight:800;border-top:2px solid var(--line);background:var(--chip)}.bk-neg{color:var(--nok)!important}.bk-pos{color:var(--ok)!important}
+  .bk-tbl td:nth-child(8),.bk-tbl th:nth-child(8){border-left:1px solid var(--line)}
   .pv-tbl tr.sub td{background:color-mix(in srgb,var(--chip) 60%,transparent);color:var(--muted);font-size:12.5px}
   .pv-tbl tr.sub td:first-child{padding-left:34px}
   .pv-tbl tfoot td{font-weight:700;background:var(--chip);border-top:2px solid var(--line)}
@@ -849,6 +855,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     </div>
     <div class="wk" id="wk" hidden><div class="wk-in" id="wk-in"><div class="wk-empty">Loading this week's targets…</div></div></div>
     <div class="pv" id="pv" hidden><div class="pv-in" id="pv-in"></div></div>
+    <div class="pv" id="bk" hidden><div class="pv-in" id="bk-in"></div></div>
   </main>
   </div>
 </section>
@@ -965,10 +972,10 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('app').hidden = false;
     $('pname').textContent = session.project;
     const tabs = $('tabs'); tabs.replaceChildren();
-    session.dashboards.forEach((d) => {
-      const b = document.createElement('button'); b.className = 'tab'; b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
-      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera' };
-      const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh);
+    [...session.dashboards].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).forEach((d) => {
+      const b = document.createElement('button'); b.className = 'tab' + (d.pinned ? ' pinned' : ''); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown' };
+      const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh); if (d.pinned) { const pn = document.createElement('span'); pn.className = 'pin'; pn.title = 'Pinned'; pn.setAttribute('aria-hidden', 'true'); pn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M14.5 3.5l6 6-2 .8-3.3 3.3.3 4.2-1.4 1.4-4-4-5.3 5.3-1-1 5.3-5.3-4-4 1.4-1.4 4.2.3 3.3-3.3z"/></svg>'; b.append(pn); }
       b.addEventListener('click', () => { show(d.id); drawer(false); }); tabs.append(b);
     });
     const tb = [...document.querySelectorAll('.tblock div')].map((x) => [x.querySelector('span').textContent, x.querySelector('b').textContent]);
@@ -983,7 +990,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
     session = null; current = null; secret = ''; $('up').hidden = true;
-    xpReset(); wkReset(); pvReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
+    xpReset(); wkReset(); pvReset(); bkReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -1004,6 +1011,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     p02b: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"/><path d="M5 16l4.5-5 3.5 3 6-7"/><path d="M15 7h4v4"/></svg>',
     week: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>',
     p6: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M4 12h13M4 18h7"/><rect x="13" y="4" width="7" height="4" rx="1.2"/><rect x="17" y="10" width="3.5" height="4" rx="1.2"/><rect x="11" y="16" width="9" height="4" rx="1.2"/></svg>',
+    bk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M9 9.5V20"/><path d="M12.5 13h5M12.5 16.5h3"/></svg>',
     explorer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg>',
   };
   // sidebar: collapse on desktop, drawer on phones and tablets
@@ -1027,9 +1035,11 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('xp').hidden = id !== 'explorer';
     $('wk').hidden = id !== 'week';
     $('pv').hidden = id !== 'p6';
+    $('bk').hidden = id !== 'bk';
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
     if (id === 'week') { $('loading').hidden = true; wkOpen(); return; }
     if (id === 'p6') { $('loading').hidden = true; pvOpen(); return; }
+    if (id === 'bk') { $('loading').hidden = true; bkOpen(); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
   function makeFrame(id) {
@@ -1829,6 +1839,126 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const q = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
     const txt = '﻿' + [head, ...rows].map((r) => r.map(q).join(',')).join('\r\n');
     const u = URL.createObjectURL(new Blob([txt], { type: 'text/csv' })); const a = document.createElement('a'); a.href = u; a.download = name + ' ' + PV.P.date + '.csv'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+  }
+
+  // ---------- P6 breakdown tab (pinned) ----------
+  // A drill-down of the P6 export: section > trade group > area > villa / building > activity, man-hours and cost side by side.
+  let BK = null;
+  const BK_SEC = ['Structure & envelope', 'Finishes & MEP', 'External & infrastructure', 'Close-out', 'Other / level of effort'];
+  const BK_K = ['bu', 'pvu', 'eu', 'wk', 'rem', 'bc', 'pvc', 'ec'];
+  function bkSecOf(n) {
+    if (['Substructure', 'Superstructure', 'Slab On Grade', 'Block Work', 'Roof - Water proofing', 'Wall rough in and Internal Plaster', 'Facade Finishes'].includes(n)) return 0;
+    if (['MEP 1st Fix', 'MEP 2nd Fix', 'MEP 3rd Fixand Termination', 'Floor and Wall Tiles', 'Ceiling', 'Internal Paint', 'Sanitary Fixtures', 'Doors and Windows'].includes(n)) return 1;
+    if (['Testing & Commissioning', 'Authority Approvals', 'Tie-ins', 'Snagging & De-snagging', 'Close out Documents', 'Handing Over'].includes(n)) return 3;
+    if (['Material Delivery', 'No Work Feature'].includes(n)) return 4;
+    return 2;
+  }
+  function bkReset() { BK = null; $('bk').hidden = true; $('bk-in').replaceChildren(); }
+  const bkZero = () => { const o = {}; BK_K.forEach((k) => { o[k] = 0; }); return o; };
+  const bkFromArr = (a) => ({ bu: a[3], eu: a[4], wk: a[6], rem: a[7], bc: a[8], ec: a[9], pvu: a[11], pvc: a[12] });
+  function bkBuild(P) {
+    const secs = BK_SEC.map((n, i) => Object.assign(bkZero(), { n, d: 0, id: 's' + i, kids: [] }));
+    const add = (t, r) => BK_K.forEach((k) => { t[k] += r[k] || 0; });
+    P.groups.forEach((g, gi) => {
+      const sec = secs[bkSecOf(g.n)], gn = Object.assign(bkZero(), { n: tradeName(g.n), d: 1, id: 'g' + gi, kids: [], sec: sec.n });
+      g.areas.forEach((a, ai) => { const an = Object.assign(bkZero(), { n: areaName(a.n), d: 2, id: 'g' + gi + 'a' + ai, gi, ai, g: gn.n, sec: sec.n, lazy: 'area' }); BK_K.forEach((k) => { an[k] = a[k] || 0; }); gn.kids.push(an); add(gn, an); });
+      sec.kids.push(gn); add(sec, gn);
+    });
+    const ubyArea = {}, abyUnit = {};
+    P.units.forEach((u, ui) => { (ubyArea[u[0] + '|' + u[1]] = ubyArea[u[0] + '|' + u[1]] || []).push(ui); });
+    P.acts.forEach((a) => { (abyUnit[a[0]] = abyUnit[a[0]] || []).push(a); });
+    return { secs: secs.filter((s) => s.kids.length), ubyArea, abyUnit, T: Object.assign(bkZero(), { bu: P.total.bu, pvu: P.total.pvu, eu: P.total.eu, wk: P.total.wk, rem: P.total.rem, bc: P.total.bc, pvc: P.total.pvc, ec: P.total.ec }) };
+  }
+  function bkKids(n) {
+    if (n.kids) return n.kids;
+    const P = BK.P, out = [];
+    const actNode = (a, d, par) => Object.assign(bkFromArr(a), { n: a[1] + ' · ' + P.names[a[2]], d, id: par.id + 'x' + a[1], kids: [], leaf: 1, g: par.g, sec: par.sec, area: par.area, unit: par.unit, aid: a[1], aname: P.names[a[2]] });
+    if (n.lazy === 'area') {
+      (BK.m.ubyArea[n.gi + '|' + n.ai] || []).forEach((ui) => {
+        const u = P.units[ui];
+        if (u[2] === '(whole area)') { (BK.m.abyUnit[ui] || []).forEach((a) => out.push(actNode(a, 3, Object.assign({}, n, { unit: '' })))); return; }
+        out.push(Object.assign(bkFromArr(u), { n: u[2], d: 3, id: n.id + 'u' + ui, ui, g: n.g, sec: n.sec, area: n.n, unit: u[2], lazy: 'unit' }));
+      });
+    } else if (n.lazy === 'unit') {
+      (BK.m.abyUnit[n.ui] || []).forEach((a) => out.push(actNode(a, 4, Object.assign({}, n, { area: n.area }))));
+    }
+    n.kids = out; return out;
+  }
+  const bkPl = (r, c) => { const b = c ? r.bc : r.bu, p = c ? r.pvc : r.pvu; return b > 0 ? p / b : null; };
+  const bkEa = (r, c) => { const b = c ? r.bc : r.bu, e = c ? r.ec : r.eu; return b > 0 ? e / b : null; };
+  function bkOpen() {
+    if (!BK) {
+      const P = session.p6; if (!P) { $('bk-in').replaceChildren(el('div', 'wk-empty', 'No Primavera data in this build.')); return; }
+      BK = { P, m: bkBuild(P), q: '', open: new Set() };
+    }
+    bkRender();
+  }
+  function bkRender() {
+    const root = $('bk-in'), P = BK.P, M = BK.m, T = M.T; root.replaceChildren();
+    const top = el('div', 'pv-top'), tl = el('div');
+    tl.append(el('div', 'pv-eb', 'Primavera P6 · data date ' + dmyIso(P.date)), el('h1', 'pv-h', 'P6 breakdown'),
+      el('p', 'pv-sub', 'Every section, trade group, area, villa / building and activity of the P6 export (' + P.file + '): budget, planned and earned man-hours and cost. Press ▶ to drill down.'));
+    top.append(tl); root.append(top);
+    const kp = el('div', 'pv-kpis'), kpi = (a, b, c, cls) => { const d = el('div', 'pv-kpi'); const sm = el('small', cls || '', c); d.append(el('span', null, a), el('b', null, b), sm); return d; };
+    const gapPts = (c) => ((bkEa(T, c) - bkPl(T, c)) * 100);
+    kp.append(kpi('Man-hours earned', pf(bkEa(T, 0)), 'planned ' + pf(bkPl(T, 0)) + ' · gap ' + (gapPts(0) >= 0 ? '+' : '') + gapPts(0).toFixed(1) + ' pts', gapPts(0) < 0 ? 'bk-neg' : 'bk-pos'),
+      kpi('Cost earned', pf(bkEa(T, 1)), 'planned ' + pf(bkPl(T, 1)) + ' · gap ' + (gapPts(1) >= 0 ? '+' : '') + gapPts(1).toFixed(1) + ' pts', gapPts(1) < 0 ? 'bk-neg' : 'bk-pos'),
+      kpi('Man-hours', nf(T.eu), 'earned of ' + nf(T.bu) + ' budget · ' + nf(T.rem) + ' remaining'),
+      kpi('This week', (T.wk >= 0 ? '+' : '') + nf(T.wk), 'man-hours earned this week'));
+    root.append(kp);
+    const tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search group, area, villa, building'; inp.value = BK.q; inp.setAttribute('aria-label', 'Search the breakdown');
+    const bAll = el('button', 'wk-btn', 'Collapse all'), bG = el('button', 'wk-btn', 'Open all groups'), bCsv = el('button', 'wk-btn', 'Download CSV');
+    [bAll, bG, bCsv].forEach((b) => { b.type = 'button'; });
+    const cnt = el('span', 'pv-pg'); tools.append(inp, bAll, bG, bCsv, cnt);
+    const holder = el('div'); root.append(tools, holder);
+    const rowsOf = () => {
+      const q = BK.q.trim().toLowerCase(), out = [];
+      const walk = (n) => {
+        if (!q) { out.push(n); if (BK.open.has(n.id)) bkKids(n).forEach(walk); return; }
+        const self = (n.n + ' ' + (n.g || '') + ' ' + (n.area || '')).toLowerCase().includes(q); let sub = [];
+        if (n.d <= 2 && !n.leaf) { const save = out.length; bkKids(n).forEach(walk); sub = out.splice(save); }
+        if (self || sub.length) { out.push(n); if (sub.length) out.push(...sub); else if (self && BK.open.has(n.id)) bkKids(n).forEach((k) => out.push(k)); }
+      };
+      M.secs.forEach(walk); return out;
+    };
+    const num = (v) => nf(v), cost = (v) => cf(v);
+    const sgn = (v, f) => (v > 0 ? '+' : '') + f(v);
+    const line = (r) => {
+      const tr = el('tr', 'bk-d' + Math.min(r.d, 4)), c0 = el('td', 'bk-n'); c0.style.paddingLeft = (12 + r.d * 18) + 'px';
+      const hasKids = !r.leaf && (r.d < 2 || r.lazy);
+      if (hasKids && (r.d < 2 || bkKids(r).length)) { const open = BK.open.has(r.id), tg = el('button', 'tg', open ? '▼' : '▶'); tg.type = 'button'; tg.setAttribute('aria-label', (open ? 'Hide ' : 'Show ') + r.n); tg.addEventListener('click', () => { if (open) BK.open.delete(r.id); else BK.open.add(r.id); draw(); }); c0.append(tg); } else c0.append(el('span', 'bk-sp'));
+      const nm = el('span', 'bk-t', r.n); nm.title = r.n; c0.append(nm); tr.append(c0);
+      const pc = (r2, c) => { const e = bkEa(r2, c); return pctCell(e); };
+      const pl = (c) => { const p = bkPl(r, c); return td(p == null ? '—' : pf(p), 'n'); };
+      const gap = (c) => { const e = bkEa(r, c), p = bkPl(r, c); if (e == null || p == null) return td('—', 'n'); const d = (e - p) * 100; return td(Math.abs(d) < 0.05 ? '0.0' : (d >= 0 ? '+' : '') + d.toFixed(1), 'n ' + (d < -0.05 ? 'bk-neg' : d > 0.05 ? 'bk-pos' : '')); };
+      const cg = td(sgn(r.ec - r.pvc, cost), 'n ' + (r.ec - r.pvc < -1 ? 'bk-neg' : r.ec - r.pvc > 1 ? 'bk-pos' : ''));
+      tr.append(td(num(r.bu), 'n'), pl(0), pc(r, 0), gap(0), td(sgn(r.wk, num), 'n'), td(num(r.rem), 'n'), td(cost(r.bc), 'n'), pl(1), pc(r, 1), cg);
+      return tr;
+    };
+    const draw = () => {
+      const rows = rowsOf(), tb = el('tbody'); rows.forEach((r) => tb.append(line(r)));
+      const th = (t, cls, span) => { const h = el('th', cls || '', t); if (span) h.colSpan = span; return h; };
+      const h1 = el('tr'), h2 = el('tr');
+      h1.append(th('', ''), th('Man-hours', 'n bk-grp', 6), th('Cost (SAR)', 'n bk-grp', 4));
+      ['Section / group / area / villa / activity', 'Budget', 'Planned %', 'Earned %', 'vs plan (pts)', 'This week', 'Remaining', 'Budget', 'Planned %', 'Earned %', 'vs plan'].forEach((t, i) => h2.append(th(t, i ? 'n' : '')));
+      const hd = el('thead'); hd.append(h1, h2);
+      const f = el('tfoot'), fr = line(Object.assign({}, T, { d: 0, n: 'Project total', leaf: 1 })); fr.classList.add('bk-tot'); f.append(fr);
+      const t = el('table', 'pv-tbl bk-tbl'); t.append(hd, tb, f); const w = el('div', 'pv-tbl-w'); w.append(t); holder.replaceChildren(w);
+      cnt.textContent = rows.length + ' rows' + (BK.q ? ' match' : '') + ' · man-hours are P6 labour units';
+    };
+    inp.addEventListener('input', () => { BK.q = inp.value; draw(); });
+    bAll.addEventListener('click', () => { BK.open.clear(); BK.q = ''; inp.value = ''; draw(); });
+    bG.addEventListener('click', () => { M.secs.forEach((s) => { BK.open.add(s.id); }); draw(); });
+    bCsv.addEventListener('click', () => {
+      const head = ['Level', 'Section', 'P6 group', 'Area', 'Villa / building', 'Activity ID', 'Activity', 'Budget man-hours', 'Planned man-hours', 'Earned man-hours', 'Planned %', 'Earned %', 'Man-hour variance', 'This week MH', 'Remaining MH', 'Budget cost', 'Planned cost', 'Earned cost', 'Planned cost %', 'Earned cost %', 'Cost variance'];
+      const lv = ['Section', 'Group', 'Area', 'Villa / building', 'Activity'], out = [];
+      const emit = (r) => { const e0 = bkEa(r, 0), p0 = bkPl(r, 0), e1 = bkEa(r, 1), p1 = bkPl(r, 1), lf = r.leaf ? 4 : r.d;
+        out.push([lv[lf], r.sec || (r.d === 0 ? r.n : ''), r.g || (r.d === 1 ? r.n : ''), r.area || (r.d === 2 ? r.n : ''), r.unit || (r.d === 3 && !r.leaf ? r.n : ''), r.aid || '', r.aname || '', Math.round(r.bu), Math.round(r.pvu), Math.round(r.eu), p0 == null ? '' : (p0 * 100).toFixed(2), e0 == null ? '' : (e0 * 100).toFixed(2), Math.round(r.eu - r.pvu), Math.round(r.wk), Math.round(r.rem), Math.round(r.bc), Math.round(r.pvc), Math.round(r.ec), p1 == null ? '' : (p1 * 100).toFixed(2), e1 == null ? '' : (e1 * 100).toFixed(2), Math.round(r.ec - r.pvc)]); };
+      const all = (n) => { emit(n); bkKids(n).forEach(all); }; M.secs.forEach(all);
+      const q = (v) => { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+      const u = URL.createObjectURL(new Blob(['﻿' + [head, ...out].map((r) => r.map(q).join(',')).join('\r\n')], { type: 'text/csv' })); const a = document.createElement('a'); a.href = u; a.download = 'P6 breakdown ' + P.date + '.csv'; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000);
+    });
+    draw(); $('bk').scrollTop = 0;
   }
 
   function pvActs(root) {

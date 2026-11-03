@@ -257,7 +257,9 @@ def build():
     # {'id': 'explorer', 'title': 'Site explorer', 'native': True} to tabs and 'explorer': explorer_data(status) to the payload.
     tabs = [{'id': d['id'], 'title': d['title']} for d in DASHBOARDS] + [{'id': 'week', 'title': 'This week', 'native': True}]
     p6 = p6_data()
-    if p6: tabs.append({'id': 'p6', 'title': 'Primavera', 'native': True})
+    if p6:
+        tabs.append({'id': 'p6', 'title': 'Primavera', 'native': True})
+        tabs.append({'id': 'bk', 'title': 'P6 breakdown', 'native': True, 'pinned': True})  # pinned: listed first in the sidebar
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     if p6:
         payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
