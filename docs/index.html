@@ -580,6 +580,25 @@
   @media (max-width:520px){.exp span{display:none}.exp{padding:8px 10px}}
   @media print{body.print-page .app{position:static!important;display:block!important;background:#fff!important}body.print-page .app::before{display:none}body.print-page .side,body.print-page .topbar,body.print-page .stage>iframe,body.print-page .menu,body.print-page .scrim,body.print-page .loading,body.print-page .pv-tools,body.print-page .pv-pg,body.print-page .pv-seg,body.print-page .wk-nav,body.print-page .wk-tools,body.print-page .bq-card p,body.print-page .exp{display:none!important}
     body.print-page .stage,body.print-page .pv,body.print-page .wk,body.print-page .main{position:static!important;overflow:visible!important;height:auto!important;display:block!important}body.print-page .pv[hidden],body.print-page .wk[hidden],body.print-page .xp[hidden]{display:none!important}body.print-page .pv-tbl-w{overflow:visible!important}body.print-page *{color-scheme:light;-webkit-print-color-adjust:exact;print-color-adjust:exact}body.print-page .pv-card,body.print-page .pv-kpi,body.print-page .bq-row,body.print-page tr{break-inside:avoid}}
+  /* printing: always black on white, whatever the screen theme */
+  .print-head{display:none}
+  @media print{
+    body.print-page{--bg:#fff;--panel:#fff;--fg:#16212A;--muted:#4A5660;--line:#C9D1D6;--accent:#14566F;--chip:#F1F3F4;--bar:#fff;--card:#fff;--solid:#fff;--hover:#F1F3F4;--active-bg:#EAF2F6;--active-line:#9DB9C6;--ok:#17794A;--warn:#9A6208;--nok:#B3321F;--gold:#8A6A12;--app-bg:none;--shadow:none;--blur:none;color:#16212A!important;background:#fff!important;color-scheme:light}
+    body.print-page .app,body.print-page .stage,body.print-page .main,body.print-page .pv,body.print-page .wk{background:#fff!important}
+    body.print-page .print-head{display:flex!important;justify-content:space-between;align-items:flex-end;gap:16px;padding:0 0 8px;margin:0 0 12px;border-bottom:2px solid #0F2742}
+    body.print-page .print-head b{font:700 18px/1.2 var(--body);color:#0F2742}body.print-page .print-head span{font:11px var(--body);color:#4A5660}body.print-page .print-head em{font:600 10px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:#8A6A12;font-style:normal;display:block;margin-bottom:2px}
+    body.print-page .pv-in,body.print-page .wk-in{max-width:none!important;padding:0!important}
+    body.print-page h1,body.print-page .pv-h{font-size:20px!important;color:#0F2742!important}body.print-page .pv-eb,body.print-page .pv-sub{color:#4A5660!important}
+    body.print-page .pv-kpi,body.print-page .pv-card,body.print-page .bq-card,body.print-page .bq-list,body.print-page .pv-tbl-w{background:#fff!important;border:1px solid #C9D1D6!important;box-shadow:none!important;border-radius:8px!important}
+    body.print-page .pv-kpi b{font-size:22px!important;color:#0F2742!important}body.print-page .pv-kpi.bq-hero b{color:#8A6A12!important}body.print-page .pv-kpi.bq-hero{background:#FBF6E6!important}
+    body.print-page .pv-tbl{font-size:10.5px!important}body.print-page .pv-tbl th{position:static!important;background:#E9EEF2!important;color:#2B3944!important;font-size:9.5px!important;padding:6px 8px!important}body.print-page .pv-tbl td{padding:5px 8px!important;color:#16212A!important;border-bottom:1px solid #DCE2E6!important;background:transparent!important}
+    body.print-page .pv-tbl tr.sub td,body.print-page .bk-d3 td,body.print-page .bk-d4 td{color:#3B4852!important}body.print-page .bk-d0 td,body.print-page .bq-head,body.print-page .bq-foot{background:#E9EEF2!important}body.print-page .bk-tot td{background:#F3E7C4!important}
+    body.print-page .bq-row{padding:7px 12px!important;font-size:10.5px!important;border-bottom:1px solid #DCE2E6!important;background:transparent!important}body.print-page .bq-nm .go{color:#16212A!important;font-size:11.5px!important}body.print-page .bq-meta,body.print-page .bq-st small,body.print-page .bq-sh small{color:#4A5660!important}
+    body.print-page .bq-tr{background:#E1E6EA!important}body.print-page .bq-tbl tbody tr:nth-child(even) td{background:#F6F8F9!important}body.print-page .bq-pill{background:#F1F3F4!important;border-color:#B9C3CA!important;color:#16212A!important}
+    body.print-page .tg,body.print-page .bq-leg button[aria-pressed="false"] .x{display:none}body.print-page .bk-neg{color:#B3321F!important}body.print-page .bk-pos{color:#17794A!important}
+    body.print-page .wk-big b{color:#0F2742!important}body.print-page .wk-card,body.print-page .wk-plan,body.print-page .wk-kpi,body.print-page .wk-tbl-w{background:#fff!important;border:1px solid #C9D1D6!important;box-shadow:none!important}body.print-page .wk-pct input{background:#fff!important;border:1px solid #B9C3CA!important;color:#16212A!important}body.print-page .wk *{text-shadow:none!important}
+    body.print-page .pv-bar .pv-l,body.print-page .pv-bar .pv-v{color:#16212A!important}
+  }
   /* BOQ tab */
   .pv-kpi.bq-hero{background:linear-gradient(135deg,color-mix(in srgb,var(--gold) 20%,var(--panel)),var(--panel));border-color:color-mix(in srgb,var(--gold) 45%,var(--line))}.pv-kpi.bq-hero b{color:var(--gold)}
   .bq-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}.bq-card h3{margin:0 0 2px;font:700 15px var(--body)}.bq-card p{margin:0 0 10px;font-size:12.5px;color:var(--muted)}
@@ -877,6 +896,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       <div class="top-meta" id="top-meta"></div>
       <button class="exp" id="exp-open" type="button" aria-haspopup="true" aria-expanded="false" title="Print as PDF or download Excel"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5"/><path d="M5 19.5h14"/></svg><span>Export</span></button>
     </header>
+  <div class="print-head" id="print-head"><div><em id="ph-eb">SBARC · Phase 02-B</em><b id="ph-title"></b></div><span id="ph-meta"></span></div>
   <main class="stage" id="stage"><div class="loading" id="loading">Loading</div>
     <div class="xp" id="xp" hidden>
       <div class="xp-find"><div class="box"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
@@ -8368,10 +8388,20 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const ds = dataToSheets(w.__DATA__); return ds.length ? ds : tablesToSheets(f.contentDocument.body);
   }
   function printPage() {
-    if (frames[current] && !frames[current].hidden && frames[current].contentWindow) { frames[current].contentWindow.focus(); frames[current].contentWindow.print(); return; }
+    const title = tabTitle(), meta = 'Status ' + (([...document.querySelectorAll('.tblock div')].find((d) => d.querySelector('span').textContent === 'Status') || document).querySelector('b') || {}).textContent + ' · printed ' + new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    const f = frames[current];
+    if (f && !f.hidden && f.contentWindow) {  // a dashboard: print it in the light theme, then put the screen theme back
+      const doc = f.contentDocument, root = doc.documentElement, was = [root.classList.contains('glass'), root.getAttribute('data-theme')];
+      root.classList.remove('glass'); root.setAttribute('data-theme', 'light');
+      const st = doc.createElement('style'); st.textContent = '@page{size:A4 landscape;margin:10mm}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}'; doc.head.append(st);
+      const back = () => { root.classList.toggle('glass', was[0]); root.setAttribute('data-theme', was[1] || 'dark'); st.remove(); f.contentWindow.removeEventListener('afterprint', back); };
+      f.contentWindow.addEventListener('afterprint', back); f.contentWindow.focus(); setTimeout(() => { f.contentWindow.print(); setTimeout(back, 1500); }, 80); return;
+    }
+    $('ph-title').textContent = title; $('ph-meta').textContent = meta;
+    const ps = document.createElement('style'); ps.textContent = '@page{size:A4 landscape;margin:10mm}'; document.head.append(ps);
     document.body.classList.add('print-page');
-    const done = () => { document.body.classList.remove('print-page'); window.removeEventListener('afterprint', done); };
-    window.addEventListener('afterprint', done); setTimeout(() => { window.print(); setTimeout(done, 1500); }, 60);
+    const done = () => { document.body.classList.remove('print-page'); ps.remove(); window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done); setTimeout(() => { window.print(); setTimeout(done, 1500); }, 80);
   }
   function closeExp() { $('exp-menu').hidden = true; $('exp-open').setAttribute('aria-expanded', 'false'); }
   function openExp() {
