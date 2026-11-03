@@ -589,6 +589,20 @@
     body.print-page .bq-tr{background:#E1E6EA!important}body.print-page .bq-tbl tbody tr:nth-child(even) td{background:#F6F8F9!important}body.print-page .bq-pill{background:#F1F3F4!important;border-color:#B9C3CA!important;color:#16212A!important}
     body.print-page .tg,body.print-page .bq-leg button[aria-pressed="false"] .x{display:none}body.print-page .bk-neg{color:#B3321F!important}body.print-page .bk-pos{color:#17794A!important}
     body.print-page .wk-big b{color:#0F2742!important}body.print-page .wk-card,body.print-page .wk-plan,body.print-page .wk-kpi,body.print-page .wk-tbl-w{background:#fff!important;border:1px solid #C9D1D6!important;box-shadow:none!important}body.print-page .wk-pct input{background:#fff!important;border:1px solid #B9C3CA!important;color:#16212A!important}body.print-page .wk *{text-shadow:none!important}
+    /* refined print type: black text, one family, tidy hierarchy */
+    body.print-page,body.print-page *:not(svg):not(svg *){color:#000!important;text-shadow:none!important;-webkit-text-fill-color:#000!important}
+    body.print-page{font-family:var(--body)!important;font-size:11px;line-height:1.4}
+    body.print-page h1,body.print-page .pv-h,body.print-page .wk-h,body.print-page .wk-big b,body.print-page .pv-kpi b{font-family:var(--body)!important;font-stretch:100%!important;letter-spacing:-.01em;font-weight:700!important}
+    body.print-page h1,body.print-page .pv-h{font-size:19px!important;margin:4px 0 4px!important}
+    body.print-page .wk-big b{font-size:30px!important}
+    body.print-page .pv-eb,body.print-page .pv-kpi span,body.print-page .pv-tbl th,body.print-page .print-head em,body.print-page .bq-hd,body.print-page [class*="-eb"]{font-family:var(--body)!important;font-weight:600!important;letter-spacing:.06em!important;font-size:9px!important}
+    body.print-page .pv-sub,body.print-page .pv-kpi small,body.print-page .bq-meta{font-size:10px!important;font-weight:400!important}
+    body.print-page .pv-tbl td,body.print-page .bq-row{font-variant-numeric:tabular-nums;font-weight:500}
+    body.print-page .pv-tbl th{border-bottom:1.5px solid #000!important;background:#EDEFF1!important}
+    body.print-page .pv-tbl td{border-bottom:.5px solid #AEB6BC!important}
+    body.print-page .pv-kpi,body.print-page .pv-card,body.print-page .bq-card,body.print-page .bq-list,body.print-page .pv-tbl-w,body.print-page .wk-card,body.print-page .wk-plan{border:1px solid #555!important;border-radius:4px!important}
+    body.print-page .bk-neg{font-weight:700}
+    body.print-page .print-head{border-bottom:2px solid #000!important}body.print-page .print-head b{font-size:17px!important}
     body.print-page .pv-bar .pv-l,body.print-page .pv-bar .pv-v{color:#16212A!important}
   }
   /* BOQ tab */
@@ -1729,7 +1743,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     if (f && !f.hidden && f.contentWindow) {  // a dashboard: print it in the light theme, then put the screen theme back
       const doc = f.contentDocument, root = doc.documentElement, was = [root.classList.contains('glass'), root.getAttribute('data-theme')];
       root.classList.remove('glass'); root.setAttribute('data-theme', 'light');
-      const st = doc.createElement('style'); st.textContent = '@page{size:A4 landscape;margin:10mm}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}'; doc.head.append(st);
+      const st = doc.createElement('style'); st.textContent = '@page{size:A4 landscape;margin:10mm}html,body{-webkit-print-color-adjust:exact;print-color-adjust:exact}body,body *:not(svg):not(svg *){color:#000!important;text-shadow:none!important;-webkit-text-fill-color:#000!important}body{font-family:"IBM Plex Sans",system-ui,Arial,sans-serif!important}h1,h2,h3{font-stretch:100%!important;letter-spacing:-.01em}'; doc.head.append(st);
       const back = () => { root.classList.toggle('glass', was[0]); root.setAttribute('data-theme', was[1] || 'dark'); st.remove(); f.contentWindow.removeEventListener('afterprint', back); };
       f.contentWindow.addEventListener('afterprint', back); f.contentWindow.focus(); setTimeout(() => { f.contentWindow.print(); setTimeout(back, 1500); }, 80); return;
     }
