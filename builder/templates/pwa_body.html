@@ -10,6 +10,8 @@
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   if (standalone) return;                       // already running as the installed app
   box.hidden = false;
+  const top = document.getElementById('inst-top');
+  if (top) { top.hidden = false; top.querySelectorAll('button').forEach((x) => x.addEventListener('click', () => { (x.dataset.os === 'ios' ? bI : bA).click(); box.scrollIntoView({ behavior: 'smooth', block: 'center' }); })); }
   const ua = navigator.userAgent;
   const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const safari = ios && !/crios|fxios|edgios|opios/i.test(ua);

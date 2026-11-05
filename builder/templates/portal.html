@@ -109,6 +109,12 @@
   .lg-sterling{padding:0;background:#000}
   @media (max-height:820px) and (min-width:901px){.gate-copy{gap:14px}.brand{font-size:clamp(76px,9vw,118px)}.lg{height:52px}}
   @media (max-height:700px) and (min-width:901px){.tagline{display:none}}
+  .inst-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+  .inst-top[hidden]{display:none}
+  .inst-top span{font:500 10.5px/1 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:#AFC0D4}
+  .inst-top button{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(232,194,122,.6);background:rgba(232,194,122,.12);color:#F3F6FA;border-radius:999px;padding:6px 12px;font:600 12.5px/1 'IBM Plex Sans',sans-serif;cursor:pointer}
+  .inst-top button svg{color:var(--gold)}
+  .inst-top button:hover{background:rgba(232,194,122,.25)}
   .inst{display:flex;flex-direction:column;gap:8px;max-width:420px;padding:11px 12px 12px;border:1px dashed rgba(232,194,122,.45);border-radius:12px;font-size:13px;color:#C9D4E3}
   .inst-h{display:flex;align-items:center;gap:8px;font:500 11px/1.2 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
   .inst-h svg{flex:none}
@@ -864,6 +870,9 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   <div class="gate-art"><!--ART--><div class="scan" aria-hidden="true"></div></div>
   <div class="gate-copy">
     <!--LOGOS-->
+    <div class="inst-top" id="inst-top" hidden><span>Get the app</span>
+      <button type="button" data-os="and" aria-label="Install on Android"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7.5v6.5M9.2 11.4 12 14l2.8-2.6"/></svg>Android</button>
+      <button type="button" data-os="ios" aria-label="Install on iPhone or iPad"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9H6.5A1.5 1.5 0 0 0 5 10.5v9A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 17.5 9H16"/><path d="M12 15V3M8.5 6.5 12 3l3.5 3.5"/></svg>iPhone · iPad</button></div>
     <div class="eyebrow">Phase 02-B · Management dashboards</div>
     <h1 class="brand">SBARC</h1>
     <p class="tagline">Site progress for <b>104 villas</b>, <b>12 buildings</b> and the external works, in one place for the project team.</p>
