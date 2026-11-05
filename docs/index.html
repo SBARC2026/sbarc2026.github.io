@@ -117,11 +117,20 @@
   .lg-sterling{padding:0;background:#000}
   @media (max-height:820px) and (min-width:901px){.gate-copy{gap:14px}.brand{font-size:clamp(76px,9vw,118px)}.lg{height:52px}}
   @media (max-height:700px) and (min-width:901px){.tagline{display:none}}
-  .inst{display:flex;align-items:center;gap:10px;max-width:420px;padding:10px 12px;border:1px dashed rgba(232,194,122,.45);border-radius:12px;font-size:13.5px;color:#C9D4E3}
-  .inst svg{color:var(--gold);flex:none}
-  .inst span{flex:1;min-width:0}
-  .inst button{flex:none;border:1px solid var(--gold);background:rgba(232,194,122,.12);color:var(--gold-2);border-radius:999px;padding:7px 14px;font-weight:600;cursor:pointer}
-  .inst button:hover{background:rgba(232,194,122,.22)}
+  .inst{display:flex;flex-direction:column;gap:8px;max-width:420px;padding:11px 12px 12px;border:1px dashed rgba(232,194,122,.45);border-radius:12px;font-size:13px;color:#C9D4E3}
+  .inst-h{display:flex;align-items:center;gap:8px;font:500 11px/1.2 'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+  .inst-h svg{flex:none}
+  .inst-b{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .inst-o{display:flex;align-items:center;gap:10px;min-width:0;text-align:left;border:1px solid rgba(232,194,122,.55);background:rgba(232,194,122,.08);color:#F3F6FA;border-radius:12px;padding:9px 11px;cursor:pointer;font:inherit;transition:background .15s,border-color .15s}
+  .inst-o svg{flex:none;color:var(--gold)}
+  .inst-o span{display:flex;flex-direction:column;min-width:0}
+  .inst-o b{font-weight:600;font-size:13.5px;line-height:1.2}
+  .inst-o small{font-size:11.5px;color:#AFC0D4;line-height:1.25}
+  .inst-o:hover,.inst-o[aria-expanded="true"]{background:rgba(232,194,122,.2);border-color:var(--gold)}
+  .inst-o:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+  .inst-help{font-size:12.5px;line-height:1.5;color:#DCE4EE;background:rgba(8,19,38,.55);border:1px solid rgba(143,163,189,.25);border-radius:10px;padding:9px 12px}
+  .inst-help ol{margin:4px 0 0;padding-left:18px}.inst-help b{color:#fff}
+  @media (max-width:380px){.inst-b{grid-template-columns:1fr}}
   .eyebrow{font:500 12.5px/1.2 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:10px}
   .eyebrow::before{content:"";width:28px;height:2px;background:var(--gold)}
   .brand{margin:0;font:800 clamp(88px,11vw,164px)/.84 var(--disp);font-stretch:68%;letter-spacing:-.01em;color:#fff;
@@ -875,10 +884,14 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       <div class="msg" id="g-msg" role="alert"></div>
     </form></div>
     <div class="inst" id="inst" hidden>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3"/></svg>
-      <span id="inst-t">Use SBARC as an app on this device.</span>
-      <button type="button" id="inst-b">Install app</button>
+      <div class="inst-h"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3"/></svg><span id="inst-t">Install SBARC as an app</span></div>
+      <div class="inst-b">
+        <button type="button" class="inst-o" id="inst-and" aria-describedby="inst-help"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 7.5v6.5M9.2 11.4 12 14l2.8-2.6M10 18.5h4"/></svg><span><b>Android</b><small>Install app</small></span></button>
+        <button type="button" class="inst-o" id="inst-ios" aria-describedby="inst-help"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 9H6.5A1.5 1.5 0 0 0 5 10.5v9A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 17.5 9H16"/><path d="M12 15V3M8.5 6.5 12 3l3.5 3.5"/></svg><span><b>iPhone · iPad</b><small>Add to Home Screen</small></span></button>
+      </div>
+      <div class="inst-help" id="inst-help" hidden></div>
     </div>
+</div>
   </div>
   <div class="tblock" aria-hidden="true"><div><span>Project</span><b>SBARC</b></div><div><span>Status</span><b>31-10-2026</b></div><div><span>Issued</span><b>02-11-2026</b></div></div>
 </section>
@@ -9522,26 +9535,38 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
   }
-  const box = document.getElementById('inst'), btn = document.getElementById('inst-b'), txt = document.getElementById('inst-t');
+  const box = document.getElementById('inst'), help = document.getElementById('inst-help');
+  const bA = document.getElementById('inst-and'), bI = document.getElementById('inst-ios');
+  if (!box || !bA || !bI) return;
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  if (standalone || !/^https?:$/.test(location.protocol)) return;
-  let deferred = null;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); deferred = e;
-    txt.textContent = 'Use SBARC as an app on this device.'; btn.hidden = false; box.hidden = false;
-  });
-  btn.addEventListener('click', async () => {
-    if (!deferred) return;
-    deferred.prompt();
-    try { await deferred.userChoice; } catch (e) { /* dismissed */ }
-    deferred = null; box.hidden = true;
-  });
+  if (standalone) return;                       // already running as the installed app
+  box.hidden = false;
+  const ua = navigator.userAgent;
+  const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const safari = ios && !/crios|fxios|edgios|opios/i.test(ua);
+  const web = /^https?:$/.test(location.protocol);
+  let deferred = null, open = null;
+  const show = (who, html) => {
+    if (open === who) { help.hidden = true; open = null; bA.setAttribute('aria-expanded', 'false'); bI.setAttribute('aria-expanded', 'false'); return; }
+    help.innerHTML = html; help.hidden = false; open = who;
+    bA.setAttribute('aria-expanded', String(who === 'a')); bI.setAttribute('aria-expanded', String(who === 'i'));
+  };
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; bA.querySelector('small').textContent = 'Install now'; });
   window.addEventListener('appinstalled', () => { box.hidden = true; });
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (ios) {
-    txt.textContent = 'To install on iPhone or iPad: tap Share, then “Add to Home Screen”.';
-    btn.hidden = true; box.hidden = false;
-  }
+  bA.addEventListener('click', async () => {
+    if (deferred) {
+      deferred.prompt();
+      try { await deferred.userChoice; } catch (e) { /* dismissed */ }
+      deferred = null; help.hidden = true; return;
+    }
+    show('a', '<b>Android</b><ol>' + (web ? '' : '<li>Open the SBARC website link (not a saved file).</li>') +
+      '<li>Open the link in <b>Chrome</b>.</li><li>Tap the menu <b>⋮</b> at the top right.</li><li>Tap <b>Install app</b> (or <b>Add to Home screen</b>), then <b>Install</b>.</li></ol>');
+  });
+  bI.addEventListener('click', () => {
+    show('i', '<b>iPhone · iPad</b><ol>' + (safari && web ? '' : '<li>Open the SBARC website link in <b>Safari</b>.</li>') +
+      '<li>Tap <b>Share</b> (the square with an arrow).</li><li>Scroll and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. SBARC appears on your home screen.</li></ol>');
+  });
+  if (ios) bI.parentNode.insertBefore(bI, bA);   // put the device's own button first
 })();
 </script>
 <script>if(/; wv\)/.test(navigator.userAgent))document.write("<style>\n  #full,#u-drop,#u-files,#u-eml,#inst{display:none!important}\n  .send{grid-template-columns:1fr!important}\n<\/style>\n<script>\n(() => {\n  const set = (sel, t) => { const el = document.querySelector(sel); if (el) el.textContent = t; };\n  set('#u-mail b', 'Open email');\n  set('#u-mail span', 'Your email app opens with the update written in. Attach your Excel sheet there, then send.');\n  set('.sh-head p', 'Fill in the details, then attach your Excel sheet in the email that opens.');\n  const b = document.getElementById('u-mail'); if (b) b.classList.add('main');\n})();\n<\/script>\n");</script>

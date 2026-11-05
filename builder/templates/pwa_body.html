@@ -4,25 +4,37 @@
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
   }
-  const box = document.getElementById('inst'), btn = document.getElementById('inst-b'), txt = document.getElementById('inst-t');
+  const box = document.getElementById('inst'), help = document.getElementById('inst-help');
+  const bA = document.getElementById('inst-and'), bI = document.getElementById('inst-ios');
+  if (!box || !bA || !bI) return;
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  if (standalone || !/^https?:$/.test(location.protocol)) return;
-  let deferred = null;
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault(); deferred = e;
-    txt.textContent = 'Use SBARC as an app on this device.'; btn.hidden = false; box.hidden = false;
-  });
-  btn.addEventListener('click', async () => {
-    if (!deferred) return;
-    deferred.prompt();
-    try { await deferred.userChoice; } catch (e) { /* dismissed */ }
-    deferred = null; box.hidden = true;
-  });
+  if (standalone) return;                       // already running as the installed app
+  box.hidden = false;
+  const ua = navigator.userAgent;
+  const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const safari = ios && !/crios|fxios|edgios|opios/i.test(ua);
+  const web = /^https?:$/.test(location.protocol);
+  let deferred = null, open = null;
+  const show = (who, html) => {
+    if (open === who) { help.hidden = true; open = null; bA.setAttribute('aria-expanded', 'false'); bI.setAttribute('aria-expanded', 'false'); return; }
+    help.innerHTML = html; help.hidden = false; open = who;
+    bA.setAttribute('aria-expanded', String(who === 'a')); bI.setAttribute('aria-expanded', String(who === 'i'));
+  };
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; bA.querySelector('small').textContent = 'Install now'; });
   window.addEventListener('appinstalled', () => { box.hidden = true; });
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-  if (ios) {
-    txt.textContent = 'To install on iPhone or iPad: tap Share, then “Add to Home Screen”.';
-    btn.hidden = true; box.hidden = false;
-  }
+  bA.addEventListener('click', async () => {
+    if (deferred) {
+      deferred.prompt();
+      try { await deferred.userChoice; } catch (e) { /* dismissed */ }
+      deferred = null; help.hidden = true; return;
+    }
+    show('a', '<b>Android</b><ol>' + (web ? '' : '<li>Open the SBARC website link (not a saved file).</li>') +
+      '<li>Open the link in <b>Chrome</b>.</li><li>Tap the menu <b>⋮</b> at the top right.</li><li>Tap <b>Install app</b> (or <b>Add to Home screen</b>), then <b>Install</b>.</li></ol>');
+  });
+  bI.addEventListener('click', () => {
+    show('i', '<b>iPhone · iPad</b><ol>' + (safari && web ? '' : '<li>Open the SBARC website link in <b>Safari</b>.</li>') +
+      '<li>Tap <b>Share</b> (the square with an arrow).</li><li>Scroll and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. SBARC appears on your home screen.</li></ol>');
+  });
+  if (ios) bI.parentNode.insertBefore(bI, bA);   // put the device's own button first
 })();
 </script>
