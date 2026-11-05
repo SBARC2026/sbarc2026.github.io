@@ -8,7 +8,6 @@
   const bA = document.getElementById('inst-and'), bI = document.getElementById('inst-ios');
   if (!box || !bA || !bI) return;
   const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-  if (standalone) return;                       // already running as the installed app
   box.hidden = false;
   const top = document.getElementById('inst-top');
   if (top) { top.hidden = false; top.querySelectorAll('button').forEach((x) => x.addEventListener('click', () => { (x.dataset.os === 'ios' ? bI : bA).click(); box.scrollIntoView({ behavior: 'smooth', block: 'center' }); })); }
@@ -23,18 +22,17 @@
     bA.setAttribute('aria-expanded', String(who === 'a')); bI.setAttribute('aria-expanded', String(who === 'i'));
   };
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferred = e; bA.querySelector('small').textContent = 'Install now'; });
-  window.addEventListener('appinstalled', () => { box.hidden = true; });
   bA.addEventListener('click', async () => {
     if (deferred) {
       deferred.prompt();
       try { await deferred.userChoice; } catch (e) { /* dismissed */ }
       deferred = null; help.hidden = true; return;
     }
-    show('a', '<b>Android</b><ol>' + (web ? '' : '<li>Open the SBARC website link (not a saved file).</li>') +
+    show('a', '<b>Android</b><ol>' + (web && !standalone ? '' : '<li>On the phone, open <b>' + (web ? location.origin + '/' : 'the SBARC website link') + '</b>.</li>') +
       '<li>Open the link in <b>Chrome</b>.</li><li>Tap the menu <b>⋮</b> at the top right.</li><li>Tap <b>Install app</b> (or <b>Add to Home screen</b>), then <b>Install</b>.</li></ol>');
   });
   bI.addEventListener('click', () => {
-    show('i', '<b>iPhone · iPad</b><ol>' + (safari && web ? '' : '<li>Open the SBARC website link in <b>Safari</b>.</li>') +
+    show('i', '<b>iPhone · iPad</b><ol>' + (safari && web && !standalone ? '' : '<li>On the iPhone or iPad, open <b>' + (web ? location.origin + '/' : 'the SBARC website link') + '</b> in <b>Safari</b>.</li>') +
       '<li>Tap <b>Share</b> (the square with an arrow).</li><li>Scroll and tap <b>Add to Home Screen</b>.</li><li>Tap <b>Add</b>. SBARC appears on your home screen.</li></ol>');
   });
   if (ios) bI.parentNode.insertBefore(bI, bA);   // put the device's own button first
