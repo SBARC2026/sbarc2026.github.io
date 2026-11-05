@@ -1,0 +1,10 @@
+{
+  "title": "November plan",
+  "clusters": ["05-9", "05-10", "05-6", "05-5", "05-1", "05-7"],
+  "wave": {"05-9": 1, "05-10": 1, "05-6": 2, "05-5": 2, "05-1": 2, "05-7": 2},
+  "start": "2026-11-08",
+  "end": "2026-11-30",
+  "weeks": 4,
+  "rate": 5,
+  "note": "Cluster push plan agreed for November 2026. Crews = villas / (rate villas per crew per week x weeks). Edit clusters, dates or rate here; the tab recalculates from the latest villa data on every build."
+}

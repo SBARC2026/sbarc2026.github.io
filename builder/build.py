@@ -227,6 +227,53 @@ def explorer_data(status):
             'cpos': [[n, round(x), round(y)] for n, x, y in g['clusters']], 'acts': acts, 'villas': villas,
             'vx': js(site.get('vextra')), 'bs': js(site.get('bstat'))}
 
+
+NOV_FILE = os.path.join(B, 'nov_plan.json')
+NOV_ACTS = [('Finishes', 'Paint', 'Paint'), ('Finishes', 'Quartz', 'Quartz'), ('Finishes', 'Floor tiles', 'Floor tiles'),
+            ('Gypsum board', 'Board', 'Board'), ('Gypsum board', 'Tape & joint', 'Tape & joint'), ('Gypsum board', 'Painting', 'Painting'),
+            ('Marble', '60×60 floor', '60×60 floor'), ('Marble', '40×40 wet area', '40×40 wet'), ('Marble', 'Stairs', 'Stairs'),
+            ('Other', 'Wooden handrail', 'Handrail'), ('Other', 'Cage ladder', 'Cage ladder'), ('Other', 'Internal doors', 'Int. doors'),
+            ('Other', 'External doors', 'Ext. doors'), ('Other', 'Kitchen', 'Kitchen'), ('Aluminium exterior', 'Walkway pergola', 'Pergola'),
+            ('Aluminium exterior', 'Balcony handrail', 'Balcony rail'), ('Electrical', '1st fix ceiling EMT', 'Elec 1st fix'),
+            ('Electrical', '2nd fix ceiling wires', 'Elec 2nd fix'), ('Plumbing', '2nd fix ceiling', 'Plumb 2nd fix'), ('HVAC', '2nd fix ceiling', 'HVAC 2nd fix')]
+NOV_GROUPS = [('Finishes', 3), ('Gypsum', 3), ('Marble', 3), ('Joinery & kitchen', 5), ('Aluminium', 2), ('MEP ceiling', 4)]
+NOV_PH = [('Ceiling MEP', '#5B6B7A', [16, 17, 18, 19], (1, 1)), ('Gypsum', '#7A5C9E', [3, 4, 5], (1, 2)),
+          ('Wet finishes', '#2E7FA8', [6, 7, 8, 2, 1, 0], (2, 3)), ('Aluminium & rails', '#9A7A2E', [14, 15, 9, 10], (2, 3)),
+          ('Kitchens & doors', '#0F2742', [13, 11, 12], (3, 4))]
+NOV_SEQ = [16, 18, 19, 17, 3, 4, 5, 6, 7, 8, 2, 1, 0, 14, 15, 9, 10, 13, 11, 12]
+def nov_data():
+    """November cluster push plan (builder/nov_plan.json) computed from the latest villa activity data. None if absent."""
+    if not os.path.exists(NOV_FILE): return None
+    cfg = json.loads(rd(NOV_FILE)); import math
+    per = {}
+    for r in blob_rows('exec', 'villa_activities'): per.setdefault(r['villa'], {})[(r['group'], r['activity'])] = r
+    def st(v, i):
+        a = per.get(v, {}).get(NOV_ACTS[i][:2])
+        if not a: return 'n', None
+        return ({'Done': 'd', 'In progress': 'p'}.get(a['status'], 'x'), a.get('pct') if a['status'] == 'In progress' else None)
+    vs = [v for v in blob_rows('exec', 'villas') if v['cluster'] in cfg['clusters']]
+    out = []
+    for c in cfg['clusters']:
+        l = sorted([v for v in vs if v['cluster'] == c], key=lambda v: -v['total'])
+        if not l: continue
+        cnt = {n: sum(1 for v in l if any(st(v['villa'], i)[0] in 'px' for i in ix)) for n, _, ix, _ in NOV_PH}
+        slot = {n: sl for n, _, _, sl in NOV_PH}
+        if not any(cnt[n] for n in ('Ceiling MEP', 'Gypsum', 'Wet finishes', 'Aluminium & rails')): slot['Kitchens & doors'] = (1, 2)
+        elif not cnt['Wet finishes'] and not cnt['Aluminium & rails']: slot['Kitchens & doors'] = (2, 3)
+        ph = []
+        for n, col, _, _ in NOV_PH:
+            k = cnt[n]; a, b = slot[n]
+            ph.append([n, col, k, a if k else None, b if k else None, math.ceil(k / (cfg['rate'] * (b - a + 1))) if k else 0])
+        ends = [p[4] for p in ph if p[4]]
+        villas = []
+        for v in l:
+            s = [st(v['villa'], i) for i in range(len(NOV_ACTS))]
+            nxt = [NOV_ACTS[i][2] for i in NOV_SEQ if s[i][0] in 'px'][:2]
+            villas.append([v['villa'], v.get('type', ''), round(v['total'], 4), ''.join(x[0] for x in s), [x[1] for x in s], sum(1 for x in s if x[0] in 'px'), ' → '.join(nxt) or 'Handover'])
+        out.append({'c': c, 'wave': cfg['wave'].get(c, 2), 'ph': ph, 'end': max(ends) if ends else 1, 'villas': villas})
+    return {'title': cfg['title'], 'start': cfg['start'], 'end': cfg['end'], 'weeks': cfg['weeks'], 'rate': cfg['rate'],
+            'acts': [a[2] for a in NOV_ACTS], 'groups': NOV_GROUPS, 'clusters': out}
+
 def dmy(iso):
     return f'{iso[8:10]}-{iso[5:7]}-{iso[0:4]}'
 
@@ -270,8 +317,11 @@ def build():
         tabs.append({'id': 'bk', 'title': 'P6 breakdown', 'native': True})
     boq = boq_data()
     if boq: tabs.append({'id': 'boq', 'title': 'BOQ & amounts', 'native': True, 'pinned': True})  # pinned: listed first in the sidebar
+    nov = nov_data()
+    if nov: tabs.append({'id': 'nov', 'title': 'November plan', 'native': True, 'pinned': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     if boq: payload['boq'] = boq
+    if nov: payload['nov'] = nov
     if p6:
         payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
         g = os.path.join(B, 'p6', 'gantt.bin')  # P6 schedule (.xer), encrypted; fetched by the browser when the Gantt opens

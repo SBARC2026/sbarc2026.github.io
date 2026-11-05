@@ -70,3 +70,6 @@ Hard-coded dates in the page (`files/index.html`: site-status chip, buildings no
 `SBARC_PASSWORD=... python3 builder/tools/boq_import.py <"SBARC Rules of Credit" artifact .html or boq.json>` rewrites `builder/boq/boq.bin`
 (encrypted with the portal password; the repo is public, so amounts are never committed readable). `build.py` adds the "BOQ items & amounts" tab
 when the file exists. Source: artifact https://claude.ai/artifact/Ps17om7Dv51covX5eGw4gz (BOQ 5.3 - IPA 24 B.O.Q. Break R00). Re-run only when the BOQ changes.
+
+## November plan tab
+The "November plan" tab (pinned) is computed on every build by `nov_data()` in `build.py` from the latest `villas` and `villa_activities` rows and the settings in `builder/nov_plan.json` (clusters, waves, start/end dates, weeks, villas per crew per week). Nothing to do on a daily update; edit `nov_plan.json` only if the plan itself changes.

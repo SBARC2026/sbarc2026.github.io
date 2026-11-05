@@ -496,6 +496,44 @@
   .pv{position:absolute;inset:0;overflow-y:auto;background:var(--bg)}
   .pv-in{max-width:1240px;margin:0 auto;padding:20px max(16px,3vw) 44px;display:flex;flex-direction:column;gap:16px}
   .pv-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
+  .nv-sec{margin-top:22px}.nv-h2{margin:0 0 10px;font:700 22px/1.1 var(--disp);font-stretch:80%}.nv-h3{margin:16px 0 8px;font:700 15px var(--disp);font-stretch:85%}
+  .nv-tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+  .nv-gt,.nv-vt{border-collapse:collapse;width:100%;font-size:12.5px}
+  .nv-gt th,.nv-vt th{font:600 10.5px/1.2 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+  .nv-gt th.nv-w small{display:block;text-transform:none;letter-spacing:0;font-size:10px;margin-top:2px}
+  .nv-gt td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:middle}.nv-gt tr:last-child td{border-bottom:0}
+  .nv-gt td.nv-gc{border-left:1px dashed var(--line);min-width:118px;padding:4px 5px}
+  .nv-gb{color:#fff;font:600 10.5px/1.2 var(--body);border-radius:5px;padding:3px 6px;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nv-hd b{display:block;font-size:14px}.nv-hd small{color:var(--muted);font-size:11px}
+  .nv-lk{border:0;background:none;color:var(--fg);font:700 14px var(--body);padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+  .nv-bc{display:flex;align-items:center;gap:6px;min-width:96px}.nv-bar{flex:1;height:6px;border-radius:3px;background:rgba(127,143,160,.22);overflow:hidden}.nv-bar i{display:block;height:100%}
+  .nv-bar .nv-ok,i.nv-ok{background:#1E9A5C}.nv-bar .nv-tr{background:#E09B17}.nv-bar .nv-pu{background:#D63A28}.nv-bv{font-weight:600;font-variant-numeric:tabular-nums;min-width:34px;text-align:right}
+  .nv-lg{display:flex;flex-wrap:wrap;gap:14px;margin:8px 2px 0;font-size:12px;color:var(--muted)}.nv-lg i{display:inline-block;width:12px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+  .nv-ms{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:10px}
+  .nv-m{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px}.nv-m.on{border-top:3px solid #1E9A5C}
+  .nv-m em{font:600 10.5px var(--mono);letter-spacing:.06em;text-transform:uppercase;font-style:normal;color:var(--muted)}.nv-m b{font:700 26px/1 var(--disp);font-stretch:80%}.nv-m span{font-size:12px;color:var(--muted)}.nv-m small{font-size:11px;color:var(--muted)}
+  .nv-note{margin:10px 2px 0;font-size:12.5px;color:var(--muted);max-width:80em}
+  .nv-k-pu{border-top:3px solid #D63A28!important}.nv-k-tr{border-top:3px solid #E09B17!important}.nv-k-ok{border-top:3px solid #1E9A5C!important}
+  .nv-seg{margin:0 0 12px;flex-wrap:wrap}
+  .nv-cl{border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:16px;scroll-margin-top:70px}
+  .nv-clh{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:10px}.nv-clh>div:first-child{display:flex;flex-direction:column;gap:2px;flex:1;min-width:200px}
+  .nv-clh b{font:700 20px var(--disp);font-stretch:80%}.nv-clh span{font-size:12.5px;color:var(--muted)}.nv-clp{width:180px}
+  .nv-pills{display:flex;gap:6px;flex-wrap:wrap}.nv-pill{display:inline-block;padding:2px 9px;border-radius:999px;font:600 11px/1.5 var(--body);white-space:nowrap}
+  .nv-pill.nv-pu{background:rgba(214,58,40,.16);color:#E2604F}.nv-pill.nv-tr{background:rgba(224,155,23,.18);color:#D8971A}.nv-pill.nv-ok{background:rgba(30,154,92,.18);color:#2FB673}
+  :root[data-theme="light"] .nv-pill.nv-pu{color:#8A1C12}:root[data-theme="light"] .nv-pill.nv-tr{color:#6E4A05}:root[data-theme="light"] .nv-pill.nv-ok{color:#14532F}
+  .nv-ps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:8px;margin-bottom:10px}
+  .nv-pc{border:1px solid var(--line);border-left:4px solid;border-radius:8px;padding:6px 9px;display:flex;flex-direction:column;gap:1px}
+  .nv-pc em{font:600 10px var(--mono);letter-spacing:.06em;text-transform:uppercase;font-style:normal;color:var(--muted)}.nv-pc b{font-size:13px}.nv-pc b.nv-dn{color:#2FB673}.nv-pc span{font-size:11.5px;color:var(--muted)}
+  .nv-vt th,.nv-vt td{text-align:center;border:1px solid var(--line)}.nv-vt{font-size:12px}
+  .nv-vt .nv-g1 th{border:0;padding:5px 4px;text-align:center}.nv-vt th.nv-grp{background:#0F2742;color:#fff;border:1px solid #0F2742}.nv-vt th.nv-trk{background:#E3C27A;color:#0F2742}
+  .nv-vt th.nv-v{height:96px;padding:0 2px;vertical-align:bottom}.nv-vt th.nv-v div{writing-mode:vertical-rl;transform:rotate(180deg);margin:0 auto;padding:4px 0;text-transform:none;letter-spacing:0;font-size:11px}
+  .nv-vt td{padding:4px 4px;height:28px;font-variant-numeric:tabular-nums;min-width:30px}
+  .nv-vt td.nv-sd{background:rgba(30,154,92,.14);color:#2FB673;font-weight:700}.nv-vt td.nv-sp{background:rgba(224,155,23,.22);font-weight:700}.nv-vt td.nv-sx{background:rgba(214,58,40,.18);color:#E2604F;font-weight:700}
+  .nv-vt td.nv-sn{background:repeating-linear-gradient(45deg,rgba(127,143,160,.14),rgba(127,143,160,.14) 2px,transparent 2px,transparent 5px)}
+  :root[data-theme="light"] .nv-vt td.nv-sd{color:#1E7B4D}:root[data-theme="light"] .nv-vt td.nv-sx{color:#8A1C12}
+  .nv-vt td.nv-rk{color:var(--muted);font-family:var(--mono);font-size:11px}.nv-vt td.nv-vn{text-align:left;font-weight:700;white-space:nowrap}.nv-vt td.nv-vn small{font-weight:400;color:var(--muted);margin-left:4px;font-size:10.5px}
+  .nv-vt td.nv-on{font-weight:700}.nv-vt td.nv-np{text-align:left;white-space:nowrap;font-size:11.5px;min-width:160px}
+  @media print{body.print-page .nv-tw{overflow:visible!important;border:0!important}body.print-page .nv-cl{break-inside:avoid;page-break-inside:avoid}body.print-page .nv-seg{display:none!important}body.print-page .nv-gb{color:#fff!important;-webkit-text-fill-color:#fff!important}body.print-page .nv-vt th.nv-grp{color:#fff!important;-webkit-text-fill-color:#fff!important}body.print-page .nv-vt th.nv-v{height:70px}}
   .pv-eb{font:500 11px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
   .pv-h{margin:4px 0 0;font:800 40px/1 var(--disp);font-stretch:72%}
   .pv-sub{margin:6px 0 0;color:var(--muted);font-size:13.5px;max-width:64em}
@@ -943,6 +981,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     <div class="wk" id="wk" hidden><div class="wk-in" id="wk-in"><div class="wk-empty">Loading this week's targets…</div></div></div>
     <div class="pv" id="pv" hidden><div class="pv-in" id="pv-in"></div></div>
     <div class="pv" id="bq" hidden><div class="pv-in" id="bq-in"></div></div>
+    <div class="pv" id="nv" hidden><div class="pv-in" id="nv-in"></div></div>
     <div class="pv" id="bk" hidden><div class="pv-in" id="bk-in"></div></div>
   </main>
   </div>
@@ -1062,7 +1101,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const tabs = $('tabs'); tabs.replaceChildren();
     [...session.dashboards].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).forEach((d) => {
       const b = document.createElement('button'); b.className = 'tab' + (d.pinned ? ' pinned' : ''); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
-      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ' };
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', nov: 'Nov plan' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh); if (d.pinned) { const pn = document.createElement('span'); pn.className = 'pin'; pn.title = 'Pinned'; pn.setAttribute('aria-hidden', 'true'); pn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M14.5 3.5l6 6-2 .8-3.3 3.3.3 4.2-1.4 1.4-4-4-5.3 5.3-1-1 5.3-5.3-4-4 1.4-1.4 4.2.3 3.3-3.3z"/></svg>'; b.append(pn); }
       b.addEventListener('click', () => { show(d.id); drawer(false); }); tabs.append(b);
     });
@@ -1078,7 +1117,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
     session = null; current = null; secret = ''; $('up').hidden = true;
-    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
+    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); nvReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -1099,6 +1138,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     p02b: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"/><path d="M5 16l4.5-5 3.5 3 6-7"/><path d="M15 7h4v4"/></svg>',
     week: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>',
     p6: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M4 12h13M4 18h7"/><rect x="13" y="4" width="7" height="4" rx="1.2"/><rect x="17" y="10" width="3.5" height="4" rx="1.2"/><rect x="11" y="16" width="9" height="4" rx="1.2"/></svg>',
+    nov: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4M7 13h4M7 16.5h7"/></svg>',
     boq: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7h4"/><path d="M9 11h6M9 14.5h6M9 18h3.5"/></svg>',
     bk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M9 9.5V20"/><path d="M12.5 13h5M12.5 16.5h3"/></svg>',
     explorer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg>',
@@ -1126,11 +1166,13 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('pv').hidden = id !== 'p6';
     $('bk').hidden = id !== 'bk';
     $('bq').hidden = id !== 'boq';
+    $('nv').hidden = id !== 'nov';
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
     if (id === 'week') { $('loading').hidden = true; wkOpen(); return; }
     if (id === 'p6') { $('loading').hidden = true; pvOpen(); return; }
     if (id === 'bk') { $('loading').hidden = true; bkOpen(); return; }
     if (id === 'boq') { $('loading').hidden = true; bqOpen(); return; }
+    if (id === 'nov') { $('loading').hidden = true; nvOpen(); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
   function makeFrame(id) {
@@ -1754,6 +1796,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   const tabTitle = () => ((session.dashboards.find((d) => d.id === current) || {}).title || 'SBARC');
   function exportSheets() {
     if (current === 'bq' || current === 'boq') return bqSheets();
+    if (current === 'nov') return nvSheets();
     if (current === 'bk' || current === 'p6') return [{ name: 'P6 breakdown', rows: bkSheetRows() }];
     if (current === 'week') return tablesToSheets($('wk-in'));
     const f = frames[current], w = f && f.contentWindow; if (!w) return [];
@@ -2043,6 +2086,101 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   }
 
   // ---------- BOQ tab ----------
+
+  // ----- November plan: cluster push plan computed at build time (session.nov) -----
+  let NV = null;
+  function nvReset() { NV = null; $('nv').hidden = true; $('nv-in').replaceChildren(); }
+  const nvTier = (t) => { const p = Math.round(t * 100); return p >= 90 ? 'ok' : p >= 80 ? 'tr' : 'pu'; };
+  const NVT = { ok: 'OK', tr: 'On track', pu: 'Push' };
+  function nvWeek(n) {
+    const D = session.nov, a = new Date(D.start + 'T00:00:00'); a.setDate(a.getDate() + 7 * (n - 1));
+    const b = new Date(a); b.setDate(b.getDate() + 4); const e = new Date(D.end + 'T00:00:00'); return [a, b > e ? e : b];
+  }
+  const nvD = (d) => d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  function nvOpen() {
+    const D = session.nov; if (!D) { $('nv-in').replaceChildren(el('div', 'wk-empty', 'No November plan in this build.')); return; }
+    if (!NV) NV = { show: 'all' };
+    nvRender();
+  }
+  function nvBar(t) { const w = el('div', 'nv-bar'), i = el('i', 'nv-' + nvTier(t)); i.style.width = Math.round(t * 100) + '%'; w.append(i); const v = el('span', 'nv-bv', Math.round(t * 100) + '%'); const box = el('div', 'nv-bc'); box.append(w, v); return box; }
+  function nvRender() {
+    const D = session.nov, root = $('nv-in'); root.replaceChildren();
+    const all = D.clusters.flatMap((c) => c.villas), n = all.length, avg = all.reduce((s, v) => s + v[2], 0) / (n || 1);
+    const cnt = { pu: 0, tr: 0, ok: 0 }; all.forEach((v) => { cnt[nvTier(v[2])]++; });
+    const top = el('div', 'pv-top'), tl = el('div');
+    tl.append(el('div', 'pv-eb', 'November 2026 · ' + D.clusters.length + ' clusters · ' + n + ' villas'), el('h1', 'pv-h', 'November push plan'),
+      el('p', 'pv-sub', 'Clusters ' + D.clusters.map((c) => c.c).join(', ') + ' with every villa in them: what is still open, which trade package runs in which week, and the crews it needs to hand them over by ' + nvD(new Date(D.end + 'T00:00:00')) + '. Recalculated from the latest villa data on every update.'));
+    top.append(tl); root.append(top);
+    const kp = el('div', 'pv-kpis'), kpi = (a, b, c, cls) => { const d = el('div', 'pv-kpi' + (cls ? ' ' + cls : '')); d.append(el('span', null, a), el('b', null, b), el('small', null, c)); return d; };
+    kp.append(kpi('Villas in plan', String(n), D.clusters.length + ' clusters'), kpi('Average progress', Math.round(avg * 100) + '%', 'BOQ-weighted'),
+      kpi('Push', String(cnt.pu), 'below 80%', 'nv-k-pu'), kpi('On track', String(cnt.tr), '80–89%', 'nv-k-tr'), kpi('OK', String(cnt.ok), '90% and above', 'nv-k-ok'),
+      kpi('Target', nvD(new Date(D.end + 'T00:00:00')), D.weeks + ' working weeks from ' + nvD(new Date(D.start + 'T00:00:00'))));
+    root.append(kp);
+    // gantt
+    const sec = el('section', 'nv-sec'); sec.append(el('h2', 'nv-h2', 'Cluster plan'));
+    const wrap = el('div', 'nv-tw'), t = el('table', 'nv-gt'), hr = el('tr');
+    ['Wave', 'Cluster', 'Villas', 'Progress'].forEach((x) => hr.append(el('th', null, x)));
+    for (let w = 1; w <= D.weeks; w++) { const th = el('th', 'nv-w', 'W' + w); th.append(el('small', null, nvD(nvWeek(w)[0]) + '–' + nvD(nvWeek(w)[1]))); hr.append(th); }
+    hr.append(el('th', null, 'Handover')); t.append(hr);
+    [...D.clusters].sort((a, b) => a.wave - b.wave || a.end - b.end).forEach((c) => {
+      const tr = el('tr'), ca = c.villas.reduce((s, v) => s + v[2], 0) / c.villas.length;
+      tr.append(el('td', null, 'Wave ' + c.wave)); const cn = el('td', 'nv-cn'); const lk = el('button', 'nv-lk', c.c); lk.type = 'button'; lk.addEventListener('click', () => { NV.show = c.c; nvRender(); const s2 = document.getElementById('nv-' + c.c); if (s2) s2.scrollIntoView({ behavior: 'smooth', block: 'start' }); }); cn.append(lk); tr.append(cn);
+      tr.append(el('td', null, String(c.villas.length))); const pc = el('td'); pc.append(nvBar(ca)); tr.append(pc);
+      for (let w = 1; w <= D.weeks; w++) {
+        const td = el('td', 'nv-gc'); c.ph.filter((p) => p[3] && p[3] <= w && w <= p[4]).forEach((p) => { const b = el('div', 'nv-gb', p[0].split(' ')[0] + ' ' + p[2] + (p[5] > 1 ? ' · ' + p[5] + ' crews' : '')); b.style.background = p[1]; b.title = p[0] + ': ' + p[2] + ' villas, ' + p[5] + ' crew' + (p[5] > 1 ? 's' : ''); td.append(b); }); tr.append(td);
+      }
+      const hd = el('td', 'nv-hd'); hd.append(el('b', null, 'W' + c.end), el('small', null, nvD(nvWeek(c.end)[1]))); tr.append(hd); t.append(tr);
+    });
+    wrap.append(t); sec.append(wrap);
+    const lg = el('div', 'nv-lg'); D.clusters[0].ph.forEach((p) => { const s1 = el('span'); const i = el('i'); i.style.background = p[1]; s1.append(i, document.createTextNode(p[0])); lg.append(s1); }); sec.append(lg);
+    // milestones
+    const ms = el('div', 'nv-ms'); let cum = 0;
+    for (let w = 1; w <= D.weeks; w++) {
+      const cs = D.clusters.filter((c) => c.end === w), k = cs.reduce((s, c) => s + c.villas.length, 0); cum += k;
+      const m = el('div', 'nv-m' + (k ? ' on' : '')); m.append(el('em', null, 'W' + w + ' · ' + nvD(nvWeek(w)[0]) + '–' + nvD(nvWeek(w)[1])), el('b', null, k ? String(k) : '–'), el('span', null, k ? 'villas handed over · ' + cs.map((c) => c.c).join(', ') : 'no handover this week'));
+      const pb = el('div', 'nv-bar'), pi = el('i', 'nv-ok'); pi.style.width = Math.round(cum / n * 100) + '%'; pb.append(pi); m.append(pb, el('small', null, cum + ' of ' + n + ' cumulative')); ms.append(m);
+    }
+    sec.append(el('h3', 'nv-h3', 'Handover milestones'), ms);
+    const pk = {}; for (let w = 1; w <= D.weeks; w++) { const tw = {}; D.clusters.forEach((c) => c.ph.forEach((p) => { if (p[3] && p[3] <= w && w <= p[4]) tw[p[0]] = (tw[p[0]] || 0) + p[5]; })); Object.keys(tw).forEach((k) => { pk[k] = Math.max(pk[k] || 0, tw[k]); }); }
+    sec.append(el('p', 'nv-note', 'Peak crews: ' + D.clusters[0].ph.map((p) => (pk[p[0]] || 0) + ' ' + p[0]).join(', ') + '. Crews = villas ÷ (' + D.rate + ' villas a crew a week × weeks allowed). Order in each cluster: ceiling MEP → gypsum → wet finishes → aluminium & rails → kitchens & doors. Proposed targets to confirm with the trade foremen.'));
+    root.append(sec);
+    // cluster sheets
+    const s3 = el('section', 'nv-sec'); s3.append(el('h2', 'nv-h2', 'Cluster sheets'));
+    const seg = el('div', 'pv-seg nv-seg'); [['all', 'All clusters'], ...D.clusters.map((c) => [c.c, c.c])].forEach(([k, tx]) => { const b = el('button', null, tx); b.type = 'button'; b.setAttribute('aria-pressed', String(NV.show === k)); b.addEventListener('click', () => { NV.show = k; nvRender(); }); seg.append(b); });
+    s3.append(seg);
+    D.clusters.filter((c) => NV.show === 'all' || NV.show === c.c).forEach((c) => s3.append(nvCluster(c)));
+    root.append(s3);
+  }
+  function nvCluster(c) {
+    const D = session.nov, box = el('div', 'nv-cl'); box.id = 'nv-' + c.c;
+    const ca = c.villas.reduce((s, v) => s + v[2], 0) / c.villas.length, cnt = { pu: 0, tr: 0, ok: 0 }; c.villas.forEach((v) => { cnt[nvTier(v[2])]++; });
+    const hd = el('div', 'nv-clh'); const tt = el('div'); tt.append(el('b', null, 'Cluster ' + c.c), el('span', null, c.villas.length + ' villas · ' + c.villas.reduce((s, v) => s + v[5], 0) + ' open activities · handover W' + c.end + ' (' + nvD(nvWeek(c.end)[1]) + ')'));
+    const pills = el('div', 'nv-pills'); ['pu', 'tr', 'ok'].forEach((k) => { if (cnt[k]) pills.append(el('span', 'nv-pill nv-' + k, NVT[k] + ' ' + cnt[k])); });
+    const pr = el('div', 'nv-clp'); pr.append(nvBar(ca)); hd.append(tt, pills, pr); box.append(hd);
+    const ps = el('div', 'nv-ps'); c.ph.forEach((p) => { const d = el('div', 'nv-pc'); d.style.borderLeftColor = p[1]; d.append(el('em', null, p[0]));
+      if (p[2]) { d.append(el('b', null, p[2] + ' villa' + (p[2] > 1 ? 's' : '') + ' · ' + p[5] + ' crew' + (p[5] > 1 ? 's' : '')), el('span', null, 'W' + p[3] + (p[4] > p[3] ? '–W' + p[4] : '') + ' · ' + nvD(nvWeek(p[3])[0]) + '–' + nvD(nvWeek(p[4])[1]))); }
+      else d.append(el('b', 'nv-dn', 'Complete'), el('span', null, ' ')); ps.append(d); });
+    box.append(ps);
+    const wrap = el('div', 'nv-tw'), t = el('table', 'nv-vt'), g1 = el('tr', 'nv-g1'), g2 = el('tr');
+    const th0 = el('th'); th0.colSpan = 4; g1.append(th0); D.groups.forEach(([g, k]) => { const th = el('th', 'nv-grp', g); th.colSpan = k; g1.append(th); }); const tk = el('th', 'nv-grp nv-trk', 'Tracking'); tk.colSpan = 2; g1.append(tk);
+    ['#', 'Villa', 'Progress', 'Status'].forEach((x) => g2.append(el('th', null, x))); D.acts.forEach((a) => { const th = el('th', 'nv-v'); th.append(el('div', null, a)); g2.append(th); }); g2.append(el('th', null, 'Open'), el('th', null, 'Next push'));
+    t.append(g1, g2);
+    c.villas.forEach((v, i) => {
+      const tr = el('tr'), k = nvTier(v[2]); tr.append(el('td', 'nv-rk', String(i + 1))); const vn = el('td', 'nv-vn', v[0]); vn.append(el('small', null, v[1])); tr.append(vn);
+      const pc = el('td'); pc.append(nvBar(v[2])); tr.append(pc); const sc = el('td'); sc.append(el('span', 'nv-pill nv-' + k, v[2] >= 1 ? 'Done' : NVT[k])); tr.append(sc);
+      [...v[3]].forEach((ch, j) => { const td = el('td', 'nv-s' + ch, ch === 'd' ? '✓' : ch === 'p' ? (v[4][j] != null ? String(v[4][j]) : '•') : ch === 'x' ? '✕' : ''); td.title = D.acts[j] + ': ' + ({ d: 'complete', p: 'in progress' + (v[4][j] != null ? ' ' + v[4][j] + '%' : ''), x: 'not started', n: 'not in scope' })[ch]; tr.append(td); });
+      tr.append(el('td', 'nv-on', v[5] ? String(v[5]) : ''), el('td', 'nv-np', v[6])); t.append(tr);
+    });
+    wrap.append(t); box.append(wrap); return box;
+  }
+  function nvSheets() {
+    const D = session.nov; if (!D) return [];
+    const plan = [['Wave', 'Cluster', 'Villas', 'Average %', 'Package', 'Villas open', 'From week', 'To week', 'Crews', 'Handover week']];
+    D.clusters.forEach((c) => { const ca = Math.round(c.villas.reduce((s, v) => s + v[2], 0) / c.villas.length * 1000) / 10; c.ph.forEach((p) => plan.push([c.wave, c.c, c.villas.length, ca, p[0], p[2], p[3] || '', p[4] || '', p[5], c.end])); });
+    const vl = [['Cluster', 'Villa', 'Type', 'Progress %', 'Status', ...D.acts, 'Open', 'Next push']];
+    D.clusters.forEach((c) => c.villas.forEach((v) => vl.push([c.c, v[0], v[1], Math.round(v[2] * 1000) / 10, v[2] >= 1 ? 'Done' : NVT[nvTier(v[2])], ...[...v[3]].map((ch, j) => (ch === 'd' ? 'Done' : ch === 'p' ? (v[4][j] != null ? v[4][j] + '%' : 'In progress') : ch === 'x' ? 'Not started' : '')), v[5], v[6]])));
+    return [{ name: 'Cluster plan', rows: plan }, { name: 'Villas', rows: vl }];
+  }
   // session.boq: { rules:[{c, g, n, s:[[stage, %]], l: lines, v: amount, b: note}], lines:[[bill, item, description, unit, amount, work-type code, section]], bills:[[bill, title, lines, amount]] }
   let BQ = null;
   const bqF = (n) => Math.round(n).toLocaleString('en-US');
