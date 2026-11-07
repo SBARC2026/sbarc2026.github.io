@@ -326,7 +326,7 @@ def build():
     boq = boq_data()
     if boq: tabs.append({'id': 'boq', 'title': 'BOQ & amounts', 'native': True, 'pinned': True})  # pinned: listed first in the sidebar
     ipa = ipa_data()
-    if ipa: tabs.append({'id': 'ipa', 'title': 'Last payment (IPA)', 'native': True, 'pinned': True})
+    # the payment data shows inside the BOQ tab (view "Payment"); no separate tab
     nov = nov_data()
     if nov: tabs.append({'id': 'nov', 'title': 'November plan', 'native': True, 'pinned': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}

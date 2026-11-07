@@ -77,5 +77,5 @@ The "November plan" tab (pinned) is computed on every build by `nov_data()` in `
 ## Last payment tab (IPA, BOQ analysis)
 `SBARC_PASSWORD=... python3 builder/tools/ipa_import.py "<IPA n B.O.Q. Break. Rxx>.xlsx"` rewrites `builder/ipa/ipa.bin` (encrypted; amounts are never committed readable).
 It reads GENERAL SUMMARY, SECTIONS and every bill sheet, scales line amounts by the contract discount and asserts they add up to the certified totals.
-`build.py` adds the pinned tab "Last payment & BOQ analysis" when the file exists. Re-run it for each new payment certificate. The tab compares the certified
+`build.py` sends it with the page and the BOQ tab shows it as the "Payment" view. Re-run it for each new payment certificate. The tab compares the certified
 percentage with the P6 earned cost (`p6.total.ec / bc`): different measures, so shown as a gap to reconcile, never as an error.

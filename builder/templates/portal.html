@@ -1799,7 +1799,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   }
   const tabTitle = () => ((session.dashboards.find((d) => d.id === current) || {}).title || 'SBARC');
   function exportSheets() {
-    if (current === 'bq' || current === 'boq') return bqSheets();
+    if (current === 'bq' || current === 'boq') return BQ && BQ.view === 'ip' ? ipSheets() : bqSheets();
     if (current === 'ipa') return ipSheets();
     if (current === 'nov') return nvSheets();
     if (current === 'bk' || current === 'p6') return [{ name: 'P6 breakdown', rows: bkSheetRows() }];
@@ -2209,8 +2209,9 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     tl.append(el('div', 'pv-eb', 'Contract BOQ 5.3 · IPA 24 B.O.Q. Break R00'), el('h1', 'pv-h', 'BOQ items & amounts'),
       el('p', 'pv-sub', 'Every priced BOQ line with its amount, grouped by work type and by bill. Amounts are the contract BOQ amounts before discount, in SAR.'));
     const seg = el('div', 'pv-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'View');
-    [['wt', 'Work types'], ['bl', 'Bills'], ['ln', 'All lines']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(BQ.view === k)); b.addEventListener('click', () => { BQ.view = k; bqRender(); }); seg.append(b); });
+    [['wt', 'Work types'], ['bl', 'Bills'], ['ln', 'All lines'], ...(session.ipa ? [['ip', 'Payment · IPA ' + session.ipa.ipa.replace(/ REV.*/, '')]] : [])].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(BQ.view === k)); b.addEventListener('click', () => { BQ.view = k; bqRender(); }); seg.append(b); });
     const rt = el('div', 'pv-top-r'); rt.append(seg); top.append(tl, rt); root.append(top);
+    if (BQ.view === 'ip' && ipEnsure()) { const box = el('div'); root.append(box); ipRender(box, true); $('bq').scrollTop = 0; return; }
     const kp = el('div', 'pv-kpis'), kpi = (a, b, c, cls) => { const d = el('div', 'pv-kpi' + (cls ? ' ' + cls : '')); d.append(el('span', null, a), el('b', null, b), el('small', null, c)); return d; };
     const big = BQ.groups[0];
     kp.append(kpi('BOQ value', bqM(BQ.total), 'SAR ' + bqF(BQ.total), 'bq-hero'), kpi('Priced lines', bqF(D.lines.length), D.bills.length + ' bills, 1 to 5b'), kpi('Work types', String(D.rules.length), BQ.groups.length + ' groups'),
@@ -2324,21 +2325,21 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     return true;
   }
   function ipOpen() { if (!ipEnsure()) { $('ip-in').replaceChildren(el('div', 'wk-empty', 'No payment data in this build.')); return; } ipRender(); }
-  function ipRender() {
-    const root = $('ip-in'), D = IP.D, G = D.grand; root.replaceChildren();
+  function ipRender(box, emb) {
+    if (box) { IP.box = box; IP.emb = !!emb; } const root = IP.box || $('ip-in'), D = IP.D, G = D.grand; root.replaceChildren();
     const top = el('div', 'pv-top'), tl = el('div');
-    tl.append(el('div', 'pv-eb', 'IPA ' + D.ipa + ' · period ending ' + D.period), el('h1', 'pv-h', 'Last payment & BOQ analysis'),
+    if (!IP.emb) tl.append(el('div', 'pv-eb', 'IPA ' + D.ipa + ' · period ending ' + D.period), el('h1', 'pv-h', 'Last payment & BOQ analysis'),
       el('p', 'pv-sub', 'What the latest payment certificate has claimed against the contract BOQ: by bill, by work type and line by line. Amounts in SAR, after the contract discount.'));
     const seg = el('div', 'pv-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'View');
     [['ov', 'Overview'], ['bl', 'Bills'], ['wt', 'Work types'], ['ln', 'Lines']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(IP.view === k)); b.addEventListener('click', () => { IP.view = k; ipRender(); }); seg.append(b); });
-    const rt = el('div', 'pv-top-r'); rt.append(seg); top.append(tl, rt); root.append(top);
+    const rt = el('div', 'pv-top-r'); rt.append(seg); if (IP.emb) { rt.style.cssText = 'margin:14px 0 0'; root.append(Object.assign(el('p', 'pv-sub', 'IPA ' + D.ipa + ' · period ending ' + D.period + ' · what the latest payment certificate has claimed against this BOQ, in SAR after the contract discount.'), { style: 'margin-top:14px' }), rt); } else { top.append(tl, rt); root.append(top); }
     const kp = el('div', 'pv-kpis'), kpi = (a, b, c, cls) => { const d = el('div', 'pv-kpi' + (cls ? ' ' + cls : '')); d.append(el('span', null, a), el('b', null, b), el('small', null, c)); return d; };
     const mv = G.claimed - G.prev;
     kp.append(kpi('Certified to date', ipM(G.claimed), ipP(G.claimed / G.contract) + ' of the contract', 'bq-hero'), kpi('Contract value', ipM(G.contract), 'after ' + ipM(-G.discount) + ' discount'),
       kpi('Still to come', ipM(G.remaining), ipP(G.remaining / G.contract) + ' of the contract'), kpi('Against previous certificate', (mv >= 0 ? '+' : '−') + ipM(Math.abs(mv)), 'revision of IPA ' + D.ipa.replace(/ REV.*/, '')));
     root.append(kp);
     ({ ov: ipOverview, bl: ipBills, wt: ipWork, ln: ipLines })[IP.view](root);
-    $('ip').scrollTop = 0;
+    (root.closest('.pv') || $('ip')).scrollTop = 0;
   }
   const ipBar = (frac, col) => { const t = el('span', 'bq-tr'), i = el('i'); i.style.width = Math.max(0, Math.min(1, frac)) * 100 + '%'; if (col) i.style.background = col; t.append(i); return t; };
   function ipGo(f) { Object.assign(IP.ln, { q: '', sheet: '', st: '', sort: 'rem', page: 0 }, f); IP.view = 'ln'; ipRender(); }
