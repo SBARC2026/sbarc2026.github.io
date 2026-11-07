@@ -681,6 +681,15 @@
   .bq-d{white-space:normal;min-width:340px}.bq-d small{display:block;margin-top:2px;color:var(--muted);font-size:11.5px}
   .bq-am b{display:block;font-weight:700}.bq-am .bq-tr{margin-top:4px;width:110px;margin-left:auto;flex:none;height:4px}
   .bq-pill{display:inline-block;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;padding:2px 9px;border-radius:999px;background:color-mix(in srgb,var(--c,var(--accent)) 18%,transparent);border:1px solid color-mix(in srgb,var(--c,var(--accent)) 45%,transparent)}
+  .ip-ov{position:fixed;inset:0;z-index:60;background:rgba(4,10,20,.62);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:4vh 14px;overflow:auto}
+  .ip-md{background:#14202D;border:1px solid var(--line);border-radius:16px;width:min(920px,100%);padding:20px 22px 22px;box-shadow:0 30px 80px rgba(0,0,0,.5);color:var(--fg)}:root[data-theme="light"] .ip-md{background:#fff}
+  .ip-md h2{margin:2px 0 4px;font:800 22px/1.2 var(--head,var(--body))}.ip-md .ip-eb{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .ip-x{float:right;appearance:none;border:1px solid var(--line);background:var(--chip);color:var(--fg);border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:18px;line-height:1}
+  .ip-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:14px 0}.ip-k div{background:var(--chip);border-radius:10px;padding:9px 12px}.ip-k span{display:block;font:600 10.5px var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}.ip-k b{font-size:18px}
+  .ip-md h3{margin:16px 0 6px;font:700 14px var(--body)}.ip-md .bq-row{padding:8px 4px;grid-template-columns:minmax(0,1.6fr) 1fr 52px 84px 84px;font-size:12.5px}.ip-md .bq-row.ipg{cursor:pointer}.ip-md .bq-row.ipg:hover{background:color-mix(in srgb,var(--accent) 8%,transparent)}
+  .ip-dl{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;font-size:13px;margin:10px 0}.ip-dl dt{color:var(--muted)}.ip-dl dd{margin:0;word-break:break-word}
+  .ip-act{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.bq-tbl tbody tr.ipc,.bq-row.ipc{cursor:pointer}.bq-tbl tbody tr.ipc:hover td{background:color-mix(in srgb,var(--accent) 10%,transparent)}
+  @media (max-width:860px){.ip-md .bq-row{grid-template-columns:minmax(0,1fr) 60px 80px}.ip-md .bq-row>:nth-child(2),.ip-md .bq-row>:nth-child(5){display:none}.ip-dl{grid-template-columns:110px 1fr}}
   @media (max-width:860px){.bq-row{grid-template-columns:minmax(0,1fr) auto;gap:8px 12px}.bq-head{display:none}.bq-row>.bq-st,.bq-row>.bq-sh:nth-child(2){grid-column:1/-1;order:3}.bq-row>.n:nth-child(3){display:none}.bq-row .bq-sh:last-child{grid-column:1/-1}}
   .pv-tbl tr.sub td{background:color-mix(in srgb,var(--chip) 60%,transparent);color:var(--muted);font-size:12.5px}
   .pv-tbl tr.sub td:first-child{padding-left:34px}
@@ -2315,7 +2324,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   const ipBill = (s) => (s === 'B1' ? 'Bill 1' : s === 'B5.b' ? 'Bill 5B' : s.startsWith('B5') ? 'Bill 5 & 5A' : 'Bill ' + s[1]);
   const ipSt = (it) => (it[7] <= 0.005 ? 'ns' : it[7] >= it[5] * 0.999 ? 'done' : 'ip');
   const IP_ST = { ns: 'Not started', ip: 'In progress', done: 'Complete' };
-  function ipReset() { IP = null; $('ip').hidden = true; $('ip-in').replaceChildren(); }
+  function ipReset() { ipClose(); IP = null; $('ip').hidden = true; $('ip-in').replaceChildren(); }
   function ipEnsure() {
     if (IP) return true;
     const D = session.ipa; if (!D) return false;
@@ -2342,7 +2351,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     (root.closest('.pv') || $('ip')).scrollTop = 0;
   }
   const ipBar = (frac, col) => { const t = el('span', 'bq-tr'), i = el('i'); i.style.width = Math.max(0, Math.min(1, frac)) * 100 + '%'; if (col) i.style.background = col; t.append(i); return t; };
-  function ipGo(f) { Object.assign(IP.ln, { q: '', sheet: '', st: '', sort: 'rem', page: 0 }, f); IP.view = 'ln'; ipRender(); }
+  function ipGo(f) { Object.assign(IP.ln, { q: '', sheet: '', w: null, bill: '', st: '', sort: 'rem', page: 0 }, f); IP.view = 'ln'; ipRender(); }
   function ipOverview(root) {
     const D = IP.D, G = D.grand, S = IP.st, n = D.items.length;
     const grid = el('div', 'bq-grid'); grid.style.cssText = 'display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));margin-top:14px';
@@ -2365,14 +2374,14 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     // 3. work types still to come
     const c3 = el('section', 'bq-card'); c3.append(el('h3', null, 'Largest amounts still to come, by work type'), el('p', null, 'Remaining value of each BOQ section, largest first.'));
     const ws = [...D.sections].sort((a, b) => b.remaining - a.remaining).slice(0, 6), mx = Math.max(1, ...ws.map((w) => w.remaining));
-    ws.forEach((w) => { const r = el('div', 'bq-row'); r.style.cssText = 'grid-template-columns:minmax(0,1.7fr) 70px 44px 62px;padding:7px 0;border:0'; const nm = el('span', null, w.name.replace(/^SECTION /, '')); nm.style.cssText = 'line-height:1.25;font-size:12.5px'; r.append(nm, ipBar(w.remaining / mx, '#A78BFA'), el('span', 'n', ipP(w.claimed / w.contract, 0)), el('b', 'n', ipM(w.remaining))); c3.append(r); });
+    ws.forEach((w) => { const r = el('div', 'bq-row ipc'); r.title = 'Show details'; r.addEventListener('click', () => ipDetailWork(w)); r.style.cssText = 'grid-template-columns:minmax(0,1.7fr) 70px 44px 62px;padding:7px 0;border:0'; const nm = el('span', null, w.name.replace(/^SECTION /, '')); nm.style.cssText = 'line-height:1.25;font-size:12.5px'; r.append(nm, ipBar(w.remaining / mx, '#A78BFA'), el('span', 'n', ipP(w.claimed / w.contract, 0)), el('b', 'n', ipM(w.remaining))); c3.append(r); });
     c3.append(Object.assign(el('p', null, 'Bar = value still to come · % = already certified.'), { style: 'margin-top:6px' }));
     // 4. changes since the previous certificate
     const c4 = el('section', 'bq-card'); c4.append(el('h3', null, 'Changed in this revision'));
     const ch = IP.chg, cv = ch.reduce((a, it) => a + (it[6] - it[8]) * it[5], 0);
     c4.append(el('p', null, ch.length ? ch.length + ' lines have a different percentage from the previous certificate (net ' + (cv >= 0 ? '+' : '−') + ipM(Math.abs(cv)) + ' at line prices, before discount effects).' : 'No line changed against the previous certificate.'));
     const cl = [...ch].sort((a, b) => Math.abs((b[6] - b[8]) * b[5]) - Math.abs((a[6] - a[8]) * a[5])).slice(0, 5);
-    cl.forEach((it) => { const r = el('div', 'bq-row'); r.style.cssText = 'grid-template-columns:minmax(0,1fr) 120px 70px;padding:6px 0;border:0;font-size:12.5px'; const nm = el('span', null, it[2]); nm.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; nm.title = it[0] + ' ' + it[1] + ' · ' + it[2]; r.append(nm, el('span', 'n', ipP(it[8], 0) + ' → ' + ipP(it[6], 0)), el('b', 'n', ipM((it[6] - it[8]) * it[5]))); c4.append(r); });
+    cl.forEach((it) => { const r = el('div', 'bq-row ipc'); r.title = 'Show details'; r.addEventListener('click', () => ipDetailLine(it)); r.style.cssText = 'grid-template-columns:minmax(0,1fr) 120px 70px;padding:6px 0;border:0;font-size:12.5px'; const nm = el('span', null, it[2]); nm.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; nm.title = it[0] + ' ' + it[1] + ' · ' + it[2]; r.append(nm, el('span', 'n', ipP(it[8], 0) + ' → ' + ipP(it[6], 0)), el('b', 'n', ipM((it[6] - it[8]) * it[5]))); c4.append(r); });
     if (ch.length) { const b = el('button', 'wk-btn', 'List all changed lines'); b.type = 'button'; b.style.marginTop = '8px'; b.addEventListener('click', () => ipGo({ st: 'chg', sort: 'chg' })); c4.append(b); }
     grid.append(c1, c2, c3, c4); root.append(grid);
   }
@@ -2380,9 +2389,10 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const D = IP.D, G = D.grand, mx = Math.max(...D.bills.map((b) => b.contract)), list = el('div', 'bq-list bq-bills'); list.style.marginTop = '14px';
     const hd = el('div', 'bq-row bq-head'); ['Bill', 'Certified', '% done', 'Contract (SAR)', 'Still to come'].forEach((t, i) => hd.append(el('span', i > 1 ? 'n' : '', t))); list.append(hd);
         D.bills.forEach((b) => {
-      const row = el('div', 'bq-row'), nm = el('div', 'bq-nm'), g = el('button', 'go', b.id + ' · ' + b.name); g.type = 'button'; g.title = 'List the lines of this bill'; g.addEventListener('click', () => ipGo({ bill: b.id }));
+      const row = el('div', 'bq-row'), nm = el('div', 'bq-nm'), g = el('button', 'go', b.id + ' · ' + b.name); g.type = 'button'; g.title = 'Show the details of this bill'; g.addEventListener('click', () => ipDetailBill(b));
       nm.append(g, el('div', 'bq-meta', 'Certified ' + ipF(b.claimed) + (Math.abs(b.claimed - b.prev) > 1 ? ' · ' + (b.claimed > b.prev ? '+' : '−') + ipF(Math.abs(b.claimed - b.prev)) + ' vs previous' : '')));
       const bar = el('div', 'bq-sh'), tr = el('span', 'bq-tr'), fi = el('i'); fi.style.width = (b.contract / mx * 100) + '%'; fi.style.opacity = '.35'; const f2 = el('i'); f2.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:' + (b.claimed / mx * 100) + '%'; tr.style.position = 'relative'; tr.append(fi, f2); bar.append(tr);
+      row.classList.add('ipc'); row.addEventListener('click', (e) => { if (e.target !== g) ipDetailBill(b); });
       row.append(nm, bar, el('b', 'n', ipP(b.claimed / b.contract)), el('span', 'n bq-amt', ipF(b.contract)), el('span', 'n', ipF(b.remaining))); list.append(row);
     });
     const ft = el('div', 'bq-row bq-foot'); ft.append(el('span', null, 'Total · ' + D.bills.length + ' bills (Bill 6 dayworks: rate only)'), el('span'), el('span', 'n', ipP(G.claimed / G.contract)), el('b', 'n bq-amt', ipF(G.contract)), el('span', 'n', ipF(G.remaining))); list.append(ft);
@@ -2394,7 +2404,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       const card = el('div'); card.style.marginTop = '14px'; card.append(Object.assign(el('h3', null, title), { style: 'margin:0 0 2px;font:700 15px var(--body)' }), Object.assign(el('p', 'pv-sub', sub), { style: 'margin:0 0 8px' }));
       const list = el('div', 'bq-list'), hd = el('div', 'bq-row bq-head'); ['Work type', 'Certified', '% done', 'Contract (SAR)', 'Still to come'].forEach((t, i) => hd.append(el('span', i > 1 ? 'n' : '', t))); list.append(hd);
       const mx = Math.max(1, ...rows.map((r) => r.contract));
-      rows.forEach((w) => { const row = el('div', 'bq-row'), nm = el('div', 'bq-nm'); nm.append(el('span', null, w.name.replace(/^SECTION /, ''))); nm.firstChild.style.fontWeight = '600';
+      rows.forEach((w) => { const row = el('div', 'bq-row ipc'), nm = el('div', 'bq-nm'); row.title = 'Show details'; row.addEventListener('click', () => ipDetailWork(w)); nm.append(el('span', null, w.name.replace(/^SECTION /, ''))); nm.firstChild.style.fontWeight = '600';
         const bar = el('div', 'bq-sh'), tr = el('span', 'bq-tr'), fi = el('i'); fi.style.width = (w.contract / mx * 100) + '%'; fi.style.opacity = '.35'; const f2 = el('i'); f2.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:' + (w.claimed / mx * 100) + '%'; tr.style.position = 'relative'; tr.append(fi, f2); bar.append(tr);
         row.append(nm, bar, el('b', 'n', w.contract ? ipP(w.claimed / w.contract) : '–'), el('span', 'n bq-amt', ipF(w.contract)), el('span', 'n', ipF(w.remaining))); list.append(row); });
       const c = rows.reduce((a, r) => a + r.contract, 0), cl = rows.reduce((a, r) => a + r.claimed, 0), rm = rows.reduce((a, r) => a + r.remaining, 0), ft = el('div', 'bq-row bq-foot');
@@ -2413,27 +2423,94 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const clr = el('button', 'wk-btn', 'Clear filters'); clr.type = 'button'; const cnt = el('span', 'pv-pg'); tools.append(inp, sb, ss, so, clr, cnt);
     const holder = el('div'), pg = el('div', 'pv-tools'); root.append(tools, holder, pg);
     const key = { rem: (i) => i[5] - i[7], tot: (i) => i[5], clm: (i) => i[7], chg: (i) => Math.abs((i[6] - i[8]) * i[5]) };
-    const filt = () => { const q = S.q.trim().toLowerCase(); return D.items.filter((i) => (!S.bill || ipBill(i[0]) === S.bill) && (!S.st || (S.st === 'open' ? ipSt(i) !== 'done' : S.st === 'chg' ? Math.abs(i[6] - i[8]) > 0.0005 : ipSt(i) === S.st)) && (!q || (i[2] + ' ' + i[1] + ' ' + i[0] + ' ' + i[10]).toLowerCase().includes(q))).sort((a, b) => key[S.sort](b) - key[S.sort](a)); };
+    const filt = () => { const q = S.q.trim().toLowerCase(); return D.items.filter((i) => (!S.bill || ipBill(i[0]) === S.bill) && (!S.sheet || i[0] === S.sheet) && (!S.w || ipMatchW(i, S.w)) && (!S.st || (S.st === 'open' ? ipSt(i) !== 'done' : S.st === 'chg' ? Math.abs(i[6] - i[8]) > 0.0005 : ipSt(i) === S.st)) && (!q || (i[2] + ' ' + i[1] + ' ' + i[0] + ' ' + i[10]).toLowerCase().includes(q))).sort((a, b) => key[S.sort](b) - key[S.sort](a)); };
     const draw = () => {
       const rs = filt(), n = rs.length, pages = Math.max(1, Math.ceil(n / PAGE)); if (S.page >= pages) S.page = pages - 1;
       const sum = (k) => rs.reduce((a, i) => a + i[k], 0), mx = Math.max(1, ...rs.map((i) => i[5]));
       const t = el('table', 'pv-tbl bq-tbl'), hd = el('thead'), hr = el('tr'); [['Sheet'], ['Item'], ['Description'], ['Unit'], ['Contract (SAR)', 1], ['% done', 1], ['Certified (SAR)', 1], ['Still to come', 1]].forEach(([l, nn]) => hr.append(el('th', nn ? 'n' : '', l))); hd.append(hr);
       const tb = el('tbody'); rs.slice(S.page * PAGE, S.page * PAGE + PAGE).forEach((i) => {
-        const tr = el('tr'), d = el('td', 'bq-d', i[2]); const sub = [i[9], i[10]].filter(Boolean).join(' · '); if (sub) d.append(el('small', null, sub));
+        const tr = el('tr', 'ipc'), d = el('td', 'bq-d', i[2]); tr.title = 'Show details'; tr.addEventListener('click', () => ipDetailLine(i)); const sub = [i[9], i[10]].filter(Boolean).join(' · '); if (sub) d.append(el('small', null, sub));
         const ch = Math.abs(i[6] - i[8]) > 0.0005, pc = el('td', 'n', ipP(i[6], 0) + (ch ? ' (was ' + ipP(i[8], 0) + ')' : ''));
         const am = el('td', 'n bq-am'); am.append(el('b', null, ipF(i[5]))); const m = ipBar(i[5] / mx); m.style.cssText = 'display:block;margin:4px 0 0 auto;width:110px;flex:none;height:4px'; am.append(m);
         tr.append(el('td', 'bq-it', i[0]), el('td', 'bq-it', i[1]), d, el('td', 'bq-un', i[3]), am, pc, td(ipF(i[7]), 'n'), td(ipF(i[5] - i[7]), 'n')); tb.append(tr);
       });
       const f = el('tfoot'), fr = el('tr'); fr.append(td('Total of the ' + ipF(n) + ' lines'), td(''), td(''), td(''), td(ipF(sum(5)), 'n'), td(sum(5) ? ipP(sum(7) / sum(5), 0) : '', 'n'), td(ipF(sum(7)), 'n'), td(ipF(sum(5) - sum(7)), 'n')); f.append(fr); t.append(hd, tb, f);
       const w = el('div', 'pv-tbl-w'); w.append(t); holder.replaceChildren(w);
-      cnt.textContent = ipF(n) + ' of ' + ipF(D.items.length) + ' lines · page ' + (S.page + 1) + ' of ' + pages;
+      cnt.textContent = (S.w ? S.w.name + ' · ' : '') + (S.sheet ? ((D.titles && D.titles[S.sheet]) || S.sheet) + ' · ' : '') + ipF(n) + ' of ' + ipF(D.items.length) + ' lines · page ' + (S.page + 1) + ' of ' + pages;
       pg.replaceChildren(); const pb = el('button', 'wk-btn', '‹ Previous'), nb = el('button', 'wk-btn', 'Next ›'); [pb, nb].forEach((b) => { b.type = 'button'; }); pb.disabled = S.page === 0; nb.disabled = S.page >= pages - 1;
       pb.addEventListener('click', () => { S.page--; draw(); holder.scrollIntoView({ block: 'start' }); }); nb.addEventListener('click', () => { S.page++; draw(); holder.scrollIntoView({ block: 'start' }); }); pg.append(pb, nb);
     };
     inp.addEventListener('input', () => { S.q = inp.value; S.page = 0; draw(); }); sb.addEventListener('change', () => { S.bill = sb.value; S.page = 0; draw(); }); ss.addEventListener('change', () => { S.st = ss.value; S.page = 0; draw(); }); so.addEventListener('change', () => { S.sort = so.value; S.page = 0; draw(); });
-    clr.addEventListener('click', () => { Object.assign(S, { q: '', bill: '', st: '', sort: 'rem', page: 0 }); inp.value = ''; sb.value = ''; ss.value = ''; so.value = 'rem'; draw(); });
+    clr.addEventListener('click', () => { Object.assign(S, { q: '', bill: '', sheet: '', w: null, st: '', sort: 'rem', page: 0 }); inp.value = ''; sb.value = ''; ss.value = ''; so.value = 'rem'; draw(); });
     draw();
   }
+  // ----- details: a bill, a work type or one line opens in a panel -----
+  const ipSecKey = (i) => { const m = /^SECTION\s*(?:NO\.?\s*)?([A-Z])\b/.exec(i[9]); return m ? m[1] : ''; };
+  const ipPkgKey = (i) => { const m = /BILL NO\. 5b?\.(\d)/i.exec(i[9]); return m ? '5.' + m[1] : ''; };
+  const ipMatchW = (i, w) => (w.k === 'pkg' ? ipPkgKey(i) === w.v : ipSecKey(i) === w.v);
+  const ipWKey = (w) => { const m = /^SECTION\s+([A-Z])\b/.exec(w.name), p = /^Bill (5\.\d)\b/.exec(w.name); return m ? { k: 'sec', v: m[1], name: w.name.replace(/^SECTION /, '') } : p ? { k: 'pkg', v: p[1], name: w.name } : null; };
+  function ipClose() { const o = document.getElementById('ip-ov'); if (o) o.remove(); document.removeEventListener('keydown', ipEsc); }
+  function ipEsc(e) { if (e.key === 'Escape') ipClose(); }
+  function ipModal(eb, title, kpis) {
+    ipClose(); const ov = el('div', 'ip-ov'); ov.id = 'ip-ov'; const md = el('div', 'ip-md'); md.setAttribute('role', 'dialog'); md.setAttribute('aria-modal', 'true'); md.setAttribute('aria-label', title);
+    const x = el('button', 'ip-x', '✕'); x.type = 'button'; x.setAttribute('aria-label', 'Close'); x.addEventListener('click', ipClose);
+    md.append(x, el('div', 'ip-eb', eb), el('h2', null, title));
+    if (kpis) { const k = el('div', 'ip-k'); kpis.forEach(([a, b]) => { const d = el('div'); d.append(el('span', null, a), el('b', null, b)); k.append(d); }); md.append(k); }
+    ov.append(md); ov.addEventListener('mousedown', (e) => { if (e.target === ov) ipClose(); }); document.body.append(ov); document.addEventListener('keydown', ipEsc); x.focus(); return md;
+  }
+  const ipAgg = (a) => { const o = { n: a.length, t: 0, c: 0, ns: 0, ip: 0, dn: 0 }; a.forEach((i) => { o.t += i[5]; o.c += i[7]; o[{ ns: 'ns', ip: 'ip', done: 'dn' }[ipSt(i)]]++; }); return o; };
+  const ipKp = (g) => [['Contract', ipM(g.t)], ['Certified', ipM(g.c) + ' · ' + (g.t ? ipP(g.c / g.t, 0) : '–')], ['Still to come', ipM(g.t - g.c)], ['Lines', ipF(g.n) + ' · ' + ipF(g.ns) + ' not started']];
+  // a grouped table: rows [{l, t, c, f}] where f opens a deeper detail
+  function ipGroups(md, title, rows) {
+    if (!rows.length) return; md.append(el('h3', null, title)); const mx = Math.max(1, ...rows.map((r) => r.t)), list = el('div', 'bq-list');
+    const hd = el('div', 'bq-row bq-head'); ['', 'Certified', '%', 'Contract', 'To come'].forEach((t, i) => hd.append(el('span', i > 1 ? 'n' : '', t))); list.append(hd);
+    rows.forEach((r) => { const row = el('div', 'bq-row' + (r.f ? ' ipg' : '')), nm = el('span', null, r.l); nm.style.fontWeight = '600'; const tr = ipBar(r.c / mx); tr.title = 'Certified ' + ipF(r.c) + ' of ' + ipF(r.t);
+      row.append(nm, tr, el('b', 'n', r.t ? ipP(r.c / r.t, 0) : '–'), el('span', 'n', ipF(r.t)), el('span', 'n', ipF(r.t - r.c))); if (r.f) row.addEventListener('click', r.f); list.append(row); }); md.append(list);
+  }
+  function ipTop(md, title, a, n) {
+    const rs = a.filter((i) => i[5] - i[7] > 0.5).sort((x, y) => (y[5] - y[7]) - (x[5] - x[7])).slice(0, n || 10); if (!rs.length) return; md.append(el('h3', null, title));
+    const list = el('div', 'bq-list'); rs.forEach((i) => { const row = el('div', 'bq-row ipg'); row.style.gridTemplateColumns = 'minmax(0,1.8fr) 70px 90px'; const nm = el('span', null, i[2]); nm.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; nm.title = i[2];
+      row.append(nm, el('span', 'n', ipP(i[6], 0)), el('b', 'n', ipF(i[5] - i[7]))); row.addEventListener('click', () => ipDetailLine(i)); list.append(row); }); md.append(list);
+  }
+  const ipBtn = (t, f) => { const b = el('button', 'wk-btn', t); b.type = 'button'; b.addEventListener('click', f); return b; };
+  function ipDetailBill(b) {
+    const D = IP.D, a = D.items.filter((i) => ipBill(i[0]) === b.id), g = ipAgg(a), md = ipModal('Bill', b.id + ' · ' + b.name, ipKp(g));
+    const mv = b.claimed - b.prev; if (Math.abs(mv) > 1) md.append(Object.assign(el('p', 'pv-sub', 'This revision moved the bill by ' + (mv > 0 ? '+' : '−') + ipF(Math.abs(mv)) + ' SAR against the previous certificate.'), { style: 'margin:0' }));
+    const bySheet = {}; a.forEach((i) => { (bySheet[i[0]] = bySheet[i[0]] || []).push(i); });
+    if (Object.keys(bySheet).length > 1) ipGroups(md, 'By building or part', Object.entries(bySheet).map(([sh, it]) => { const q = ipAgg(it); return { l: (D.titles && D.titles[sh]) || sh, t: q.t, c: q.c, f: () => ipDetailSheet(sh) }; }).sort((x, y) => (y.t - y.c) - (x.t - x.c)));
+    const byW = {}; a.forEach((i) => { const k = ipSecKey(i) || ipPkgKey(i) || '–'; (byW[k] = byW[k] || { l: i[9].replace(/^SECTION (NO\. )?/, '').replace(/^BILL NO\. /i, 'Bill '), it: [] }).it.push(i); });
+    ipGroups(md, 'By work type', Object.values(byW).map((w) => { const q = ipAgg(w.it); return { l: w.l, t: q.t, c: q.c }; }).sort((x, y) => (y.t - y.c) - (x.t - x.c)).slice(0, 12));
+    ipTop(md, 'Largest amounts still to come', a, 10);
+    const act = el('div', 'ip-act'); act.append(ipBtn('List all lines of this bill', () => { ipClose(); ipGo({ bill: b.id }); })); md.append(act);
+  }
+  function ipDetailSheet(sh) {
+    const D = IP.D, a = D.items.filter((i) => i[0] === sh), g = ipAgg(a), md = ipModal('Part of a bill · ' + ipBill(sh), (D.titles && D.titles[sh]) || sh, ipKp(g));
+    const byW = {}; a.forEach((i) => { const k = ipSecKey(i) || ipPkgKey(i) || '–'; (byW[k] = byW[k] || { l: i[9].replace(/^SECTION (NO\. )?/, '').replace(/^BILL NO\. /i, 'Bill '), it: [] }).it.push(i); });
+    ipGroups(md, 'By work type', Object.values(byW).map((w) => { const q = ipAgg(w.it); return { l: w.l, t: q.t, c: q.c }; }).sort((x, y) => (y.t - y.c) - (x.t - x.c)));
+    ipTop(md, 'Largest amounts still to come', a, 12);
+    const act = el('div', 'ip-act'); act.append(ipBtn('List the lines', () => { ipClose(); ipGo({ sheet: sh }); })); md.append(act);
+  }
+  function ipDetailWork(w) {
+    const D = IP.D, key = ipWKey(w); if (!key) return; const a = D.items.filter((i) => ipMatchW(i, key)), g = ipAgg(a), md = ipModal(key.k === 'pkg' ? 'External works package' : 'Work type', key.name, [['Contract', ipM(w.contract)], ['Certified', ipM(w.claimed) + ' · ' + (w.contract ? ipP(w.claimed / w.contract, 0) : '–')], ['Still to come', ipM(w.remaining)], ['Lines', ipF(g.n) + ' · ' + ipF(g.ns) + ' not started']]);
+    if (!a.length) { md.append(el('p', 'pv-sub', 'No priced lines are listed under this heading.')); return; }
+    const byB = {}; a.forEach((i) => { (byB[ipBill(i[0])] = byB[ipBill(i[0])] || []).push(i); });
+    ipGroups(md, 'By bill', Object.entries(byB).map(([b, it]) => { const q = ipAgg(it), bb = D.bills.find((x) => x.id === b); return { l: b, t: q.t, c: q.c, f: bb ? () => ipDetailBill(bb) : null }; }).sort((x, y) => (y.t - y.c) - (x.t - x.c)));
+    const byS = {}; a.forEach((i) => { (byS[i[0]] = byS[i[0]] || []).push(i); });
+    if (Object.keys(byS).length > 1) ipGroups(md, 'By building or part', Object.entries(byS).map(([sh, it]) => { const q = ipAgg(it); return { l: (D.titles && D.titles[sh]) || sh, t: q.t, c: q.c, f: () => ipDetailSheet(sh) }; }).sort((x, y) => (y.t - y.c) - (x.t - x.c)).slice(0, 12));
+    ipTop(md, 'Largest amounts still to come', a, 12);
+    const act = el('div', 'ip-act'); act.append(ipBtn('List all lines of this work type', () => { ipClose(); ipGo({ w: key }); })); md.append(act);
+  }
+  function ipDetailLine(i) {
+    const D = IP.D, st = ipSt(i), md = ipModal(ipBill(i[0]) + ' · item ' + (i[1] || '–'), i[2], [['Contract', ipF(i[5])], ['Certified', ipF(i[7]) + ' · ' + ipP(i[6], 1)], ['Still to come', ipF(i[5] - i[7])], ['Status', IP_ST[st]]]);
+    const rate = i[4] ? i[5] / i[4] : 0, prev = i[8] * i[5], dl = el('dl', 'ip-dl');
+    [['Quantity', i[4] ? ipF(i[4]) + ' ' + i[3] : i[3] || 'Lump sum'], ['Unit rate (after discount)', rate ? rate.toLocaleString('en-US', { maximumFractionDigits: 2 }) + ' SAR' : '–'], ['% certified now', ipP(i[6], 1)],
+      ['% previous certificate', ipP(i[8], 1) + (Math.abs(i[6] - i[8]) > 0.0005 ? ' · changed by +' + ((i[6] - i[8]) * 100).toFixed(1) + ' pts (' + ipF(i[7] - prev) + ' SAR)' : ' · no change')], ['Bill sheet', (D.titles && D.titles[i[0]]) || i[0]], ['Section', i[9] || '–'], ['Comment', i[10] || '–']].forEach(([a, b]) => { dl.append(el('dt', null, a), el('dd', null, b)); });
+    md.append(dl);
+    const mx = Math.max(i[5], 1), bar = el('div'); bar.style.margin = '6px 0'; bar.append(ipBar(i[7] / mx, 'var(--gold)')); md.append(bar);
+    const sib = D.items.filter((x) => x[0] === i[0] && x[9] === i[9] && x !== i); if (sib.length) { ipTop(md, 'Other open lines in the same section', sib, 6); }
+    const act = el('div', 'ip-act'); act.append(ipBtn('Close', ipClose)); md.append(act);
+  }
+
   function ipSheets() {
     ipEnsure(); const D = IP.D, G = D.grand, pc = (a, b) => (b ? Math.round(a / b * 10000) / 100 : '');
     return [

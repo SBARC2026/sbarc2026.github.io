@@ -38,10 +38,11 @@ def main():
         elif re.match(r'BILL NO\. 5\.\d - ', d) and i > 519:
             ext.append(dict(name=d.strip().title().replace('Bill No. ', 'Bill '), contract=r[3], claimed=num(r[6]), remaining=num(r[9])))
     # items
-    items = []
+    items, titles = [], {}
     for s in wb.sheetnames:
         if not (s.startswith('B') and len(s) > 1 and s[1].isdigit()) or s.endswith('Sum'): continue
         cur = ''
+        titles[s] = str(next(wb[s].iter_rows(min_row=3, max_row=3, values_only=True))[0] or '').strip().title()
         for i, r in enumerate(wb[s].iter_rows(min_row=10, values_only=True), 10):
             r = list(r) + [None] * 20
             d, unit, tot, cl = r[1], r[2], num(r[5]), num(r[7])
@@ -55,7 +56,7 @@ def main():
     t = sum(x[5] for x in items); c = sum(x[7] for x in items)
     assert abs(t - G['contract']) < 5, ('contract does not reconcile', t, G['contract'])
     assert abs(c - G['claimed']) < 500, ('claimed does not reconcile', c, G['claimed'])
-    out = dict(ipa=(ipa.group(1).strip() if ipa else ''), period=period.group(1) if period else '', grand=G, bills=bills, sections=secs, ext=ext, items=items,
+    out = dict(ipa=(ipa.group(1).strip() if ipa else ''), period=period.group(1) if period else '', grand=G, bills=bills, sections=secs, ext=ext, items=items, titles=titles,
                cols=['sheet', 'code', 'description', 'unit', 'qty', 'total', 'pct', 'claimed', 'pct_prev', 'section', 'comment'])
     os.makedirs(os.path.join(B, 'ipa'), exist_ok=True)
     with tempfile.TemporaryDirectory() as d:
