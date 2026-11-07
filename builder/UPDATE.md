@@ -73,3 +73,9 @@ when the file exists. Source: artifact https://claude.ai/artifact/Ps17om7Dv51cov
 
 ## November plan tab
 The "November plan" tab (pinned) is computed on every build by `nov_data()` in `build.py` from the latest `villas` and `villa_activities` rows and the settings in `builder/nov_plan.json` (clusters, waves, start/end dates, weeks, villas per crew per week). Nothing to do on a daily update; edit `nov_plan.json` only if the plan itself changes.
+
+## Last payment tab (IPA, BOQ analysis)
+`SBARC_PASSWORD=... python3 builder/tools/ipa_import.py "<IPA n B.O.Q. Break. Rxx>.xlsx"` rewrites `builder/ipa/ipa.bin` (encrypted; amounts are never committed readable).
+It reads GENERAL SUMMARY, SECTIONS and every bill sheet, scales line amounts by the contract discount and asserts they add up to the certified totals.
+`build.py` adds the pinned tab "Last payment & BOQ analysis" when the file exists. Re-run it for each new payment certificate. The tab compares the certified
+percentage with the P6 earned cost (`p6.total.ec / bc`): different measures, so shown as a gap to reconcile, never as an error.

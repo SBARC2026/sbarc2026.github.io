@@ -981,6 +981,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     <div class="wk" id="wk" hidden><div class="wk-in" id="wk-in"><div class="wk-empty">Loading this week's targets…</div></div></div>
     <div class="pv" id="pv" hidden><div class="pv-in" id="pv-in"></div></div>
     <div class="pv" id="bq" hidden><div class="pv-in" id="bq-in"></div></div>
+    <div class="pv" id="ip" hidden><div class="pv-in" id="ip-in"></div></div>
     <div class="pv" id="nv" hidden><div class="pv-in" id="nv-in"></div></div>
     <div class="pv" id="bk" hidden><div class="pv-in" id="bk-in"></div></div>
   </main>
@@ -1101,7 +1102,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const tabs = $('tabs'); tabs.replaceChildren();
     [...session.dashboards].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).forEach((d) => {
       const b = document.createElement('button'); b.className = 'tab' + (d.pinned ? ' pinned' : ''); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
-      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', nov: 'Nov plan' };
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', ipa: 'Last payment', nov: 'Nov plan' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh); if (d.pinned) { const pn = document.createElement('span'); pn.className = 'pin'; pn.title = 'Pinned'; pn.setAttribute('aria-hidden', 'true'); pn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M14.5 3.5l6 6-2 .8-3.3 3.3.3 4.2-1.4 1.4-4-4-5.3 5.3-1-1 5.3-5.3-4-4 1.4-1.4 4.2.3 3.3-3.3z"/></svg>'; b.append(pn); }
       b.addEventListener('click', () => { show(d.id); drawer(false); }); tabs.append(b);
     });
@@ -1117,7 +1118,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
     session = null; current = null; secret = ''; $('up').hidden = true;
-    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); nvReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
+    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); ipReset(); nvReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -1139,6 +1140,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     week: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>',
     p6: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h9M4 12h13M4 18h7"/><rect x="13" y="4" width="7" height="4" rx="1.2"/><rect x="17" y="10" width="3.5" height="4" rx="1.2"/><rect x="11" y="16" width="9" height="4" rx="1.2"/></svg>',
     nov: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4M7 13h4M7 16.5h7"/></svg>',
+    ipa: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6.5 9.5v.01M17.5 14.5v.01"/></svg>',
     boq: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7h4"/><path d="M9 11h6M9 14.5h6M9 18h3.5"/></svg>',
     bk: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="16" rx="2.5"/><path d="M3.5 9.5h17M9 9.5V20"/><path d="M12.5 13h5M12.5 16.5h3"/></svg>',
     explorer: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4 3.5 6v14L9 18l6 2 5.5-2V4L15 6z"/><path d="M9 4v14M15 6v14"/></svg>',
@@ -1166,12 +1168,14 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('pv').hidden = id !== 'p6';
     $('bk').hidden = id !== 'bk';
     $('bq').hidden = id !== 'boq';
+    $('ip').hidden = id !== 'ipa';
     $('nv').hidden = id !== 'nov';
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
     if (id === 'week') { $('loading').hidden = true; wkOpen(); return; }
     if (id === 'p6') { $('loading').hidden = true; pvOpen(); return; }
     if (id === 'bk') { $('loading').hidden = true; bkOpen(); return; }
     if (id === 'boq') { $('loading').hidden = true; bqOpen(); return; }
+    if (id === 'ipa') { $('loading').hidden = true; ipOpen(); return; }
     if (id === 'nov') { $('loading').hidden = true; nvOpen(); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
@@ -1796,6 +1800,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   const tabTitle = () => ((session.dashboards.find((d) => d.id === current) || {}).title || 'SBARC');
   function exportSheets() {
     if (current === 'bq' || current === 'boq') return bqSheets();
+    if (current === 'ipa') return ipSheets();
     if (current === 'nov') return nvSheets();
     if (current === 'bk' || current === 'p6') return [{ name: 'P6 breakdown', rows: bkSheetRows() }];
     if (current === 'week') return tablesToSheets($('wk-in'));
@@ -2296,6 +2301,144 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       { name: 'Work types', rows: [['Code', 'Group', 'Work type', 'Lines', 'Amount (SAR)', 'Share %', 'Rule of credit', 'Stages'], ...[...D.rules].sort((a, b) => b.v - a.v).map((r) => [r.c, r.g, r.n, r.l, r.v, share(r.v), bqKind(r), r.s.map((x) => x[1] + '% ' + x[0]).join(' · ')])] },
       { name: 'Bills', rows: [['Bill', 'Title', 'Lines', 'Amount (SAR)', 'Share %'], ...D.bills.map((b) => [b[0], b[1], b[2], b[3], share(b[3])])] },
       { name: 'All lines', rows: [['Bill', 'Item', 'Description', 'Unit', 'Amount (SAR)', 'Work type code', 'Work type', 'Section'], ...D.lines.map((l) => [l[0], l[1], l[2], l[3], l[4], l[5], (BQ.R[l[5]] || {}).n || '', l[6]])] },
+    ];
+  }
+
+  // ---------- Last payment (IPA) tab (pinned) ----------
+  // session.ipa: { ipa, period, grand:{contract, orig, discount, claimed, prev, remaining}, bills:[{id, name, contract, claimed, prev, remaining}], sections:[{name, contract, claimed, remaining}],
+  //   ext:[same, external-works packages], items:[[sheet, code, description, unit, qty, total, pct, claimed, pct_prev, section, comment]] }. Amounts are SAR after the contract discount.
+  let IP = null;
+  const ipF = (n) => Math.round(n).toLocaleString('en-US');
+  const ipM = (n) => (Math.abs(n) >= 1e6 ? (n / 1e6).toFixed(Math.abs(n) >= 1e8 ? 1 : 2) + 'M' : (n / 1e3).toFixed(0) + 'k');
+  const ipP = (x, d) => (x * 100).toFixed(d == null ? 1 : d) + '%';
+  const ipBill = (s) => (s === 'B1' ? 'Bill 1' : s === 'B5.b' ? 'Bill 5B' : s.startsWith('B5') ? 'Bill 5 & 5A' : 'Bill ' + s[1]);
+  const ipSt = (it) => (it[7] <= 0.005 ? 'ns' : it[7] >= it[5] * 0.999 ? 'done' : 'ip');
+  const IP_ST = { ns: 'Not started', ip: 'In progress', done: 'Complete' };
+  function ipReset() { IP = null; $('ip').hidden = true; $('ip-in').replaceChildren(); }
+  function ipEnsure() {
+    if (IP) return true;
+    const D = session.ipa; if (!D) return false;
+    const st = { ns: { n: 0, v: 0, c: 0 }, ip: { n: 0, v: 0, c: 0 }, done: { n: 0, v: 0, c: 0 } }, chg = [];
+    D.items.forEach((it) => { const s = st[ipSt(it)]; s.n++; s.v += it[5]; s.c += it[7]; if (Math.abs(it[6] - it[8]) > 0.0005) chg.push(it); });
+    IP = { D, st, chg, view: 'ov', ln: { q: '', sheet: '', st: '', sort: 'rem', page: 0 } };
+    return true;
+  }
+  function ipOpen() { if (!ipEnsure()) { $('ip-in').replaceChildren(el('div', 'wk-empty', 'No payment data in this build.')); return; } ipRender(); }
+  function ipRender() {
+    const root = $('ip-in'), D = IP.D, G = D.grand; root.replaceChildren();
+    const top = el('div', 'pv-top'), tl = el('div');
+    tl.append(el('div', 'pv-eb', 'IPA ' + D.ipa + ' · period ending ' + D.period), el('h1', 'pv-h', 'Last payment & BOQ analysis'),
+      el('p', 'pv-sub', 'What the latest payment certificate has claimed against the contract BOQ: by bill, by work type and line by line. Amounts in SAR, after the contract discount.'));
+    const seg = el('div', 'pv-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'View');
+    [['ov', 'Overview'], ['bl', 'Bills'], ['wt', 'Work types'], ['ln', 'Lines']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(IP.view === k)); b.addEventListener('click', () => { IP.view = k; ipRender(); }); seg.append(b); });
+    const rt = el('div', 'pv-top-r'); rt.append(seg); top.append(tl, rt); root.append(top);
+    const kp = el('div', 'pv-kpis'), kpi = (a, b, c, cls) => { const d = el('div', 'pv-kpi' + (cls ? ' ' + cls : '')); d.append(el('span', null, a), el('b', null, b), el('small', null, c)); return d; };
+    const mv = G.claimed - G.prev;
+    kp.append(kpi('Certified to date', ipM(G.claimed), ipP(G.claimed / G.contract) + ' of the contract', 'bq-hero'), kpi('Contract value', ipM(G.contract), 'after ' + ipM(-G.discount) + ' discount'),
+      kpi('Still to come', ipM(G.remaining), ipP(G.remaining / G.contract) + ' of the contract'), kpi('Against previous certificate', (mv >= 0 ? '+' : '−') + ipM(Math.abs(mv)), 'revision of IPA ' + D.ipa.replace(/ REV.*/, '')));
+    root.append(kp);
+    ({ ov: ipOverview, bl: ipBills, wt: ipWork, ln: ipLines })[IP.view](root);
+    $('ip').scrollTop = 0;
+  }
+  const ipBar = (frac, col) => { const t = el('span', 'bq-tr'), i = el('i'); i.style.width = Math.max(0, Math.min(1, frac)) * 100 + '%'; if (col) i.style.background = col; t.append(i); return t; };
+  function ipGo(f) { Object.assign(IP.ln, { q: '', sheet: '', st: '', sort: 'rem', page: 0 }, f); IP.view = 'ln'; ipRender(); }
+  function ipOverview(root) {
+    const D = IP.D, G = D.grand, S = IP.st, n = D.items.length;
+    const grid = el('div', 'bq-grid'); grid.style.cssText = 'display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));margin-top:14px';
+    // 1. financial claim against P6 earned cost
+    const p6 = session.p6 && session.p6.total, c1 = el('section', 'bq-card');
+    c1.append(el('h3', null, 'Financial claim against P6 earned cost'));
+    if (p6 && p6.bc > 0) {
+      const fin = G.claimed / G.contract, ec = p6.ec / p6.bc, gap = p6.ec / p6.bc * G.contract - G.claimed;
+      c1.append(el('p', null, 'The certificate values work at BOQ prices; P6 earns cost against its own budget. They are different measures, so the gap is a prompt to reconcile, not an error.'));
+      [['Certified (IPA)', fin, ipM(G.claimed), 'var(--gold)'], ['P6 earned cost', ec, ipM(p6.ec), '#62B2D6']].forEach(([l, f, v, col]) => { const r = el('div', 'bq-row'); r.style.cssText = 'grid-template-columns:130px 1fr 70px 80px;padding:8px 0;border:0'; r.append(el('span', null, l), ipBar(f, col), el('b', 'n', ipP(f)), el('span', 'n', v)); c1.append(r); });
+      const g = el('p', null, 'Gap: P6 earned cost is ' + (ec > fin ? 'ahead of' : 'behind') + ' the certificate by ' + Math.abs((ec - fin) * 100).toFixed(1) + ' points, about SAR ' + ipM(Math.abs(gap)) + ' at contract value.'); g.style.marginTop = '8px'; c1.append(g);
+    } else c1.append(el('p', null, 'The P6 cost is not loaded in this build.'));
+    // 2. status of lines
+    const c2 = el('section', 'bq-card'); c2.append(el('h3', null, 'Where the BOQ stands, line by line'), el('p', null, n.toLocaleString('en-US') + ' priced lines. Click a row to list them.'));
+    [['done', '#5FD3B6'], ['ip', '#E8C27A'], ['ns', '#F07D66']].forEach(([k, col]) => {
+      const s = S[k], r = el('div', 'bq-row'); r.style.cssText = 'grid-template-columns:110px 1fr 56px 78px;padding:8px 0;border:0;cursor:pointer'; r.title = 'List these lines';
+      r.append(el('span', null, IP_ST[k]), ipBar(s.v / G.contract * 2.2, col), el('b', 'n', ipF(s.n)), el('span', 'n', ipM(s.v))); r.addEventListener('click', () => ipGo({ st: k })); c2.append(r);
+    });
+    const open = S.ip.v - S.ip.c, g2 = el('p', null, 'Of the SAR ' + ipM(G.remaining) + ' still to come, ' + ipM(S.ns.v) + ' (' + ipP(S.ns.v / G.remaining, 0) + ') is on lines not started and ' + ipM(open) + ' is the balance on lines in progress.'); g2.style.marginTop = '8px'; c2.append(g2);
+    // 3. work types still to come
+    const c3 = el('section', 'bq-card'); c3.append(el('h3', null, 'Largest amounts still to come, by work type'), el('p', null, 'Remaining value of each BOQ section, largest first.'));
+    const ws = [...D.sections].sort((a, b) => b.remaining - a.remaining).slice(0, 6), mx = Math.max(1, ...ws.map((w) => w.remaining));
+    ws.forEach((w) => { const r = el('div', 'bq-row'); r.style.cssText = 'grid-template-columns:minmax(0,1.7fr) 70px 44px 62px;padding:7px 0;border:0'; const nm = el('span', null, w.name.replace(/^SECTION /, '')); nm.style.cssText = 'line-height:1.25;font-size:12.5px'; r.append(nm, ipBar(w.remaining / mx, '#A78BFA'), el('span', 'n', ipP(w.claimed / w.contract, 0)), el('b', 'n', ipM(w.remaining))); c3.append(r); });
+    c3.append(Object.assign(el('p', null, 'Bar = value still to come · % = already certified.'), { style: 'margin-top:6px' }));
+    // 4. changes since the previous certificate
+    const c4 = el('section', 'bq-card'); c4.append(el('h3', null, 'Changed in this revision'));
+    const ch = IP.chg, cv = ch.reduce((a, it) => a + (it[6] - it[8]) * it[5], 0);
+    c4.append(el('p', null, ch.length ? ch.length + ' lines have a different percentage from the previous certificate (net ' + (cv >= 0 ? '+' : '−') + ipM(Math.abs(cv)) + ' at line prices, before discount effects).' : 'No line changed against the previous certificate.'));
+    const cl = [...ch].sort((a, b) => Math.abs((b[6] - b[8]) * b[5]) - Math.abs((a[6] - a[8]) * a[5])).slice(0, 5);
+    cl.forEach((it) => { const r = el('div', 'bq-row'); r.style.cssText = 'grid-template-columns:minmax(0,1fr) 120px 70px;padding:6px 0;border:0;font-size:12.5px'; const nm = el('span', null, it[2]); nm.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap'; nm.title = it[0] + ' ' + it[1] + ' · ' + it[2]; r.append(nm, el('span', 'n', ipP(it[8], 0) + ' → ' + ipP(it[6], 0)), el('b', 'n', ipM((it[6] - it[8]) * it[5]))); c4.append(r); });
+    if (ch.length) { const b = el('button', 'wk-btn', 'List all changed lines'); b.type = 'button'; b.style.marginTop = '8px'; b.addEventListener('click', () => ipGo({ st: 'chg', sort: 'chg' })); c4.append(b); }
+    grid.append(c1, c2, c3, c4); root.append(grid);
+  }
+  function ipBills(root) {
+    const D = IP.D, G = D.grand, mx = Math.max(...D.bills.map((b) => b.contract)), list = el('div', 'bq-list bq-bills'); list.style.marginTop = '14px';
+    const hd = el('div', 'bq-row bq-head'); ['Bill', 'Certified', '% done', 'Contract (SAR)', 'Still to come'].forEach((t, i) => hd.append(el('span', i > 1 ? 'n' : '', t))); list.append(hd);
+        D.bills.forEach((b) => {
+      const row = el('div', 'bq-row'), nm = el('div', 'bq-nm'), g = el('button', 'go', b.id + ' · ' + b.name); g.type = 'button'; g.title = 'List the lines of this bill'; g.addEventListener('click', () => ipGo({ bill: b.id }));
+      nm.append(g, el('div', 'bq-meta', 'Certified ' + ipF(b.claimed) + (Math.abs(b.claimed - b.prev) > 1 ? ' · ' + (b.claimed > b.prev ? '+' : '−') + ipF(Math.abs(b.claimed - b.prev)) + ' vs previous' : '')));
+      const bar = el('div', 'bq-sh'), tr = el('span', 'bq-tr'), fi = el('i'); fi.style.width = (b.contract / mx * 100) + '%'; fi.style.opacity = '.35'; const f2 = el('i'); f2.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:' + (b.claimed / mx * 100) + '%'; tr.style.position = 'relative'; tr.append(fi, f2); bar.append(tr);
+      row.append(nm, bar, el('b', 'n', ipP(b.claimed / b.contract)), el('span', 'n bq-amt', ipF(b.contract)), el('span', 'n', ipF(b.remaining))); list.append(row);
+    });
+    const ft = el('div', 'bq-row bq-foot'); ft.append(el('span', null, 'Total · ' + D.bills.length + ' bills (Bill 6 dayworks: rate only)'), el('span'), el('span', 'n', ipP(G.claimed / G.contract)), el('b', 'n bq-amt', ipF(G.contract)), el('span', 'n', ipF(G.remaining))); list.append(ft);
+    root.append(list);
+    const note = el('p', 'pv-sub', 'Certified = the amount of the latest certificate after discount. Bars: pale = contract, solid = certified. Before discount the BOQ adds up to SAR ' + ipF(G.orig) + '; the contract discount is SAR ' + ipF(-G.discount) + ' (' + ipP(-G.discount / G.orig, 3) + ').'); note.style.marginTop = '10px'; root.append(note);
+  }
+  function ipWork(root) {
+    const D = IP.D, mk = (title, sub, rows, tot) => {
+      const card = el('div'); card.style.marginTop = '14px'; card.append(Object.assign(el('h3', null, title), { style: 'margin:0 0 2px;font:700 15px var(--body)' }), Object.assign(el('p', 'pv-sub', sub), { style: 'margin:0 0 8px' }));
+      const list = el('div', 'bq-list'), hd = el('div', 'bq-row bq-head'); ['Work type', 'Certified', '% done', 'Contract (SAR)', 'Still to come'].forEach((t, i) => hd.append(el('span', i > 1 ? 'n' : '', t))); list.append(hd);
+      const mx = Math.max(1, ...rows.map((r) => r.contract));
+      rows.forEach((w) => { const row = el('div', 'bq-row'), nm = el('div', 'bq-nm'); nm.append(el('span', null, w.name.replace(/^SECTION /, ''))); nm.firstChild.style.fontWeight = '600';
+        const bar = el('div', 'bq-sh'), tr = el('span', 'bq-tr'), fi = el('i'); fi.style.width = (w.contract / mx * 100) + '%'; fi.style.opacity = '.35'; const f2 = el('i'); f2.style.cssText = 'position:absolute;left:0;top:0;height:100%;width:' + (w.claimed / mx * 100) + '%'; tr.style.position = 'relative'; tr.append(fi, f2); bar.append(tr);
+        row.append(nm, bar, el('b', 'n', w.contract ? ipP(w.claimed / w.contract) : '–'), el('span', 'n bq-amt', ipF(w.contract)), el('span', 'n', ipF(w.remaining))); list.append(row); });
+      const c = rows.reduce((a, r) => a + r.contract, 0), cl = rows.reduce((a, r) => a + r.claimed, 0), rm = rows.reduce((a, r) => a + r.remaining, 0), ft = el('div', 'bq-row bq-foot');
+      ft.append(el('span', null, tot), el('span'), el('span', 'n', ipP(cl / c)), el('b', 'n bq-amt', ipF(c)), el('span', 'n', ipF(rm))); list.append(ft); card.append(list); return card;
+    };
+    const zones = [...D.sections].sort((a, b) => b.contract - a.contract);
+    root.append(mk('Office, residential, community zones and utilities building', 'BOQ sections A to R, largest first. Section J (finishes) is shown after discount.', zones, 'Total · ' + zones.length + ' sections'),
+      mk('External works and Road 611', 'Packages of Bill 5 and 5b.', D.ext, 'Total · ' + D.ext.length + ' packages'));
+  }
+  function ipLines(root) {
+    const S = IP.ln, D = IP.D, PAGE = 100, sheets = [...new Set(D.items.map((i) => i[0]))];
+    const tools = el('div', 'pv-tools'), inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search description or item'; inp.value = S.q; inp.setAttribute('aria-label', 'Search lines');
+    const sb = el('select'); sb.setAttribute('aria-label', 'Bill sheet'); sb.append(new Option('All bills', '')); D.bills.forEach((b) => sb.append(new Option(b.id + ' · ' + b.name, b.id))); sb.value = S.bill || '';
+    const ss = el('select'); ss.setAttribute('aria-label', 'Status'); [['', 'Any status'], ['ns', 'Not started'], ['ip', 'In progress'], ['done', 'Complete'], ['open', 'Not complete'], ['chg', 'Changed in this revision']].forEach(([v, t]) => ss.append(new Option(t, v))); ss.value = S.st;
+    const so = el('select'); so.setAttribute('aria-label', 'Sort'); [['rem', 'Largest still to come'], ['tot', 'Largest contract value'], ['clm', 'Largest certified'], ['chg', 'Largest change']].forEach(([v, t]) => so.append(new Option(t, v))); so.value = S.sort;
+    const clr = el('button', 'wk-btn', 'Clear filters'); clr.type = 'button'; const cnt = el('span', 'pv-pg'); tools.append(inp, sb, ss, so, clr, cnt);
+    const holder = el('div'), pg = el('div', 'pv-tools'); root.append(tools, holder, pg);
+    const key = { rem: (i) => i[5] - i[7], tot: (i) => i[5], clm: (i) => i[7], chg: (i) => Math.abs((i[6] - i[8]) * i[5]) };
+    const filt = () => { const q = S.q.trim().toLowerCase(); return D.items.filter((i) => (!S.bill || ipBill(i[0]) === S.bill) && (!S.st || (S.st === 'open' ? ipSt(i) !== 'done' : S.st === 'chg' ? Math.abs(i[6] - i[8]) > 0.0005 : ipSt(i) === S.st)) && (!q || (i[2] + ' ' + i[1] + ' ' + i[0] + ' ' + i[10]).toLowerCase().includes(q))).sort((a, b) => key[S.sort](b) - key[S.sort](a)); };
+    const draw = () => {
+      const rs = filt(), n = rs.length, pages = Math.max(1, Math.ceil(n / PAGE)); if (S.page >= pages) S.page = pages - 1;
+      const sum = (k) => rs.reduce((a, i) => a + i[k], 0), mx = Math.max(1, ...rs.map((i) => i[5]));
+      const t = el('table', 'pv-tbl bq-tbl'), hd = el('thead'), hr = el('tr'); [['Sheet'], ['Item'], ['Description'], ['Unit'], ['Contract (SAR)', 1], ['% done', 1], ['Certified (SAR)', 1], ['Still to come', 1]].forEach(([l, nn]) => hr.append(el('th', nn ? 'n' : '', l))); hd.append(hr);
+      const tb = el('tbody'); rs.slice(S.page * PAGE, S.page * PAGE + PAGE).forEach((i) => {
+        const tr = el('tr'), d = el('td', 'bq-d', i[2]); const sub = [i[9], i[10]].filter(Boolean).join(' · '); if (sub) d.append(el('small', null, sub));
+        const ch = Math.abs(i[6] - i[8]) > 0.0005, pc = el('td', 'n', ipP(i[6], 0) + (ch ? ' (was ' + ipP(i[8], 0) + ')' : ''));
+        const am = el('td', 'n bq-am'); am.append(el('b', null, ipF(i[5]))); const m = ipBar(i[5] / mx); m.style.cssText = 'display:block;margin:4px 0 0 auto;width:110px;flex:none;height:4px'; am.append(m);
+        tr.append(el('td', 'bq-it', i[0]), el('td', 'bq-it', i[1]), d, el('td', 'bq-un', i[3]), am, pc, td(ipF(i[7]), 'n'), td(ipF(i[5] - i[7]), 'n')); tb.append(tr);
+      });
+      const f = el('tfoot'), fr = el('tr'); fr.append(td('Total of the ' + ipF(n) + ' lines'), td(''), td(''), td(''), td(ipF(sum(5)), 'n'), td(sum(5) ? ipP(sum(7) / sum(5), 0) : '', 'n'), td(ipF(sum(7)), 'n'), td(ipF(sum(5) - sum(7)), 'n')); f.append(fr); t.append(hd, tb, f);
+      const w = el('div', 'pv-tbl-w'); w.append(t); holder.replaceChildren(w);
+      cnt.textContent = ipF(n) + ' of ' + ipF(D.items.length) + ' lines · page ' + (S.page + 1) + ' of ' + pages;
+      pg.replaceChildren(); const pb = el('button', 'wk-btn', '‹ Previous'), nb = el('button', 'wk-btn', 'Next ›'); [pb, nb].forEach((b) => { b.type = 'button'; }); pb.disabled = S.page === 0; nb.disabled = S.page >= pages - 1;
+      pb.addEventListener('click', () => { S.page--; draw(); holder.scrollIntoView({ block: 'start' }); }); nb.addEventListener('click', () => { S.page++; draw(); holder.scrollIntoView({ block: 'start' }); }); pg.append(pb, nb);
+    };
+    inp.addEventListener('input', () => { S.q = inp.value; S.page = 0; draw(); }); sb.addEventListener('change', () => { S.bill = sb.value; S.page = 0; draw(); }); ss.addEventListener('change', () => { S.st = ss.value; S.page = 0; draw(); }); so.addEventListener('change', () => { S.sort = so.value; S.page = 0; draw(); });
+    clr.addEventListener('click', () => { Object.assign(S, { q: '', bill: '', st: '', sort: 'rem', page: 0 }); inp.value = ''; sb.value = ''; ss.value = ''; so.value = 'rem'; draw(); });
+    draw();
+  }
+  function ipSheets() {
+    ipEnsure(); const D = IP.D, G = D.grand, pc = (a, b) => (b ? Math.round(a / b * 10000) / 100 : '');
+    return [
+      { name: 'Bills', rows: [['Bill', 'Name', 'Contract (SAR)', 'Certified (SAR)', '% done', 'Previous certificate (SAR)', 'Still to come (SAR)'], ...D.bills.map((b) => [b.id, b.name, Math.round(b.contract), Math.round(b.claimed), pc(b.claimed, b.contract), Math.round(b.prev), Math.round(b.remaining)]), ['Total', '', Math.round(G.contract), Math.round(G.claimed), pc(G.claimed, G.contract), Math.round(G.prev), Math.round(G.remaining)]] },
+      { name: 'Work types', rows: [['Section / package', 'Contract (SAR)', 'Certified (SAR)', '% done', 'Still to come (SAR)'], ...[...D.sections, ...D.ext].map((w) => [w.name, Math.round(w.contract), Math.round(w.claimed), pc(w.claimed, w.contract), Math.round(w.remaining)])] },
+      { name: 'Lines', rows: [['Sheet', 'Bill', 'Item', 'Description', 'Unit', 'Qty', 'Contract (SAR)', '% done', 'Certified (SAR)', 'Still to come (SAR)', '% previous certificate', 'Section', 'Comment'], ...D.items.map((i) => [i[0], ipBill(i[0]), i[1], i[2], i[3], i[4], i[5], Math.round(i[6] * 10000) / 100, i[7], Math.round((i[5] - i[7]) * 100) / 100, Math.round(i[8] * 10000) / 100, i[9], i[10]])] },
     ];
   }
 

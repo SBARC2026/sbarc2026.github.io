@@ -135,6 +135,14 @@ def boq_data():
     subprocess.run(['node', os.path.join(B, 'decrypt.js'), BOQ_FILE, os.environ['SBARC_PASSWORD'], tmp], check=True)
     out = json.loads(rd(tmp)); os.remove(tmp); return out
 
+IPA_FILE = os.path.join(B, 'ipa', 'ipa.bin')
+def ipa_data():
+    """Latest payment certificate (IPA) BOQ breakdown (builder/ipa/ipa.bin, encrypted; see tools/ipa_import.py). None if absent."""
+    if not os.path.exists(IPA_FILE): return None
+    tmp = os.path.join(DATA, 'ipa.json'); os.makedirs(DATA, exist_ok=True)
+    subprocess.run(['node', os.path.join(B, 'decrypt.js'), IPA_FILE, os.environ['SBARC_PASSWORD'], tmp], check=True)
+    out = json.loads(rd(tmp)); os.remove(tmp); return out
+
 def apply_p6(dash, data):
     """Management Tracking: the P6 export sets the earned value of its reporting week, unless the dashboard already holds a later week."""
     p6 = p6_data()
@@ -317,10 +325,13 @@ def build():
         tabs.append({'id': 'bk', 'title': 'P6 breakdown', 'native': True})
     boq = boq_data()
     if boq: tabs.append({'id': 'boq', 'title': 'BOQ & amounts', 'native': True, 'pinned': True})  # pinned: listed first in the sidebar
+    ipa = ipa_data()
+    if ipa: tabs.append({'id': 'ipa', 'title': 'Last payment (IPA)', 'native': True, 'pinned': True})
     nov = nov_data()
     if nov: tabs.append({'id': 'nov', 'title': 'November plan', 'native': True, 'pinned': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     if boq: payload['boq'] = boq
+    if ipa: payload['ipa'] = ipa
     if nov: payload['nov'] = nov
     if p6:
         payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
