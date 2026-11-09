@@ -948,6 +948,8 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
 <section class="app" id="app" hidden>
   <aside class="side" id="side" aria-label="Navigation">
     <div class="side-brand"><span class="mk" aria-hidden="true"><!--MARK--></span><div class="proj"><b id="pname">SBARC</b><span>Management dashboards</span></div></div>
+    <div class="side-lab" id="nov-lab" hidden>Nov plan</div>
+    <nav class="tabs" id="tabs-nov" role="tablist" aria-label="November plan" aria-orientation="vertical"></nav>
     <div class="side-lab">Dashboards</div>
     <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboards" aria-orientation="vertical"></nav>
     <div class="side-lab">Tools</div>
@@ -1108,12 +1110,12 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     setTimeout(() => { g.hidden = true; g.classList.remove('leaving'); busy(false); }, reduce ? 0 : 1050);
     $('app').hidden = false;
     $('pname').textContent = session.project;
-    const tabs = $('tabs'); tabs.replaceChildren();
+    const tabs = $('tabs'), tabsNov = $('tabs-nov'); tabs.replaceChildren(); tabsNov.replaceChildren(); $('nov-lab').hidden = !session.dashboards.some((d) => d.id === 'nov');
     [...session.dashboards].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).forEach((d) => {
       const b = document.createElement('button'); b.className = 'tab' + (d.pinned ? ' pinned' : ''); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
       const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', ipa: 'Last payment', nov: 'Nov plan' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh); if (d.pinned) { const pn = document.createElement('span'); pn.className = 'pin'; pn.title = 'Pinned'; pn.setAttribute('aria-hidden', 'true'); pn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M14.5 3.5l6 6-2 .8-3.3 3.3.3 4.2-1.4 1.4-4-4-5.3 5.3-1-1 5.3-5.3-4-4 1.4-1.4 4.2.3 3.3-3.3z"/></svg>'; b.append(pn); }
-      b.addEventListener('click', () => { show(d.id); drawer(false); }); tabs.append(b);
+      b.addEventListener('click', () => { show(d.id); drawer(false); }); (d.id === 'nov' ? tabsNov : tabs).append(b);
     });
     const tb = [...document.querySelectorAll('.tblock div')].map((x) => [x.querySelector('span').textContent, x.querySelector('b').textContent]);
     const meta = $('top-meta'); meta.replaceChildren();
