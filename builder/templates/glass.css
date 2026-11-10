@@ -117,3 +117,12 @@ html.glass .pc-tip{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)
 
 /* motion: restrained */
 @media (prefers-reduced-motion:reduce){html.glass *{transition:none!important}}
+
+/* site-wide refresh: the Analyser look on the embedded dashboards */
+html.glass .sb-hero,html.glass .pc-hero{position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(135deg,#0B1B3A 0%,#12265A 45%,#3B1E6B 100%)!important;border:1px solid rgba(255,255,255,.14)}
+html.glass .sb-hero:before,html.glass .pc-hero:before{content:"";position:absolute;z-index:-1;width:420px;height:420px;left:-140px;top:-220px;border-radius:50%;background:#22D3EE;filter:blur(64px);opacity:.42;pointer-events:none}
+html.glass .sb-hero:after,html.glass .pc-hero:after{content:"";position:absolute;z-index:-1;width:460px;height:460px;right:-170px;bottom:-290px;border-radius:50%;background:#C026D3;filter:blur(64px);opacity:.42;pointer-events:none}
+html.glass .sb-title,html.glass .pc-hero-title{background:linear-gradient(90deg,#FFFFFF 0%,#A5F3FC 50%,#F0ABFC 100%);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+html.glass .sb-title em,html.glass .pc-hero-title span{color:transparent!important}
+html.glass .sb-kpi,html.glass .sb-card,html.glass .sb-bcard,html.glass .sb-tile{transition:transform .2s,box-shadow .2s,border-color .2s}
+html.glass .sb-kpi:hover,html.glass .sb-bcard:hover,html.glass .sb-tile:hover{transform:translateY(-3px);border-color:rgba(125,211,252,.5)}

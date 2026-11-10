@@ -547,10 +547,29 @@
   .az-col i{width:100%;border-radius:10px 10px 4px 4px;min-height:3px;transition:height 1s cubic-bezier(.2,.8,.2,1),filter .15s}.az-col:hover i{filter:brightness(1.2)}.az-col b{font:800 20px var(--disp)}.az-col span{font-size:11.5px;color:var(--muted)}
   .az-tip{position:fixed;z-index:60;pointer-events:none;background:#0B1730;color:#EAF1F8;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.45;box-shadow:0 14px 34px -12px rgba(0,0,0,.7);max-width:260px}.az-tip b{color:#fff}
   .az-mini{font-size:12px;color:var(--muted);margin:8px 0 0}
+  /* ----- site-wide: the Analyser look on every native tab ----- */
+  .pv-in>.pv-top:first-child,.wk-in>.wk-top:first-child{position:relative;overflow:hidden;border-radius:22px;padding:24px 24px 20px;border:1px solid rgba(255,255,255,.14);background:linear-gradient(135deg,#0B1B3A 0%,#12265A 45%,#3B1E6B 100%);color:#F3F7FF;isolation:isolate;align-items:flex-end}
+  .pv-in>.pv-top:first-child:before,.wk-in>.wk-top:first-child:before,.pv-in>.pv-top:first-child:after,.wk-in>.wk-top:first-child:after{content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(60px);opacity:.5;animation:azFloat 14s ease-in-out infinite alternate;pointer-events:none}
+  .pv-in>.pv-top:first-child:before,.wk-in>.wk-top:first-child:before{width:380px;height:380px;left:-120px;top:-200px;background:#22D3EE}
+  .pv-in>.pv-top:first-child:after,.wk-in>.wk-top:first-child:after{width:440px;height:440px;right:-160px;bottom:-280px;background:#C026D3;animation-delay:-6s}
+  .pv-in>.pv-top:first-child .pv-eb,.wk-in>.wk-top:first-child .wk-eb{color:#A5F3FC}
+  .pv-in>.pv-top:first-child .pv-h,.wk-in>.wk-top:first-child .wk-h{background:linear-gradient(90deg,#FFFFFF 0%,#A5F3FC 50%,#F0ABFC 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:clamp(30px,4.6vw,46px)}
+  .pv-in>.pv-top:first-child .pv-sub,.wk-in>.wk-top:first-child .wk-sub{color:#D6E2F5}
+  .pv-in>.pv-top:first-child .pv-seg,.wk-in>.wk-top:first-child select,.wk-in>.wk-top:first-child .wk-nav button{border-color:rgba(255,255,255,.22)}
+  .pv-in>.pv-top:first-child .pv-seg button{background:rgba(255,255,255,.08);color:#D6E2F5}
+  .pv-seg button[aria-pressed="true"],.pv-in>.pv-top:first-child .pv-seg button[aria-pressed="true"]{background:linear-gradient(90deg,#38BDF8,#A78BFA);color:#06101F;font-weight:700}
+  .pv-kpis .pv-kpi{--k:#38BDF8}.pv-kpis .pv-kpi:nth-child(6n+2){--k:#A78BFA}.pv-kpis .pv-kpi:nth-child(6n+3){--k:#F0ABFC}.pv-kpis .pv-kpi:nth-child(6n+4){--k:#FBBF24}.pv-kpis .pv-kpi:nth-child(6n+5){--k:#34D399}.pv-kpis .pv-kpi:nth-child(6n+6){--k:#FB923C}
+  .pv-kpis .pv-kpi:after{background:var(--k);opacity:.9;height:3px}.pv-kpis .pv-kpi:before{content:"";position:absolute;right:-40px;top:-50px;width:150px;height:130px;border-radius:50%;background:var(--k);opacity:.13;filter:blur(26px);pointer-events:none}
+  .pv-kpis .pv-kpi:hover{border-color:var(--k);box-shadow:0 16px 30px -22px var(--k)}
+  .tab[aria-selected="true"]{box-shadow:inset 3px 0 0 #7DD3FC,0 10px 24px -18px #7DD3FC}
+  .az-strip{display:flex;flex-direction:column;gap:8px}.az-strip>h2{margin:0;font:600 11px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:8px}.az-strip>h2:before{content:"";width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#38BDF8,#F0ABFC)}
+  .az-strip .az-ins{grid-template-columns:repeat(auto-fit,minmax(min(100%,225px),1fr));gap:10px}.az-strip .az-in{padding:11px 13px 11px 17px;gap:4px;animation:none}.az-strip .az-in b{font-size:24px}.az-strip .az-in strong{font-size:13.5px}.az-strip .az-in p{font-size:12.5px}
+  .az-strip .az-in.nogo{cursor:default}.az-strip .az-in.nogo:hover{transform:none}
+  @media print{.pv-in>.pv-top:first-child,.wk-in>.wk-top:first-child{background:#fff!important;border:0!important;padding:0!important;color:#0F2742!important}.pv-in>.pv-top:first-child:before,.pv-in>.pv-top:first-child:after,.wk-in>.wk-top:first-child:before,.wk-in>.wk-top:first-child:after,.pv-kpis .pv-kpi:before{display:none!important}.pv-in>.pv-top:first-child .pv-h,.wk-in>.wk-top:first-child .wk-h{background:none!important;-webkit-text-fill-color:#0F2742;color:#0F2742!important}.pv-in>.pv-top:first-child .pv-sub,.pv-in>.pv-top:first-child .pv-eb,.wk-in>.wk-top:first-child .wk-sub,.wk-in>.wk-top:first-child .wk-eb{color:#4A5660!important}.az-strip .az-in{break-inside:avoid;background:#fff!important;border:1px solid #C9D1D6!important}}
+  @media (prefers-reduced-motion:reduce){.pv-in>.pv-top:first-child:before,.pv-in>.pv-top:first-child:after,.wk-in>.wk-top:first-child:before,.wk-in>.wk-top:first-child:after{animation:none!important}}
   /* polish shared by every native tab */
   .pv-kpi{position:relative;overflow:hidden;transition:transform .18s,border-color .18s,box-shadow .18s}.pv-kpi:after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,#38BDF8,#A78BFA,#F0ABFC);opacity:.0;transition:opacity .2s}
   .pv-kpi:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line));box-shadow:0 14px 28px -22px var(--accent)}.pv-kpi:hover:after{opacity:1}
-  :root[data-theme="glass"] .pv-h{background:linear-gradient(90deg,#FFFFFF,#A5F3FC 60%,#C4B5FD);-webkit-background-clip:text;background-clip:text;color:transparent}
   .pv-in>*{animation:azUp .45s both}.pv-tbl tbody tr{transition:background .12s}
   @media (prefers-reduced-motion:reduce){.az-hero:before,.az-hero:after,.az-eb i,.az-in,.pv-in>*{animation:none!important}.az-ring .vl,.az-trk i,.az-trk u,.az-col i{transition:none!important}}
   @media print{.az-nav,.az-ctl{display:none!important}.az-hero{background:#fff!important;color:#0F2742!important;border:1px solid #C9D1D6}.az-hero:before,.az-hero:after{display:none}.az-title{color:#0F2742!important;background:none!important;-webkit-text-fill-color:#0F2742}.az-lead,.az-ring em,.az-ring small,.az-eb{color:#4A5660!important}.az-ring text{fill:#0F2742!important}.az-ring .tr{stroke:#DDE3E8!important}.pv-in>*{animation:none!important}}
@@ -1795,6 +1814,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   let execGoPending = false;
   function frameReady(id, f) {
     if (id === 'p02b' && current === 'week') wkOpen();
+    if (id === 'p02b' && current === 'an' && azPlanA()) azRender();
     if (id !== 'exec') return;
     try {
       if (pendingCluster !== undefined) f.contentWindow.dash.setParams({ cluster: pendingCluster });
@@ -2201,7 +2221,6 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     let i4 = 0; for (let i = 0; i < h.length - 1; i++) if (L.t - h[i].t >= 3.5 * AZW) i4 = i;
     const lastW = h.length > 1 ? paceFrom(h.length - 2) : 0, avg4 = h.length > 1 ? paceFrom(i4) : 0;
     const plan = D.plan.map(([d, p]) => ({ t: azD(d), p }));
-    const planAt = (t) => { if (!plan.length || t < plan[0].t) return null; for (let i = 1; i < plan.length; i++) if (t <= plan[i].t) { const a = plan[i - 1], b = plan[i]; return a.p + (b.p - a.p) * (t - a.t) / (b.t - a.t); } return plan[plan.length - 1].p; };
     const tg = D.targets.map(([d, p]) => { const t = azD(d), w = (t - L.t) / AZW; return { t, p, need: w > 0 ? (p * B - L.e) / w : Infinity }; });
     const finish = (pace) => (pace > 0 ? L.t + (B - L.e) / pace * AZW : Infinity), pctAt = (pace, t) => Math.min(1, (L.e + pace * Math.max(0, t - L.t) / AZW) / B);
     // villas, clusters, activities
@@ -2216,18 +2235,29 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     // MAK vs PMC
     let cm = null; if (session.cmp && cmEnsure()) { const T = session.cmp.total, m = {}; CM.acts.forEach((a) => { const o = (m[a.trade] = m[a.trade] || { n: a.trade, bud: 0, me: 0, pe: 0 }); o.bud += a.bud; o.me += a.me; o.pe += a.pe; }); const zero = CM.acts.filter((a) => a.cat === 'zero'); cm = { T, gap: T.mak - T.pmc, trades: Object.values(m).map((o) => Object.assign(o, { d: o.me - o.pe })).sort((a, b) => b.d - a.d), zeroN: zero.length, zeroMH: zero.reduce((s, a) => s + a.d, 0), diff: CM.acts.filter((a) => a.cat !== 'same').length }; }
     const ipa = session.ipa ? { p: session.ipa.grand.claimed / session.ipa.grand.contract, ref: session.ipa.ipa } : null;
-    return { D, B, P, h, L, pct: L.e / B, lastW, avg4, plan, planAt, tg, finish, pctAt, V, clusters, actAvg, vAvg, vFin, vMep, bl, bAvg, trades, cm, ipa };
+    const M = { D, B, P, h, L, pct: L.e / B, lastW, avg4, plan, planLabel: 'the ' + D.plan_name + ' plan', planShort: D.plan_name, tg, finish, pctAt, V, clusters, actAvg, vAvg, vFin, vMep, bl, bAvg, trades, cm, ipa };
+    M.planAt = (t) => { const plan = M.plan; if (!plan.length || t < plan[0].t) return null; for (let i = 1; i < plan.length; i++) if (t <= plan[i].t) { const a = plan[i - 1], b = plan[i]; return a.p + (b.p - a.p) * (t - a.t) / (b.t - a.t); } return plan[plan.length - 1].p; };
+    return M;
+  }
+  // the weekly recovery plan (Plan A) lives in the Management Tracking dashboard: use it as the plan line once that page has loaded, so every tab measures against the same plan
+  function azPlanA() {
+    if (!AZ || AZ.planA) return false;
+    try {
+      const f = frames.p02b || (() => { const n = makeFrame('p02b'); n.hidden = current !== 'p02b'; return n; })(); if (!f._ready) return false;
+      const wt = f.contentWindow.dash.data('weekly_totals').data.filter((r) => r.scope === 'All' && r.from && r.to && r.cum_pct != null); if (wt.length < 2) return false;
+      const M = AZ.M; M.plan = [{ t: azD(wt[0].from) - 864e5, p: wt[0].cum_pct - wt[0].pts }, ...wt.map((r) => ({ t: azD(r.to), p: r.cum_pct }))]; M.planLabel = 'the recovery plan (Plan A)'; M.planShort = 'recovery plan (Plan A)'; AZ.planA = true; return true;
+    } catch (e) { return false; }
   }
   function azOpen() {
     if (!session.an) { $('az-in').replaceChildren(el('div', 'wk-empty', 'No analyser data in this build.')); return; }
     if (!AZ) { const M = azModel(); AZ = { M, pace: Math.max(1000, Math.round(M.avg4 / 500) * 500) }; }
-    azRender();
+    azPlanA(); azRender();
   }
   const azJump = (id) => { const n = document.getElementById(id); if (n) n.scrollIntoView({ behavior: azReduce() ? 'auto' : 'smooth', block: 'start' }); };
   function azInsights() {
     const M = AZ.M, out = [], add = (sev, k, t, d, go, cta) => out.push({ sev, k, t, d, go, cta });
     const pl = M.planAt(M.L.t);
-    if (pl != null) { const g = pl - M.pct; add(g > 0.03 ? 'bad' : g > 0.005 ? 'warn' : 'good', (g > 0 ? '−' : '+') + Math.abs(g * 100).toFixed(1) + ' pts', g > 0 ? 'Behind the ' + M.D.plan_name + ' plan' : 'Ahead of the ' + M.D.plan_name + ' plan', 'Actual ' + azP(M.pct, 2) + ' against ' + azP(pl, 2) + ' planned for ' + azFd(M.L.t) + ': ' + azN(Math.abs(g) * M.B) + ' man-hours ' + (g > 0 ? 'to recover.' : 'in hand.'), () => azJump('az-fc'), 'See the S-curve'); }
+    if (pl != null) { const g = pl - M.pct; add(g > 0.03 ? 'bad' : g > 0.005 ? 'warn' : 'good', (g > 0 ? '−' : '+') + Math.abs(g * 100).toFixed(1) + ' pts', g > 0 ? 'Behind ' + M.planLabel : 'Ahead of ' + M.planLabel, 'Actual ' + azP(M.pct, 2) + ' against ' + azP(pl, 2) + ' planned for ' + azFd(M.L.t) + ': ' + azN(Math.abs(g) * M.B) + ' man-hours ' + (g > 0 ? 'to recover.' : 'in hand.'), () => azJump('az-fc'), 'See the S-curve'); }
     const t0 = M.tg[0]; if (t0 && isFinite(t0.need) && M.lastW > 0) { const x = t0.need / M.lastW; add(x > 1.5 ? 'bad' : x > 1.05 ? 'warn' : 'good', '×' + x.toFixed(1), 'Pace needed for ' + azP(t0.p, 1) + ' by ' + azFs(t0.t), 'Last week earned ' + azN(M.lastW) + ' man-hours. The target needs ' + azN(t0.need) + ' a week from now on.', () => { AZ.pace = Math.round(t0.need / 500) * 500; azRender(); azJump('az-fc'); }, 'Load this pace in the forecast'); }
     if (M.avg4 > 0) { const f = M.finish(M.avg4), last = M.tg[M.tg.length - 1]; add(last && f > last.t + 2 * AZW ? 'bad' : last && f > last.t ? 'warn' : 'good', azFs(f) + ' ' + new Date(f).getUTCFullYear(), 'Finish date at the recent pace', 'Recent average: ' + azN(M.avg4) + ' man-hours a week. ' + azN(M.B - M.L.e) + ' man-hours are still to earn' + (last ? '; the plan milestone is ' + azFd(last.t) + '.' : '.'), () => azJump('az-fc'), 'Try other paces'); }
     if (M.cm) add(M.cm.gap > 0.01 * M.B ? 'warn' : 'info', azN(M.cm.gap), 'Man-hours MAK claims that PMC has not accepted', 'MAK ' + azP(M.cm.T.makp, 2) + ' against PMC ' + azP(M.cm.T.pmcp, 2) + '. ' + azN(M.cm.zeroN) + ' activities sit at 0% with PMC: settling them alone recovers ' + azN(M.cm.zeroMH) + ' man-hours.', () => { show('cmp'); }, 'Open MAK vs PMC');
@@ -2264,7 +2294,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const is = sec('az-is', 'What the data says', 'Findings worked out from the figures on every build, most urgent first. Click one to see what is behind it.'), ig = el('div', 'az-ins');
     azInsights().forEach((x, i) => { const c = el('button', 'az-in az-' + x.sev); c.type = 'button'; c.style.animationDelay = (i * 60) + 'ms'; const kb = el('b', null, x.k); c.append(el('span', 'tg', { bad: 'Act now', warn: 'Watch', info: 'Know', good: 'Good' }[x.sev]), kb, el('strong', null, x.t), el('p', null, x.d), el('span', 'azg', x.cta + ' →')); c.addEventListener('click', x.go); azCount(kb, 1000); ig.append(c); });
     is.append(ig);
-    azForecast(sec('az-fc', 'Forecast and what-if', 'Earned man-hours to date, the ' + D.plan_name + ' plan and a projection you control. Move the slider or pick a pace.'));
+    azForecast(sec('az-fc', 'Forecast and what-if', 'Earned man-hours to date, ' + M.planLabel + ' and a projection you control. Move the slider or pick a pace.'));
     azHeat(sec('az-hm', 'Villa heatmap', 'Average completion of each activity in each cluster. Click a cell for its villas, an activity name for the whole site, or a cluster for its villas.'));
     if (M.trades.length) azTree(sec('az-tm', 'Where the remaining man-hours are', 'P6 trades sized by remaining man-hours and coloured by % complete. Click a block for its breakdown.'));
     if (M.cm) azCmp(sec('az-cp', 'MAK vs PMC by trade', 'The ten trades with the largest gap. The purple dot is PMC, the blue dot is MAK; the bar between them is the gap.'));
@@ -2278,7 +2308,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const presets = [['Last week', M.lastW], ['Recent average', M.avg4], ...M.tg.filter((t) => isFinite(t.need)).map((t) => ['Needed for ' + azP(t.p, t.p < 1 ? 1 : 0) + ' by ' + azFs(t.t), t.need])].filter((p) => p[1] > 0);
     const chips = presets.map(([t, v]) => { const b = el('button', 'az-chip', t); b.type = 'button'; b.addEventListener('click', () => { AZ.pace = Math.round(v / 500) * 500; rg.value = AZ.pace; draw(); }); ctl.append(b); return [b, Math.round(v / 500) * 500]; });
     ctl.append(rg); const holder = el('div'), out = el('div', 'az-out'), lg = el('div', 'az-lg');
-    [['#38BDF8', 'Actual (earned)'], ['#94A3B8', 'Plan · ' + M.D.plan_name], ['#F0ABFC', 'Forecast at the chosen pace'], ['#FBBF24', 'Plan milestones']].forEach(([c, t]) => { const s = el('span'); const i = el('i'); i.style.background = c; s.append(i, t); lg.append(s); });
+    [['#38BDF8', 'Actual (earned)'], ['#94A3B8', 'Plan · ' + M.planShort], ['#F0ABFC', 'Forecast at the chosen pace'], ['#FBBF24', 'Plan milestones']].forEach(([c, t]) => { const s = el('span'); const i = el('i'); i.style.background = c; s.append(i, t); lg.append(s); });
     card.append(el('h3', null, 'S-curve'), el('p', 'sb', 'Share of the ' + azN(M.B) + ' budgeted man-hours'), ctl, holder, lg, out);
     const draw = () => {
       const pace = AZ.pace, fin = M.finish(pace), W = 920, H = 340, m = { l: 44, r: 16, t: 14, b: 30 };
@@ -2415,6 +2445,70 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const tr = [['Trade', 'Budget (MH)', 'Earned (MH)', '% complete', 'Remaining (MH)', 'This week (MH)']]; [...M.trades].sort((a, b) => b.rem - a.rem).forEach((t) => tr.push([t.n, t.bu, t.eu, Math.round(t.eu / t.bu * 1000) / 10, t.rem, t.wk]));
     return [{ name: 'Insights', rows: ins }, { name: 'Forecast', rows: fc }, { name: 'Villa heatmap', rows: hm }, { name: 'Trades', rows: tr }];
   }
+  // ----- site-wide: an automatic-insights strip on every native tab (same engine and cards as the Analyser) -----
+  const insM = (v) => (Math.abs(v) >= 1e6 ? (v / 1e6).toFixed(1) + 'M' : azN(v));
+  const insTrades = (P) => P.groups.map((g) => { const s = (k) => g.areas.reduce((x, a) => x + (a[k] || 0), 0); return { n: g.n, bu: s('bu'), eu: s('eu'), rem: s('rem'), wk: s('wk'), pv: s('pvu') }; }).filter((t) => t.bu > 0);
+  const INS = {
+    'pv-in': () => {
+      const P = session.p6; if (!P || !PV || PV.view !== 'ov') return []; const T = P.total, tr = insTrades(P), out = [], spi = T.eu / T.pvu;
+      out.push({ sev: spi < 0.9 ? 'bad' : spi < 0.98 ? 'warn' : 'good', k: spi.toFixed(2), t: 'Schedule performance (SPI)', d: azN(Math.abs(T.pvu - T.eu)) + ' man-hours ' + (T.pvu > T.eu ? 'behind' : 'ahead of') + ' the P6 plan to date.' });
+      if (T.wk > 0) out.push({ sev: 'info', k: (T.rem / T.wk).toFixed(0) + ' wks', t: 'To finish at this week\'s pace', d: azN(T.rem) + ' man-hours remain; this week earned ' + azN(T.wk) + '.', go: () => { show('an'); setTimeout(() => azJump('az-fc'), 60); }, cta: 'Open the forecast' });
+      const st = tr.filter((t) => t.rem > 0.5 && t.wk <= 0), sr = st.reduce((s, t) => s + t.rem, 0); if (st.length) out.push({ sev: sr / T.rem > 0.3 ? 'bad' : 'warn', k: String(st.length), t: 'Open trades with nothing earned this week', d: 'They hold ' + azN(sr) + ' man-hours (' + azP(sr / T.rem, 0) + ' of what remains). Largest: ' + st.sort((a, b) => b.rem - a.rem).slice(0, 2).map((t) => t.n).join(', ') + '.' });
+      const bh = [...tr].sort((a, b) => (b.pv - b.eu) - (a.pv - a.eu))[0]; if (bh && bh.pv > bh.eu) out.push({ sev: 'warn', k: azK(bh.pv - bh.eu), t: 'Furthest behind plan: ' + bh.n, d: azP(bh.eu / bh.bu, 0) + ' earned against ' + azP(bh.pv / bh.bu, 0) + ' planned.' });
+      const bw = [...tr].sort((a, b) => b.wk - a.wk)[0]; if (bw && bw.wk > 0) out.push({ sev: 'good', k: '+' + azK(bw.wk), t: 'Best trade this week: ' + bw.n, d: azP(bw.wk / T.wk, 0) + ' of everything earned in the week.' });
+      const g = T.eu / T.bu - T.ec / T.bc; out.push({ sev: 'info', k: Math.abs(g * 100).toFixed(1) + ' pts', t: 'Man-hours ' + (g > 0 ? 'ahead of' : 'behind') + ' cost progress', d: 'Man-hours ' + azP(T.eu / T.bu, 1) + ', cost ' + azP(T.ec / T.bc, 1) + ': the costlier work is ' + (g > 0 ? 'still to come.' : 'already done.') });
+      return out;
+    },
+    'bk-in': () => {
+      const P = session.p6; if (!P) return []; const tr = insTrades(P), ar = {}, out = [];
+      P.groups.forEach((g) => g.areas.forEach((a) => { const o = (ar[a.n] = ar[a.n] || { n: a.n, bu: 0, eu: 0, rem: 0, wk: 0 }); o.bu += a.bu || 0; o.eu += a.eu || 0; o.rem += a.rem || 0; o.wk += a.wk || 0; }));
+      Object.values(ar).filter((a) => a.bu > 0).sort((a, b) => b.rem - a.rem).slice(0, 3).forEach((a) => out.push({ sev: a.eu / a.bu < 0.6 ? 'bad' : a.eu / a.bu < 0.9 ? 'warn' : 'good', k: azP(a.eu / a.bu, 0), t: a.n, d: azN(a.rem) + ' man-hours remain (' + azP(a.rem / P.total.rem, 0) + ' of the total); +' + azN(a.wk) + ' this week.' }));
+      const done = tr.filter((t) => t.rem <= 0.5).length, ns = tr.filter((t) => t.eu <= 0), nsr = ns.reduce((s, t) => s + t.rem, 0);
+      out.push({ sev: 'good', k: done + ' / ' + tr.length, t: 'Trades fully earned', d: 'Their budgets are closed out in P6.' });
+      if (ns.length) out.push({ sev: 'warn', k: String(ns.length), t: 'Trades not started', d: azN(nsr) + ' man-hours: ' + ns.sort((a, b) => b.rem - a.rem).slice(0, 3).map((t) => t.n).join(', ') + '.' });
+      return out;
+    },
+    'bq-in': () => {
+      if (!BQ) return []; const R = [...BQ.D.rules].sort((a, b) => b.v - a.v), out = [], t10 = R.slice(0, 10).reduce((s, r) => s + r.v, 0), g0 = BQ.groups.slice(0, 3);
+      out.push({ sev: 'info', k: azP(t10 / BQ.total, 0), t: 'Of the BOQ value sits in 10 work types', d: 'Out of ' + R.length + '. Largest: ' + R[0].n + ' (' + insM(R[0].v) + ').' });
+      out.push({ sev: 'info', k: azP(g0.reduce((s, g) => s + BQ.gv[g], 0) / BQ.total, 0), t: 'In the three largest groups', d: g0.map((g) => g + ' ' + azP(BQ.gv[g] / BQ.total, 0)).join(', ') + '.' });
+      if (session.ipa) { const G = session.ipa.grand, it = session.ipa.items, ns = it.filter((i) => i[7] <= 0.005), dn = it.filter((i) => i[7] >= i[5] * 0.999), go = () => { BQ.view = 'ip'; bqRender(); };
+        out.push({ sev: 'good', k: azP(G.claimed / G.contract, 1), t: 'Certified to date · IPA ' + session.ipa.ipa.replace(/ REV.*/, ''), d: 'SAR ' + insM(G.claimed) + ' of ' + insM(G.contract) + '; SAR ' + insM(G.contract - G.claimed) + ' still to come.', go, cta: 'Open the payment view' });
+        out.push({ sev: 'warn', k: azN(ns.length), t: 'BOQ lines with nothing certified yet', d: 'Worth SAR ' + insM(ns.reduce((s, i) => s + i[5], 0)) + ' (' + azP(ns.reduce((s, i) => s + i[5], 0) / G.contract, 0) + ' of the contract).', go, cta: 'See the lines' });
+        out.push({ sev: 'good', k: azN(dn.length), t: 'BOQ lines certified in full', d: 'Worth SAR ' + insM(dn.reduce((s, i) => s + i[5], 0)) + '.', go, cta: 'See the lines' });
+        if (session.p6) { const ec = session.p6.total.ec / session.p6.total.bc; out.push({ sev: 'info', k: ((ec - G.claimed / G.contract) * 100).toFixed(1) + ' pts', t: 'P6 earned cost above the certified share', d: 'P6 ' + azP(ec, 1) + ' against ' + azP(G.claimed / G.contract, 1) + ' certified. Different measures: a gap to reconcile, not an error.' }); } }
+      return out;
+    },
+    'wk-in': () => {
+      if (!WK || !WK.weeks) return []; const rep = WK.weeks.filter((w) => w.from && w.acum != null && isFinite(w.acum)), out = []; if (!rep.length) return [];
+      const L = rep[rep.length - 1], own = rep.filter((w) => w.since === w.from && w.act != null), sh = L.cum - L.acum, hit = own.filter((w) => w.act >= w.pts).length;
+      if (L.since === L.from && L.pts) { const r = L.act / L.pts; out.push({ sev: r >= 1 ? 'good' : r >= 0.8 ? 'warn' : 'bad', k: azP(r, 0), t: 'Of the last reported week\'s target achieved', d: 'Week ' + dm(L.from) + ' – ' + dm(L.to) + ': +' + pts(L.act) + ' pts earned against +' + pts(L.pts) + ' planned.' }); }
+      out.push({ sev: sh > 0.01 ? 'bad' : sh > 0.001 ? 'warn' : 'good', k: (sh > 0 ? '−' : '+') + pts(Math.abs(sh)) + ' pts', t: sh > 0 ? 'Behind Plan A at the last report' : 'Ahead of Plan A at the last report', d: 'Actual ' + pp(L.acum) + ' against ' + pp(L.cum) + ' planned on ' + dm(L.to) + ': ' + azN(Math.abs(sh) * WK.T) + ' man-hours.' + (own.length ? ' ' + hit + ' of ' + own.length + ' single reported weeks met their target.' : '') });
+      const w = WK.weeks[wkSel]; if (w && w.from) out.push({ sev: 'info', k: azN(w.pts * WK.T), t: 'Man-hours this week\'s target needs', d: '+' + pts(w.pts) + ' pts for ' + dm(w.from) + ' – ' + dm(w.to) + (L.since === L.from ? '; the last reported week earned ' + azN(L.act * WK.T) + '.' : '.'), go: () => { show('an'); setTimeout(() => azJump('az-fc'), 60); }, cta: 'Test it in the forecast' });
+      const nx = WK.weeks.filter((x) => x.from && x.acum == null && x.from > L.to).slice(0, 4); if (nx.length > 1) { const mx = nx.reduce((a, b) => (b.pts > a.pts ? b : a)); out.push({ sev: 'warn', k: '+' + pts(mx.pts) + ' pts', t: 'Heaviest week ahead: ' + dm(mx.from) + ' – ' + dm(mx.to), d: azN(mx.pts * WK.T) + ' man-hours planned, the most in the next ' + nx.length + ' weeks.' }); }
+      return out;
+    },
+    'nv-in': () => {
+      const D = session.nov; if (!D) return []; const vs = D.clusters.flatMap((c) => c.villas.map((v) => ({ c: c.c, code: v[0], tot: v[2], open: v[5] }))), out = [];
+      const end = +new Date(D.end + 'T00:00:00'), days = Math.ceil((end - Date.now()) / 864e5), not90 = vs.filter((v) => v.tot < 0.9).length;
+      out.push({ sev: days < 10 && not90 > 10 ? 'bad' : 'warn', k: days > 0 ? days + ' days' : 'Due', t: 'Left to the handover date', d: not90 + ' of ' + vs.length + ' villas in the plan are still below 90%.' });
+      let pk = 0, pw = 1; for (let w = 1; w <= D.weeks; w++) { const n = D.clusters.reduce((s, c) => s + c.ph.filter((p) => p[3] && p[3] <= w && w <= p[4]).reduce((x, p) => x + p[5], 0), 0); if (n > pk) { pk = n; pw = w; } }
+      out.push({ sev: 'info', k: String(pk), t: 'Crews needed in the peak week', d: 'Week ' + pw + ' of ' + D.weeks + ' carries the most packages at once.' });
+      const pkg = {}; D.clusters.forEach((c) => c.ph.forEach((p) => { pkg[p[0]] = (pkg[p[0]] || 0) + p[2]; })); const bp = Object.entries(pkg).sort((a, b) => b[1] - a[1])[0]; if (bp) out.push({ sev: 'warn', k: String(bp[1]), t: 'Villas waiting on ' + bp[0], d: 'The largest package across the ' + D.clusters.length + ' clusters.' });
+      const cl = D.clusters.map((c) => ({ c: c.c, o: c.villas.reduce((s, v) => s + v[5], 0), n: c.villas.length })).sort((a, b) => b.o - a.o)[0]; out.push({ sev: 'warn', k: String(cl.o), t: 'Open villa activities in cluster ' + cl.c, d: 'The heaviest cluster: ' + (cl.o / cl.n).toFixed(1) + ' open activities per villa.' });
+      const low = [...vs].sort((a, b) => a.tot - b.tot)[0]; out.push({ sev: 'bad', k: azP(low.tot, 0), t: 'Lowest villa: ' + low.code, d: 'Cluster ' + low.c + ', ' + low.open + ' activities open.' });
+      out.push({ sev: 'good', k: String(vs.filter((v) => v.tot >= 0.9).length), t: 'Villas already at 90% or more', d: 'Ready for snagging and close-out first.' });
+      return out;
+    }
+  };
+  function insInject(id) {
+    const box = $(id); if (!session || !box || box.querySelector(':scope > .az-strip')) return; let list; try { list = INS[id](); } catch (e) { return; } if (!list || !list.length) return;
+    const rank = { bad: 0, warn: 1, info: 2, good: 3 }; list.sort((a, b) => rank[a.sev] - rank[b.sev]);
+    const s = el('section', 'az-strip'), g = el('div', 'az-ins'); s.append(el('h2', null, 'What the data says'), g);
+    list.forEach((x) => { const c = el(x.go ? 'button' : 'div', 'az-in az-' + x.sev + (x.go ? '' : ' nogo')); if (x.go) { c.type = 'button'; c.addEventListener('click', x.go); } c.append(el('span', 'tg', { bad: 'Act now', warn: 'Watch', info: 'Know', good: 'Good' }[x.sev]), el('b', null, x.k), el('strong', null, x.t), el('p', null, x.d)); if (x.go) c.append(el('span', 'azg', x.cta + ' →')); g.append(c); });
+    const a = box.querySelector(':scope > .pv-kpis') || box.querySelector(':scope > .pv-top, :scope > .wk-top'); if (a) a.after(s); else box.prepend(s);
+  }
+  Object.keys(INS).forEach((id) => { const box = $(id); if (box) new MutationObserver(() => insInject(id)).observe(box, { childList: true }); });
   // ----- MAK vs PMC: earned labour units, activity by activity (session.cmp, from tools/cmp_import.py) -----
   let CM = null;
   function cmReset() { CM = null; $('cm').hidden = true; $('cm-in').replaceChildren(); }
@@ -3330,7 +3424,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
         const d = f.contentWindow.dash, g = (k) => d.data(k).data;
         const wt = g('weekly_totals'), la = (g('latest_actual') || [])[0];
         const weeks = []; const seen = {};
-        wt.filter((r) => r.scope === 'All').forEach((r) => { const k = r.month + '|' + r.wk; if (!seen[k]) { seen[k] = 1; weeks.push({ month: r.month, wk: r.wk, from: r.from, to: r.to, pts: r.pts, act: r.act_pts }); } });
+        wt.filter((r) => r.scope === 'All').forEach((r) => { const k = r.month + '|' + r.wk; if (!seen[k]) { seen[k] = 1; weeks.push({ month: r.month, wk: r.wk, from: r.from, to: r.to, pts: r.pts, act: r.act_pts, cum: r.cum_pct, acum: r.act_cum_pct, since: r.act_since }); } });
         const T = g('activities').reduce((s, r) => s + Number(r.budget), 0);
         const act = {}; g('activities').forEach((r) => { act[r.activity] = { budget: Number(r.budget), e0: Number(r.earned) }; });
         g('actuals').forEach((r) => { if (r.week_end === la.date && act[r.activity]) act[r.activity].er = Number(r.earned_to_date); });

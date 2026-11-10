@@ -89,3 +89,5 @@ The "Analyser" tab (pinned, opens first) is computed on every build by `an_data(
 the Management Tracking datasets (updates, actuals, s_curve) and `p6.bin`; in the browser it also reads the BOQ/IPA and MAK vs PMC data already in the page.
 Insights, forecast (straight line at a chosen weekly pace; milestones 93.7% by 31-12-2026 and 100% by 31-01-2027 from the recovery plan), heatmap, treemap and the other charts
 are recalculated from those figures; nothing to do on a daily update. If its data cannot be built the build prints a WARNING and publishes without the tab.
+Every native tab also carries an automatic "What the data says" strip (`INS` in `portal.html`), recalculated in the browser from the data already in the page;
+the Analyser takes the weekly recovery plan (Plan A) from the Management Tracking page once it has loaded, so all tabs measure against the same plan.
