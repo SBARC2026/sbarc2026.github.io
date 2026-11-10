@@ -993,6 +993,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     <div class="pv" id="pv" hidden><div class="pv-in" id="pv-in"></div></div>
     <div class="pv" id="bq" hidden><div class="pv-in" id="bq-in"></div></div>
     <div class="pv" id="ip" hidden><div class="pv-in" id="ip-in"></div></div>
+    <div class="pv" id="cm" hidden><div class="pv-in" id="cm-in"></div></div>
     <div class="pv" id="nv" hidden><div class="pv-in" id="nv-in"></div></div>
     <div class="pv" id="bk" hidden><div class="pv-in" id="bk-in"></div></div>
   </main>
@@ -1113,7 +1114,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const tabs = $('tabs'), tabsNov = $('tabs-nov'); tabs.replaceChildren(); tabsNov.replaceChildren(); $('nov-lab').hidden = !session.dashboards.some((d) => d.id === 'nov');
     [...session.dashboards].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).forEach((d) => {
       const b = document.createElement('button'); b.className = 'tab' + (d.pinned ? ' pinned' : ''); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
-      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', ipa: 'Last payment', nov: 'Nov plan' };
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', ipa: 'Last payment', nov: 'Nov plan', cmp: 'MAK vs PMC' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh); if (d.pinned) { const pn = document.createElement('span'); pn.className = 'pin'; pn.title = 'Pinned'; pn.setAttribute('aria-hidden', 'true'); pn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M14.5 3.5l6 6-2 .8-3.3 3.3.3 4.2-1.4 1.4-4-4-5.3 5.3-1-1 5.3-5.3-4-4 1.4-1.4 4.2.3 3.3-3.3z"/></svg>'; b.append(pn); }
       b.addEventListener('click', () => { show(d.id); drawer(false); }); (d.id === 'nov' ? tabsNov : tabs).append(b);
     });
@@ -1129,7 +1130,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
     session = null; current = null; secret = ''; $('up').hidden = true;
-    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); ipReset(); nvReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
+    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); ipReset(); nvReset(); cmReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -1146,6 +1147,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     } catch (e) { /* not ready */ }
   }
   const TAB_ICONS = {
+    cmp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"/><path d="M13 14l3-3 3 3"/></svg>',
     exec: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="8" rx="2"/><rect x="13.5" y="3.5" width="7" height="5" rx="2"/><rect x="13.5" y="11.5" width="7" height="9" rx="2"/><rect x="3.5" y="14.5" width="7" height="6" rx="2"/></svg>',
     p02b: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"/><path d="M5 16l4.5-5 3.5 3 6-7"/><path d="M15 7h4v4"/></svg>',
     week: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M9 14.5l2 2 4-4"/></svg>',
@@ -1181,6 +1183,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('bq').hidden = id !== 'boq';
     $('ip').hidden = id !== 'ipa';
     $('nv').hidden = id !== 'nov';
+    $('cm').hidden = id !== 'cmp';
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
     if (id === 'week') { $('loading').hidden = true; wkOpen(); return; }
     if (id === 'p6') { $('loading').hidden = true; pvOpen(); return; }
@@ -1188,6 +1191,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     if (id === 'boq') { $('loading').hidden = true; bqOpen(); return; }
     if (id === 'ipa') { $('loading').hidden = true; ipOpen(); return; }
     if (id === 'nov') { $('loading').hidden = true; nvOpen(); return; }
+    if (id === 'cmp') { $('loading').hidden = true; cmOpen(); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
   function makeFrame(id) {
@@ -1813,6 +1817,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     if (current === 'bq' || current === 'boq') return BQ && BQ.view === 'ip' ? ipSheets() : bqSheets();
     if (current === 'ipa') return ipSheets();
     if (current === 'nov') return nvSheets();
+    if (current === 'cmp') return cmSheets();
     if (current === 'bk' || current === 'p6') return [{ name: 'P6 breakdown', rows: bkSheetRows() }];
     if (current === 'week') return tablesToSheets($('wk-in'));
     const f = frames[current], w = f && f.contentWindow; if (!w) return [];
@@ -2103,6 +2108,149 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
 
   // ---------- BOQ tab ----------
 
+  // ----- MAK vs PMC: earned labour units, activity by activity (session.cmp, from tools/cmp_import.py) -----
+  let CM = null;
+  function cmReset() { CM = null; $('cm').hidden = true; $('cm-in').replaceChildren(); }
+  const cmP = (x, d) => (x * 100).toFixed(d == null ? 1 : d) + '%';
+  const cmN = (n) => Math.round(n).toLocaleString('en-US');
+  const cmS = (n) => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(Math.round(n)).toLocaleString('en-US');
+  const cmPt = (x) => (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x * 100).toFixed(2) + ' pts';
+  function cmEnsure() {
+    if (CM) return true; const D = session.cmp; if (!D) return false;
+    const path = [], acts = [], groups = { 1: [], 2: [], 3: [] };
+    D.rows.forEach((r) => {
+      const l = r[0]; path[l] = l === 1 && r[2] === 'No VILLA NO.' ? 'General (no villa number)' : r[2]; path.length = l + 1;
+      if (r[1]) {
+        const d = r[5] - r[7], cat = Math.abs(d) < 0.5 ? 'same' : r[7] <= 0.0001 && r[5] > 0 ? 'zero' : r[5] <= 0.0001 ? 'makzero' : d > 0 ? 'mak' : 'pmc';
+        acts.push({ id: r[1], name: r[2], zone: path[1] || '', trade: path[2] || '', loc: path[3] || '', bud: r[3], mp: r[4], pp: r[6], me: r[5], pe: r[7], d, cat });
+      } else if (l >= 1 && l <= 3) groups[l].push({ name: r[2], zone: path[1] || '', trade: path[2] || '', bud: r[3], mp: r[4], pp: r[6], me: r[5], pe: r[7], d: r[5] - r[7] });
+    });
+    CM = { D, acts, groups, view: 'ov', f: { q: '', trade: '', zone: '', cat: 'diff', sort: 'gap', page: 0 } };
+    return true;
+  }
+  const CMCAT = { same: 'Agree', zero: 'PMC at 0%', mak: 'MAK higher', pmc: 'PMC higher', makzero: 'MAK at 0%' };
+  function cmOpen() { if (!cmEnsure()) { $('cm-in').replaceChildren(el('div', 'wk-empty', 'No comparison data in this build.')); return; } cmRender(); }
+  function cmGo(patch) { Object.assign(CM.f, { q: '', trade: '', zone: '', cat: 'diff', sort: 'gap', page: 0 }, patch); CM.view = 'ac'; cmRender(); $('cm').scrollTop = 0; }
+  function cmRender() {
+    const D = CM.D, T = D.total, root = $('cm-in'); root.replaceChildren();
+    const top = el('div', 'pv-top'), tl = el('div');
+    tl.append(el('div', 'pv-eb', 'Earned labour units · ' + CM.acts.length.toLocaleString('en-US') + ' activities'), el('h1', 'pv-h', 'MAK vs PMC variance'),
+      el('p', 'pv-sub', 'Where the two progress figures differ and by how much, in percentage points and in man-hours, down to the single activity. MAK and PMC use the same budgeted units, so every gap below is a difference in earned units only.'));
+    top.append(tl); root.append(top);
+    const seg = el('div', 'pv-seg'); seg.setAttribute('role', 'group'); seg.setAttribute('aria-label', 'View');
+    [['ov', 'Justification'], ['tr', 'By trade'], ['lo', 'By location'], ['ac', 'Activities']].forEach(([k, t]) => { const b = el('button', null, t); b.type = 'button'; b.setAttribute('aria-pressed', String(CM.view === k)); b.addEventListener('click', () => { CM.view = k; cmRender(); }); seg.append(b); });
+    const gap = T.mak - T.pmc, diff = CM.acts.filter((a) => a.cat !== 'same');
+    const kp = el('div', 'pv-kpis'), kpi = (a, b, c, cls) => { const d = el('div', 'pv-kpi' + (cls ? ' ' + cls : '')); d.append(el('span', null, a), el('b', null, b), el('small', null, c)); return d; };
+    kp.append(kpi('MAK progress', cmP(T.makp, 2), cmN(T.mak) + ' man-hours earned'), kpi('PMC progress', cmP(T.pmcp, 2), cmN(T.pmc) + ' man-hours earned'),
+      kpi('Gap', cmPt(T.makp - T.pmcp), cmS(gap) + ' man-hours', 'bq-hero'), kpi('Budget', cmN(T.budget), 'man-hours, same in both'),
+      kpi('Activities that differ', diff.length.toLocaleString('en-US'), 'of ' + CM.acts.length.toLocaleString('en-US') + ' (' + cmP(diff.length / CM.acts.length, 1) + ')'));
+    root.append(seg, el('div', null), kp);
+    const box = el('div'); box.style.marginTop = '14px'; root.append(box);
+    ({ ov: cmOv, tr: cmTrade, lo: cmLoc, ac: cmActs })[CM.view](box);
+  }
+  const cmBar = (v, mx, cls) => { const w = el('div', 'nv-bar'), i = el('i', cls || 'nv-pu'); i.style.width = Math.min(100, Math.abs(v) / (mx || 1) * 100) + '%'; w.append(i); w.style.cssText = 'display:block;width:110px;flex:none;height:5px;margin:4px 0 0 auto'; return w; };
+  function cmOv(root) {
+    const T = CM.D.total, gap = T.mak - T.pmc, A = CM.acts, by = (c) => A.filter((a) => a.cat === c), sum = (a) => a.reduce((s, x) => s + x.d, 0);
+    const zero = by('zero'), mak = by('mak'), pmc = by('pmc'), mz = by('makzero');
+    const tr = {}; A.forEach((a) => { tr[a.trade] = (tr[a.trade] || 0) + a.d; });
+    const tops = Object.entries(tr).sort((a, b) => b[1] - a[1]), t5 = tops.slice(0, 5), t5s = t5.reduce((s, x) => s + x[1], 0);
+    const ptsOf = (m) => cmPt(m / T.budget);
+    const card = (h, lines) => { const c = el('div', 'nv-m'); c.append(el('em', null, h)); lines.forEach((l) => c.append(typeof l === 'string' ? el('span', null, l) : l)); return c; };
+    const st = el('div'); st.append(el('h3', 'nv-h3', 'How the ' + cmN(gap) + ' man-hour gap is made up'));
+    const g = el('div', 'nv-ms');
+    const mk = (h, arr, txt, cat) => { const c = card(h, [Object.assign(el('b', null, cmS(sum(arr))), {}), arr.length.toLocaleString('en-US') + ' activities · ' + ptsOf(sum(arr)) + ' of project progress', txt]); c.style.cursor = 'pointer'; c.title = 'Show these activities'; c.addEventListener('click', () => cmGo({ cat })); return c; };
+    g.append(mk('PMC recognises none (0%)', zero, 'MAK has earned units on these activities; PMC shows 0%. Closing this group alone moves PMC by ' + ptsOf(sum(zero)) + '.', 'zero'),
+      mk('Both started, MAK further on', mak, 'PMC accepts part of the progress but at a lower % than MAK.', 'mak'),
+      mk('PMC ahead of MAK', pmc, 'The reverse cases; they reduce the gap.', 'pmc'));
+    if (mz.length) g.append(mk('MAK at 0%, PMC has progress', mz, '', 'makzero'));
+    st.append(g);
+    const note = (t) => el('p', 'nv-note', t);
+    st.append(note('Agreement: ' + by('same').length.toLocaleString('en-US') + ' of ' + A.length.toLocaleString('en-US') + ' activities (' + cmP(by('same').length / A.length, 1) + ') carry exactly the same earned units in both programmes. The whole gap sits in ' + (A.length - by('same').length).toLocaleString('en-US') + ' activities.'));
+    st.append(el('h3', 'nv-h3', 'Five trades explain ' + cmP(t5s / gap, 0) + ' of the gap'));
+    const tw = el('div', 'pv-tbl-w'), tb = el('table', 'pv-tbl bq-tbl'), hd = el('tr'); ['Trade', 'MAK', 'PMC', 'Gap (man-hours)', 'Share of gap'].forEach((l, i) => hd.append(el('th', i ? 'n' : '', l)));
+    const body = el('tbody'); const gm = CM.groups[2].reduce((m, x) => { const k = x.name; (m[k] = m[k] || { me: 0, pe: 0, bud: 0 }); m[k].me += x.me; m[k].pe += x.pe; m[k].bud += x.bud; return m; }, {});
+    t5.forEach(([name, d]) => { const x = gm[name] || { me: 0, pe: 0, bud: 1 }, r = el('tr', 'ipc'); r.title = 'Show activities'; r.addEventListener('click', () => cmGo({ trade: name }));
+      const c = el('td', 'n bq-am'); c.append(el('b', null, cmS(d)), cmBar(d, t5[0][1])); r.append(td(name), td(cmP(x.me / x.bud, 1), 'n'), td(cmP(x.pe / x.bud, 1), 'n'), c, td(cmP(d / gap, 1), 'n')); body.append(r); });
+    tb.append(el('thead'), body); tb.firstChild.append(hd); tw.append(tb); st.append(tw);
+    st.append(el('h3', 'nv-h3', 'Ten activities with the largest gap'));
+    const tw2 = el('div', 'pv-tbl-w'), tb2 = el('table', 'pv-tbl bq-tbl'), hd2 = el('tr'); ['Activity', 'Location', 'MAK', 'PMC', 'Gap (man-hours)'].forEach((l, i) => hd2.append(el('th', i > 1 ? 'n' : '', l)));
+    const b2 = el('tbody'); [...A].sort((a, b) => b.d - a.d).slice(0, 10).forEach((a) => { const r = el('tr', 'ipc'); r.title = 'Show details'; r.addEventListener('click', () => cmDetail(a)); const dn = el('td', 'bq-d', a.name); dn.append(el('small', null, a.id)); r.append(dn, td(a.zone + ' · ' + a.loc), td(cmP(a.mp, 0), 'n'), td(cmP(a.pp, 0), 'n'), td(cmS(a.d), 'n')); b2.append(r); });
+    tb2.append(el('thead'), b2); tb2.firstChild.append(hd2); tw2.append(tb2); st.append(tw2);
+    st.append(el('h3', 'nv-h3', 'How to read it'));
+    ['Percent complete is earned units divided by budgeted units, so the same % on a bigger activity is more man-hours; the gap is therefore shown in man-hours and in points of total project progress (1 point = ' + cmN(T.budget / 100) + ' man-hours).',
+      'Where PMC shows 0% and MAK shows progress, the difference is whether the work has been accepted as started. These are the quickest to settle: one inspection or one submitted record per activity.',
+      'Where both show progress but at different %, the difference is the measured quantity. The trade and location tables rank where to look first.'].forEach((t) => st.append(note('• ' + t)));
+    root.append(st);
+  }
+  function cmGroupTable(root, rows, label, key) {
+    const T = CM.D.total, gap = T.mak - T.pmc, mx = Math.max(1, ...rows.map((r) => Math.abs(r.d)));
+    const t = el('table', 'pv-tbl bq-tbl'), hr = el('tr'); [label, 'Budget (man-hours)', 'MAK', 'PMC', 'Gap (pts)', 'Gap (man-hours)', 'Share of gap'].forEach((l, i) => hr.append(el('th', i ? 'n' : '', l)));
+    const h = el('thead'); h.append(hr); const b = el('tbody');
+    rows.forEach((x) => { const r = el('tr', 'ipc'); r.title = 'Show activities'; r.addEventListener('click', () => cmGo(key(x)));
+      const d = el('td', 'bq-d', x.name); if (x.zone || x.trade) d.append(el('small', null, [x.zone, x.trade].filter(Boolean).join(' · ')));
+      const c = el('td', 'n bq-am'); c.append(el('b', null, cmS(x.d)), cmBar(x.d, mx, x.d < 0 ? 'nv-ok' : 'nv-pu'));
+      r.append(d, td(cmN(x.bud), 'n'), td(cmP(x.me / x.bud, 1), 'n'), td(cmP(x.pe / x.bud, 1), 'n'), td(cmPt((x.me - x.pe) / x.bud), 'n'), c, td(cmP(x.d / gap, 1), 'n')); b.append(r); });
+    t.append(h, b); const w = el('div', 'pv-tbl-w'); w.append(t); root.append(w);
+  }
+  function cmTrade(root) {
+    const m = {}; CM.groups[2].forEach((x) => { const k = x.name, o = (m[k] = m[k] || { name: k, bud: 0, me: 0, pe: 0, d: 0 }); o.bud += x.bud; o.me += x.me; o.pe += x.pe; o.d += x.d; });
+    root.append(el('p', 'nv-note', 'Trades (work packages) across all buildings and villas, largest gap first. Click a row to see its activities.'));
+    cmGroupTable(root, Object.values(m).filter((x) => x.bud > 0).sort((a, b) => b.d - a.d), 'Trade', (x) => ({ trade: x.name }));
+  }
+  function cmLoc(root) {
+    const m = {}; CM.groups[3].forEach((x) => { const k = x.zone + '|' + x.name, o = (m[k] = m[k] || { name: x.name, zone: x.zone, bud: 0, me: 0, pe: 0, d: 0 }); o.bud += x.bud; o.me += x.me; o.pe += x.pe; o.d += x.d; });
+    root.append(el('p', 'nv-note', 'Buildings and villas (top 150 by gap), summed over all trades. Click a row to see its activities.'));
+    const loc = Object.values(m).filter((x) => x.bud > 0).sort((a, b) => b.d - a.d).slice(0, 150);
+    cmGroupTable(root, loc, 'Building / villa', (x) => ({ q: x.name, zone: x.zone }));
+  }
+  function cmActs(root) {
+    const S = CM.f, A = CM.acts, PAGE = 100, tools = el('div', 'pv-tools');
+    const inp = el('input'); inp.type = 'search'; inp.placeholder = 'Search activity, ID or building'; inp.value = S.q; inp.setAttribute('aria-label', 'Search');
+    const trs = [...new Set(A.map((a) => a.trade))].sort(), zs = [...new Set(A.map((a) => a.zone))].sort();
+    const st = el('select'); st.setAttribute('aria-label', 'Trade'); st.append(new Option('All trades', '')); trs.forEach((t) => st.append(new Option(t, t))); st.value = S.trade;
+    const sz = el('select'); sz.setAttribute('aria-label', 'Zone'); sz.append(new Option('All zones', '')); zs.forEach((t) => sz.append(new Option(t, t))); sz.value = S.zone;
+    const sc = el('select'); sc.setAttribute('aria-label', 'Difference'); [['diff', 'Only differences'], ['', 'All activities'], ['zero', 'PMC at 0%'], ['mak', 'MAK higher'], ['pmc', 'PMC higher'], ['makzero', 'MAK at 0%'], ['same', 'Agree']].forEach(([v, t]) => sc.append(new Option(t, v))); sc.value = S.cat;
+    const so = el('select'); so.setAttribute('aria-label', 'Sort'); [['gap', 'Largest MAK lead'], ['abs', 'Largest difference either way'], ['pct', 'Largest % difference'], ['bud', 'Largest budget']].forEach(([v, t]) => so.append(new Option(t, v))); so.value = S.sort;
+    const clr = el('button', 'wk-btn', 'Clear filters'); clr.type = 'button'; const cnt = el('span', 'pv-pg'); tools.append(inp, st, sz, sc, so, clr, cnt);
+    const holder = el('div'), pg = el('div', 'pv-tools'); root.append(tools, holder, pg);
+    const key = { gap: (a) => a.d, abs: (a) => Math.abs(a.d), pct: (a) => Math.abs(a.mp - a.pp), bud: (a) => a.bud };
+    const draw = () => {
+      const q = S.q.trim().toLowerCase();
+      const rs = A.filter((a) => (!S.trade || a.trade === S.trade) && (!S.zone || a.zone === S.zone) && (S.cat === 'diff' ? a.cat !== 'same' : !S.cat || a.cat === S.cat) && (!q || (a.name + ' ' + a.id + ' ' + a.loc + ' ' + a.trade).toLowerCase().includes(q))).sort((a, b) => key[S.sort](b) - key[S.sort](a));
+      const n = rs.length, pages = Math.max(1, Math.ceil(n / PAGE)); if (S.page >= pages) S.page = pages - 1;
+      const sum = (k) => rs.reduce((s, a) => s + a[k], 0), bud = sum('bud');
+      const t = el('table', 'pv-tbl bq-tbl'), hr = el('tr'); [['Activity'], ['Location'], ['Budget (MH)', 1], ['MAK', 1], ['PMC', 1], ['Gap (man-hours)', 1], ['Status']].forEach(([l, nn]) => hr.append(el('th', nn ? 'n' : '', l)));
+      const hd = el('thead'); hd.append(hr); const tb = el('tbody');
+      rs.slice(S.page * PAGE, S.page * PAGE + PAGE).forEach((a) => { const tr = el('tr', 'ipc'); tr.title = 'Show details'; tr.addEventListener('click', () => cmDetail(a));
+        const d = el('td', 'bq-d', a.name); d.append(el('small', null, a.id + ' · ' + a.trade));
+        tr.append(d, td(a.zone + ' · ' + a.loc), td(Math.round(a.bud).toLocaleString('en-US'), 'n'), td(cmP(a.mp, 0), 'n'), td(cmP(a.pp, 0), 'n'), td(cmS(a.d), 'n'), td(CMCAT[a.cat])); tb.append(tr); });
+      const f = el('tfoot'), fr = el('tr'); fr.append(td('Total of the ' + n.toLocaleString('en-US') + ' activities'), td(''), td(Math.round(bud).toLocaleString('en-US'), 'n'), td(bud ? cmP(sum('me') / bud, 1) : '', 'n'), td(bud ? cmP(sum('pe') / bud, 1) : '', 'n'), td(cmS(sum('d')), 'n'), td('')); f.append(fr);
+      t.append(hd, tb, f); const w = el('div', 'pv-tbl-w'); w.append(t); holder.replaceChildren(w);
+      cnt.textContent = n.toLocaleString('en-US') + ' of ' + A.length.toLocaleString('en-US') + ' activities · page ' + (S.page + 1) + ' of ' + pages;
+      pg.replaceChildren(); const pb = el('button', 'wk-btn', '‹ Previous'), nb = el('button', 'wk-btn', 'Next ›'); [pb, nb].forEach((b) => { b.type = 'button'; }); pb.disabled = S.page === 0; nb.disabled = S.page >= pages - 1;
+      pb.addEventListener('click', () => { S.page--; draw(); holder.scrollIntoView({ block: 'start' }); }); nb.addEventListener('click', () => { S.page++; draw(); holder.scrollIntoView({ block: 'start' }); }); pg.append(pb, nb);
+    };
+    inp.addEventListener('input', () => { S.q = inp.value; S.page = 0; draw(); }); [[st, 'trade'], [sz, 'zone'], [sc, 'cat'], [so, 'sort']].forEach(([s, k]) => s.addEventListener('change', () => { S[k] = s.value; S.page = 0; draw(); }));
+    clr.addEventListener('click', () => { Object.assign(S, { q: '', trade: '', zone: '', cat: 'diff', sort: 'gap', page: 0 }); inp.value = ''; st.value = ''; sz.value = ''; sc.value = 'diff'; so.value = 'gap'; draw(); });
+    draw();
+  }
+  function cmDetail(a) {
+    const md = ipModal(a.id, a.name, [['MAK', cmP(a.mp, 1)], ['PMC', cmP(a.pp, 1)], ['Gap', cmS(a.d) + ' man-hours'], ['Budget', Math.round(a.bud).toLocaleString('en-US') + ' man-hours']]);
+    md.append(el('p', 'nv-note', a.zone + ' · ' + a.trade + ' · ' + a.loc));
+    const t = el('table', 'pv-tbl bq-tbl'), hr = el('tr'); ['', 'Earned (man-hours)', 'Remaining (man-hours)', '% complete'].forEach((l, i) => hr.append(el('th', i ? 'n' : '', l))); const h = el('thead'); h.append(hr); const b = el('tbody');
+    [['MAK', a.me, a.mp], ['PMC', a.pe, a.pp]].forEach(([n, e, p]) => { const r = el('tr'); r.append(td(n), td(Math.round(e * 10) / 10 + '', 'n'), td(Math.round((a.bud - e) * 10) / 10 + '', 'n'), td(cmP(p, 1), 'n')); b.append(r); });
+    t.append(h, b); const w = el('div', 'pv-tbl-w'); w.append(t); md.append(w);
+    const why = a.cat === 'same' ? 'MAK and PMC agree on this activity.' : a.cat === 'zero' ? 'PMC has not recognised any progress here. Settling this needs only evidence that the activity has started (' + cmS(a.d) + ' man-hours).' : a.cat === 'mak' ? 'Both recognise progress; MAK is ' + Math.abs((a.mp - a.pp) * 100).toFixed(0) + ' points further on. The difference is the measured quantity.' : a.cat === 'pmc' ? 'PMC is further on than MAK here.' : 'MAK shows no progress while PMC does.';
+    md.append(el('p', 'nv-note', why));
+  }
+  function cmSheets() {
+    if (!CM && !cmEnsure()) return []; const T = CM.D.total;
+    const hdr = ['Zone', 'Trade', 'Location', 'Activity ID', 'Activity', 'Budget (MH)', 'MAK %', 'MAK earned', 'PMC %', 'PMC earned', 'Gap (MH)', 'Status'];
+    const acts = [hdr, ...CM.acts.filter((a) => a.cat !== 'same').sort((a, b) => b.d - a.d).map((a) => [a.zone, a.trade, a.loc, a.id, a.name, a.bud, Math.round(a.mp * 10000) / 100, a.me, Math.round(a.pp * 10000) / 100, a.pe, Math.round(a.d * 10) / 10, CMCAT[a.cat]])];
+    const m = {}; CM.groups[2].forEach((x) => { const o = (m[x.name] = m[x.name] || { bud: 0, me: 0, pe: 0 }); o.bud += x.bud; o.me += x.me; o.pe += x.pe; });
+    const tr = [['Trade', 'Budget (MH)', 'MAK %', 'PMC %', 'Gap (pts)', 'Gap (MH)'], ...Object.entries(m).filter(([, x]) => x.bud > 0).sort((a, b) => (b[1].me - b[1].pe) - (a[1].me - a[1].pe)).map(([k, x]) => [k, x.bud, Math.round(x.me / x.bud * 10000) / 100, Math.round(x.pe / x.bud * 10000) / 100, Math.round((x.me - x.pe) / x.bud * 10000) / 100, Math.round(x.me - x.pe)])];
+    return [{ name: 'Summary', rows: [['', 'MAK', 'PMC', 'Gap'], ['Progress %', Math.round(T.makp * 10000) / 100, Math.round(T.pmcp * 10000) / 100, Math.round((T.makp - T.pmcp) * 10000) / 100], ['Earned (MH)', T.mak, T.pmc, T.mak - T.pmc], ['Budget (MH)', T.budget]] }, { name: 'By trade', rows: tr }, { name: 'Activities that differ', rows: acts }];
+  }
   // ----- November plan: cluster push plan computed at build time (session.nov) -----
   let NV = null;
   function nvReset() { NV = null; $('nv').hidden = true; $('nv-in').replaceChildren(); }

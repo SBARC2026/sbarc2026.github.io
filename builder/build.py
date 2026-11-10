@@ -143,6 +143,14 @@ def ipa_data():
     subprocess.run(['node', os.path.join(B, 'decrypt.js'), IPA_FILE, os.environ['SBARC_PASSWORD'], tmp], check=True)
     out = json.loads(rd(tmp)); os.remove(tmp); return out
 
+CMP_FILE = os.path.join(B, 'cmp', 'cmp.bin')
+def cmp_data():
+    """MAK vs PMC earned labour units per activity (builder/cmp/cmp.bin, encrypted; see tools/cmp_import.py). None if absent."""
+    if not os.path.exists(CMP_FILE): return None
+    tmp = os.path.join(DATA, 'cmp.json'); os.makedirs(DATA, exist_ok=True)
+    subprocess.run(['node', os.path.join(B, 'decrypt.js'), CMP_FILE, os.environ['SBARC_PASSWORD'], tmp], check=True)
+    out = json.loads(rd(tmp)); os.remove(tmp); return out
+
 def apply_p6(dash, data):
     """Management Tracking: the P6 export sets the earned value of its reporting week, unless the dashboard already holds a later week."""
     p6 = p6_data()
@@ -327,12 +335,15 @@ def build():
     if boq: tabs.append({'id': 'boq', 'title': 'BOQ & amounts', 'native': True, 'pinned': True})  # pinned: listed first in the sidebar
     ipa = ipa_data()
     # the payment data shows inside the BOQ tab (view "Payment"); no separate tab
+    cmp_ = cmp_data()
+    if cmp_: tabs.append({'id': 'cmp', 'title': 'MAK vs PMC', 'native': True, 'pinned': True})
     nov = nov_data()
     if nov: tabs.append({'id': 'nov', 'title': 'November plan', 'native': True, 'pinned': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     if boq: payload['boq'] = boq
     if ipa: payload['ipa'] = ipa
     if nov: payload['nov'] = nov
+    if cmp_: payload['cmp'] = cmp_
     if p6:
         payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
         g = os.path.join(B, 'p6', 'gantt.bin')  # P6 schedule (.xer), encrypted; fetched by the browser when the Gantt opens
