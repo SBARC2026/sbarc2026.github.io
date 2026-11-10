@@ -83,3 +83,9 @@ MAK vs PMC tab: `SBARC_PASSWORD=... python3 builder/tools/cmp_import.py "<Comp_S
 It reads GENERAL SUMMARY, SECTIONS and every bill sheet, scales line amounts by the contract discount and asserts they add up to the certified totals.
 `build.py` sends it with the page and the BOQ tab shows it as the "Payment" view. Re-run it for each new payment certificate. The tab compares the certified
 percentage with the P6 earned cost (`p6.total.ec / bc`): different measures, so shown as a gap to reconcile, never as an error.
+
+## Analyser tab
+The "Analyser" tab (pinned, opens first) is computed on every build by `an_data()` in `build.py` from the latest exec datasets (villas, villa_activities, buildings, manpower),
+the Management Tracking datasets (updates, actuals, s_curve) and `p6.bin`; in the browser it also reads the BOQ/IPA and MAK vs PMC data already in the page.
+Insights, forecast (straight line at a chosen weekly pace; milestones 93.7% by 31-12-2026 and 100% by 31-01-2027 from the recovery plan), heatmap, treemap and the other charts
+are recalculated from those figures; nothing to do on a daily update. If its data cannot be built the build prints a WARNING and publishes without the tab.

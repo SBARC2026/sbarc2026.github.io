@@ -494,6 +494,67 @@
 
   /* ================= PRIMAVERA (P6 weekly export: charts + data) ================= */
   .pv{position:absolute;inset:0;overflow-y:auto;background:var(--bg)}
+  /* ----- Analyser ----- */
+  .az-hero{position:relative;overflow:hidden;border-radius:22px;padding:26px 26px 22px;border:1px solid var(--line);background:linear-gradient(135deg,#0B1B3A 0%,#12265A 45%,#3B1E6B 100%);color:#F3F7FF;isolation:isolate}
+  .az-hero:before,.az-hero:after{content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(60px);opacity:.55;animation:azFloat 14s ease-in-out infinite alternate}
+  .az-hero:before{width:420px;height:420px;left:-120px;top:-180px;background:#22D3EE}
+  .az-hero:after{width:480px;height:480px;right:-160px;bottom:-260px;background:#C026D3;animation-delay:-6s}
+  @keyframes azFloat{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(40px,30px,0) scale(1.15)}}
+  .az-eb{font:600 11px/1.2 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:#A5F3FC;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .az-eb i{width:8px;height:8px;border-radius:50%;background:#4ADE80;box-shadow:0 0 0 0 rgba(74,222,128,.7);animation:azPulse 2s infinite}
+  @keyframes azPulse{70%{box-shadow:0 0 0 9px rgba(74,222,128,0)}100%{box-shadow:0 0 0 0 rgba(74,222,128,0)}}
+  .az-title{margin:10px 0 6px;font:800 clamp(34px,6vw,60px)/.95 var(--disp);font-stretch:72%;letter-spacing:-.01em;background:linear-gradient(90deg,#FFFFFF 0%,#A5F3FC 45%,#F0ABFC 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .az-lead{margin:0;max-width:62em;font-size:15px;line-height:1.5;color:#D6E2F5}.az-lead b{color:#fff}
+  .az-rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:12px;margin-top:20px}
+  @media (max-width:560px){.az-hero{padding:20px 14px 16px}.az-ring svg{width:88px;height:88px}.az-nav{border-radius:16px}}
+  .az-ring{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:12px 10px 12px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;cursor:pointer;color:inherit;font:inherit;transition:transform .2s,background .2s,border-color .2s;backdrop-filter:blur(8px)}
+  .az-ring:hover,.az-ring:focus-visible{transform:translateY(-3px);background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35)}
+  .az-ring svg{width:104px;height:104px}.az-ring circle{fill:none;stroke-width:9}.az-ring .tr{stroke:rgba(255,255,255,.14)}.az-ring .vl{stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)}
+  .az-ring text{font:800 21px var(--disp);font-stretch:76%;fill:#fff;text-anchor:middle;dominant-baseline:central}
+  .az-ring em{font:600 10.5px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;font-style:normal;color:#C7D7F2}.az-ring small{font-size:11.5px;color:#A9BCDD}
+  .az-nav{display:flex;gap:8px;flex-wrap:wrap;position:sticky;top:6px;z-index:5;padding:8px 10px;margin:0 -10px;border-radius:999px;background:color-mix(in srgb,var(--paper) 78%,transparent);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line)}
+  .az-nav button{border:1px solid var(--line);background:var(--solid,var(--panel));color:var(--fg);border-radius:999px;padding:7px 13px;font-size:12.5px;cursor:pointer;transition:background .15s,border-color .15s}
+  .az-nav button:hover{border-color:var(--accent);background:var(--active-bg)}
+  .az-sec{scroll-margin-top:56px}.az-h2{margin:10px 0 2px;font:800 26px/1.05 var(--disp);font-stretch:76%}.az-sub{margin:0 0 10px;color:var(--muted);font-size:13.5px;max-width:70em}
+  .az-ins{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr));gap:12px}
+  .az-in{position:relative;text-align:left;background:var(--card,var(--panel));border:1px solid var(--line);border-radius:16px;padding:14px 16px 14px 20px;display:flex;flex-direction:column;gap:6px;cursor:pointer;color:var(--fg);font:inherit;overflow:hidden;transition:transform .18s,border-color .18s,box-shadow .18s;animation:azUp .5s both}
+  .az-in:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--c)}
+  .az-in:hover,.az-in:focus-visible{transform:translateY(-3px);border-color:var(--c);box-shadow:0 16px 30px -22px var(--c)}
+  .az-in .tg{font:600 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--c)}
+  .az-in b{font:800 30px/1 var(--disp);font-stretch:74%}.az-in strong{font-size:14.5px;line-height:1.3}.az-in p{margin:0;font-size:13px;line-height:1.45;color:var(--muted)}
+  .az-in .azg{margin-top:auto;padding-top:4px;font-size:12px;font-weight:600;color:var(--accent)}
+  .az-bad{--c:#F2674F}.az-warn{--c:#F0B142}.az-good{--c:#34D399}.az-info{--c:#7DA8FF}
+  @keyframes azUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .az-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,430px),1fr));gap:14px}
+  .az-card{background:var(--card,var(--panel));border:1px solid var(--line);border-radius:18px;padding:16px 18px;min-width:0;box-shadow:var(--shadow)}
+  .az-card h3{margin:0;font:700 17px/1.2 var(--disp);font-stretch:84%}.az-card .sb{margin:3px 0 10px;font-size:12.5px;color:var(--muted)}
+  .az-card svg{display:block;width:100%;height:auto;overflow:visible}.az-card svg text{font-family:var(--body);fill:var(--muted);font-size:11px}
+  .az-ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 10px}.az-ctl input[type=range]{flex:1;min-width:180px;accent-color:#A78BFA}
+  .az-chip{border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:999px;padding:6px 11px;font-size:12px;cursor:pointer}.az-chip[aria-pressed=true]{background:linear-gradient(90deg,#38BDF8,#A78BFA);border-color:transparent;color:#06101F;font-weight:700}
+  .az-out{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:10px}.az-out div{border:1px solid var(--line);border-radius:12px;padding:9px 11px}.az-out span{display:block;font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}.az-out b{font:800 21px/1.15 var(--disp);font-stretch:78%}
+  .az-lg{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:8px}.az-lg i{display:inline-block;width:14px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+  .az-hm-w{overflow-x:auto;padding-bottom:4px}.az-hm{display:grid;gap:3px;min-width:860px;align-items:center}
+  .az-hm .gh{font:600 9.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;border-bottom:2px solid var(--line);padding-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .az-hm .ch{height:92px;position:relative}.az-hm .ch button{position:absolute;left:50%;bottom:2px;transform-origin:0 100%;transform:rotate(-58deg);white-space:nowrap;font-size:10.5px;color:var(--muted);background:none;border:0;padding:0;cursor:pointer}.az-hm .ch button:hover{color:var(--accent)}
+  .az-hm .rl{font:700 13px var(--disp);padding-right:8px;white-space:nowrap;background:none;border:0;color:var(--fg);cursor:pointer;text-align:left}.az-hm .rl small{display:block;font:500 10px var(--mono);color:var(--muted)}
+  .az-cell{height:30px;border-radius:6px;border:0;cursor:pointer;font:700 10.5px var(--mono);color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.35);transition:transform .12s,box-shadow .12s;padding:0}.az-cell:hover,.az-cell:focus-visible{transform:scale(1.18);box-shadow:0 6px 16px -4px rgba(0,0,0,.6);position:relative;z-index:2}
+  .az-tot{font:800 13px var(--disp);text-align:right;padding-left:6px}
+  .az-tm rect{stroke:var(--bg);stroke-width:2;cursor:pointer;transition:opacity .15s}.az-tm g:hover rect{opacity:.82}.az-tm text{fill:#fff!important;pointer-events:none;font-weight:600}
+  .az-row{display:grid;grid-template-columns:minmax(90px,150px) 1fr 76px;gap:10px;align-items:center;padding:6px 4px;border-radius:8px;border:0;background:none;color:var(--fg);font:inherit;width:100%;text-align:left;cursor:pointer}.az-row:hover{background:var(--hover)}
+  .az-row .nm{font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.az-row .vl{font:700 12.5px var(--mono);text-align:right}
+  .az-trk{position:relative;height:10px;border-radius:5px;background:rgba(127,143,160,.2)}.az-trk i{position:absolute;top:0;bottom:0;border-radius:5px;transition:width 1s cubic-bezier(.2,.8,.2,1),left 1s}.az-trk u{position:absolute;top:-3px;width:16px;height:16px;border-radius:50%;margin-left:-8px;border:2px solid var(--bg);transition:left 1s cubic-bezier(.2,.8,.2,1)}
+  .az-cols{display:flex;align-items:flex-end;gap:10px;height:190px;padding-top:8px}.az-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:5px;height:100%;border:0;background:none;color:var(--fg);cursor:pointer;font:inherit;padding:0}
+  .az-col i{width:100%;border-radius:10px 10px 4px 4px;min-height:3px;transition:height 1s cubic-bezier(.2,.8,.2,1),filter .15s}.az-col:hover i{filter:brightness(1.2)}.az-col b{font:800 20px var(--disp)}.az-col span{font-size:11.5px;color:var(--muted)}
+  .az-tip{position:fixed;z-index:60;pointer-events:none;background:#0B1730;color:#EAF1F8;border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.45;box-shadow:0 14px 34px -12px rgba(0,0,0,.7);max-width:260px}.az-tip b{color:#fff}
+  .az-mini{font-size:12px;color:var(--muted);margin:8px 0 0}
+  /* polish shared by every native tab */
+  .pv-kpi{position:relative;overflow:hidden;transition:transform .18s,border-color .18s,box-shadow .18s}.pv-kpi:after{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,#38BDF8,#A78BFA,#F0ABFC);opacity:.0;transition:opacity .2s}
+  .pv-kpi:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 55%,var(--line));box-shadow:0 14px 28px -22px var(--accent)}.pv-kpi:hover:after{opacity:1}
+  :root[data-theme="glass"] .pv-h{background:linear-gradient(90deg,#FFFFFF,#A5F3FC 60%,#C4B5FD);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pv-in>*{animation:azUp .45s both}.pv-tbl tbody tr{transition:background .12s}
+  @media (prefers-reduced-motion:reduce){.az-hero:before,.az-hero:after,.az-eb i,.az-in,.pv-in>*{animation:none!important}.az-ring .vl,.az-trk i,.az-trk u,.az-col i{transition:none!important}}
+  @media print{.az-nav,.az-ctl{display:none!important}.az-hero{background:#fff!important;color:#0F2742!important;border:1px solid #C9D1D6}.az-hero:before,.az-hero:after{display:none}.az-title{color:#0F2742!important;background:none!important;-webkit-text-fill-color:#0F2742}.az-lead,.az-ring em,.az-ring small,.az-eb{color:#4A5660!important}.az-ring text{fill:#0F2742!important}.az-ring .tr{stroke:#DDE3E8!important}.pv-in>*{animation:none!important}}
+
   .pv-in{max-width:1240px;margin:0 auto;padding:20px max(16px,3vw) 44px;display:flex;flex-direction:column;gap:16px}
   .pv-top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px}
   .nv-sec{margin-top:22px}.nv-h2{margin:0 0 10px;font:700 22px/1.1 var(--disp);font-stretch:80%}.nv-h3{margin:16px 0 8px;font:700 15px var(--disp);font-stretch:85%}
@@ -993,6 +1054,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     <div class="pv" id="pv" hidden><div class="pv-in" id="pv-in"></div></div>
     <div class="pv" id="bq" hidden><div class="pv-in" id="bq-in"></div></div>
     <div class="pv" id="ip" hidden><div class="pv-in" id="ip-in"></div></div>
+    <div class="pv" id="az" hidden><div class="pv-in" id="az-in"></div></div>
     <div class="pv" id="cm" hidden><div class="pv-in" id="cm-in"></div></div>
     <div class="pv" id="nv" hidden><div class="pv-in" id="nv-in"></div></div>
     <div class="pv" id="bk" hidden><div class="pv-in" id="bk-in"></div></div>
@@ -1114,7 +1176,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const tabs = $('tabs'), tabsNov = $('tabs-nov'); tabs.replaceChildren(); tabsNov.replaceChildren(); $('nov-lab').hidden = !session.dashboards.some((d) => d.id === 'nov');
     [...session.dashboards].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).forEach((d) => {
       const b = document.createElement('button'); b.className = 'tab' + (d.pinned ? ' pinned' : ''); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
-      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', ipa: 'Last payment', nov: 'Nov plan', cmp: 'MAK vs PMC' };
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', ipa: 'Last payment', nov: 'Nov plan', cmp: 'MAK vs PMC', an: 'Analyser' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh); if (d.pinned) { const pn = document.createElement('span'); pn.className = 'pin'; pn.title = 'Pinned'; pn.setAttribute('aria-hidden', 'true'); pn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M14.5 3.5l6 6-2 .8-3.3 3.3.3 4.2-1.4 1.4-4-4-5.3 5.3-1-1 5.3-5.3-4-4 1.4-1.4 4.2.3 3.3-3.3z"/></svg>'; b.append(pn); }
       b.addEventListener('click', () => { show(d.id); drawer(false); }); (d.id === 'nov' ? tabsNov : tabs).append(b);
     });
@@ -1130,7 +1192,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
     session = null; current = null; secret = ''; $('up').hidden = true;
-    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); ipReset(); nvReset(); cmReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
+    xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); ipReset(); nvReset(); cmReset(); azReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
     $('g-pass').focus();
@@ -1147,6 +1209,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     } catch (e) { /* not ready */ }
   }
   const TAB_ICONS = {
+    an: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 5.6L20 11l-5.8 2.4L12 19l-2.2-5.6L4 11l5.8-2.4z"/><path d="M19 3v3M20.5 4.5h-3"/></svg>',
     cmp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"/><path d="M13 14l3-3 3 3"/></svg>',
     exec: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="8" rx="2"/><rect x="13.5" y="3.5" width="7" height="5" rx="2"/><rect x="13.5" y="11.5" width="7" height="9" rx="2"/><rect x="3.5" y="14.5" width="7" height="6" rx="2"/></svg>',
     p02b: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 20.5h17"/><path d="M5 16l4.5-5 3.5 3 6-7"/><path d="M15 7h4v4"/></svg>',
@@ -1184,14 +1247,16 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('ip').hidden = id !== 'ipa';
     $('nv').hidden = id !== 'nov';
     $('cm').hidden = id !== 'cmp';
+    $('az').hidden = id !== 'an'; azTipHide();
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
-    if (id === 'week') { $('loading').hidden = true; wkOpen(); return; }
-    if (id === 'p6') { $('loading').hidden = true; pvOpen(); return; }
-    if (id === 'bk') { $('loading').hidden = true; bkOpen(); return; }
-    if (id === 'boq') { $('loading').hidden = true; bqOpen(); return; }
+    if (id === 'week') { $('loading').hidden = true; wkOpen(); kpiAnim($('wk-in')); return; }
+    if (id === 'p6') { $('loading').hidden = true; pvOpen(); kpiAnim($('pv-in')); return; }
+    if (id === 'bk') { $('loading').hidden = true; bkOpen(); kpiAnim($('bk-in')); return; }
+    if (id === 'boq') { $('loading').hidden = true; bqOpen(); kpiAnim($('bq-in')); return; }
     if (id === 'ipa') { $('loading').hidden = true; ipOpen(); return; }
-    if (id === 'nov') { $('loading').hidden = true; nvOpen(); return; }
-    if (id === 'cmp') { $('loading').hidden = true; cmOpen(); return; }
+    if (id === 'nov') { $('loading').hidden = true; nvOpen(); kpiAnim($('nv-in')); return; }
+    if (id === 'cmp') { $('loading').hidden = true; cmOpen(); kpiAnim($('cm-in')); return; }
+    if (id === 'an') { $('loading').hidden = true; azOpen(); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
   function makeFrame(id) {
@@ -1818,6 +1883,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     if (current === 'ipa') return ipSheets();
     if (current === 'nov') return nvSheets();
     if (current === 'cmp') return cmSheets();
+    if (current === 'an') return azSheets();
     if (current === 'bk' || current === 'p6') return [{ name: 'P6 breakdown', rows: bkSheetRows() }];
     if (current === 'week') return tablesToSheets($('wk-in'));
     const f = frames[current], w = f && f.contentWindow; if (!w) return [];
@@ -2108,6 +2174,247 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
 
   // ---------- BOQ tab ----------
 
+  // ----- Analyser: every source in one place (session.an + p6 + cmp + ipa), charts, automatic insights, drill-down, forecast -----
+  let AZ = null;
+  const azD = (s) => +new Date(s + 'T00:00:00Z'), AZW = 6048e5;
+  const azFd = (t) => new Date(t).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  const azFs = (t) => new Date(t).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+  const azN = (n) => Math.round(n).toLocaleString('en-US'), azP = (x, d) => (x * 100).toFixed(d == null ? 1 : d) + '%';
+  const azK = (n) => (Math.abs(n) >= 1e6 ? (n / 1e6).toFixed(2) + 'M' : Math.abs(n) >= 1e4 ? Math.round(n / 1e3) + 'k' : azN(n));
+  const azHue = (p) => 'hsl(' + Math.round(4 + Math.max(0, Math.min(1, p)) * 138) + ' 68% ' + (p >= 0.999 ? 36 : 43) + '%)';
+  const azReduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function azTip(e, html) { let t = document.getElementById('az-tip'); if (!t) { t = el('div', 'az-tip'); t.id = 'az-tip'; document.body.append(t); } t.innerHTML = html; t.hidden = false; const w = t.offsetWidth, h = t.offsetHeight; t.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, e.clientX + 14)) + 'px'; t.style.top = Math.max(8, e.clientY - h - 12) + 'px'; }
+  function azTipHide() { const t = document.getElementById('az-tip'); if (t) t.hidden = true; }
+  function azReset() { AZ = null; azTipHide(); $('az').hidden = true; $('az-in').replaceChildren(); }
+  // count-up for any number text ("81.5%", "4,363,488", "+1.48 pts"); used by the Analyser and by the KPI tiles of every native tab
+  function azCount(node, ms) {
+    const txt = node.textContent, m = /^(.*?)([\d,]+(?:\.\d+)?)(.*)$/.exec(txt); if (!m || azReduce() || node.dataset.az === txt) return; node.dataset.az = txt;
+    const to = parseFloat(m[2].replace(/,/g, '')), dec = (m[2].split('.')[1] || '').length, comma = m[2].includes(','), t0 = performance.now(), dur = ms || 900;
+    const fmt = (v) => (comma ? v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) : v.toFixed(dec));
+    const step = (now) => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); if (node.dataset.az !== txt) return; node.textContent = m[1] + fmt(to * e) + m[3]; if (k < 1) requestAnimationFrame(step); else node.textContent = txt; };
+    requestAnimationFrame(step);
+  }
+  function kpiAnim(root) { if (root) root.querySelectorAll('.pv-kpi b').forEach((b) => { delete b.dataset.az; azCount(b, 700); }); }
+  function azModel() {
+    const D = session.an, B = D.budget, P = session.p6, h = D.hist.map(([d, e]) => ({ t: azD(d), e })), L = h[h.length - 1];
+    const paceFrom = (i) => (L.e - h[i].e) / ((L.t - h[i].t) / AZW);
+    let i4 = 0; for (let i = 0; i < h.length - 1; i++) if (L.t - h[i].t >= 3.5 * AZW) i4 = i;
+    const lastW = h.length > 1 ? paceFrom(h.length - 2) : 0, avg4 = h.length > 1 ? paceFrom(i4) : 0;
+    const plan = D.plan.map(([d, p]) => ({ t: azD(d), p }));
+    const planAt = (t) => { if (!plan.length || t < plan[0].t) return null; for (let i = 1; i < plan.length; i++) if (t <= plan[i].t) { const a = plan[i - 1], b = plan[i]; return a.p + (b.p - a.p) * (t - a.t) / (b.t - a.t); } return plan[plan.length - 1].p; };
+    const tg = D.targets.map(([d, p]) => { const t = azD(d), w = (t - L.t) / AZW; return { t, p, need: w > 0 ? (p * B - L.e) / w : Infinity }; });
+    const finish = (pace) => (pace > 0 ? L.t + (B - L.e) / pace * AZW : Infinity), pctAt = (pace, t) => Math.min(1, (L.e + pace * Math.max(0, t - L.t) / AZW) / B);
+    // villas, clusters, activities
+    const V = D.villas.map((v) => ({ code: v[0], c: v[1], fin: v[2], mep: v[3], tot: v[4], a: v[5] })), nA = D.acts.length;
+    const cl = {}; V.forEach((v) => { (cl[v.c] = cl[v.c] || { c: v.c, v: [] }).v.push(v); });
+    const clusters = Object.values(cl).map((c) => { const n = c.v.length, av = (k) => c.v.reduce((s, v) => s + v[k], 0) / n; return { c: c.c, v: c.v.sort((a, b) => b.tot - a.tot), n, fin: av('fin'), mep: av('mep'), tot: av('tot'), n90: c.v.filter((v) => v.tot >= 0.9).length, cells: D.acts.map((_, i) => c.v.reduce((s, v) => s + v.a[i], 0) / n / 100) }; }).sort((a, b) => b.tot - a.tot);
+    const actAvg = D.acts.map((a, i) => ({ i, g: a[0], n: a[1], p: V.reduce((s, v) => s + v.a[i], 0) / V.length / 100, done: V.filter((v) => v.a[i] >= 100).length, ns: V.filter((v) => v.a[i] <= 0).length }));
+    const vAvg = V.reduce((s, v) => s + v.tot, 0) / V.length, vFin = V.reduce((s, v) => s + v.fin, 0) / V.length, vMep = V.reduce((s, v) => s + v.mep, 0) / V.length;
+    const bl = D.bld.map((b) => ({ code: b[0], name: b[1], fin: b[2], mep: b[3], tot: b[4], ns: b[5], ip: b[6] })).sort((a, b) => b.tot - a.tot), bAvg = bl.reduce((s, b) => s + b.tot, 0) / (bl.length || 1);
+    // trades from P6
+    const trades = P ? P.groups.map((g) => { const s = (k) => g.areas.reduce((x, a) => x + (a[k] || 0), 0); return { n: g.n, areas: g.areas, bu: s('bu'), eu: s('eu'), rem: s('rem'), wk: s('wk'), pv: s('pvu') }; }).filter((t) => t.bu > 0) : [];
+    // MAK vs PMC
+    let cm = null; if (session.cmp && cmEnsure()) { const T = session.cmp.total, m = {}; CM.acts.forEach((a) => { const o = (m[a.trade] = m[a.trade] || { n: a.trade, bud: 0, me: 0, pe: 0 }); o.bud += a.bud; o.me += a.me; o.pe += a.pe; }); const zero = CM.acts.filter((a) => a.cat === 'zero'); cm = { T, gap: T.mak - T.pmc, trades: Object.values(m).map((o) => Object.assign(o, { d: o.me - o.pe })).sort((a, b) => b.d - a.d), zeroN: zero.length, zeroMH: zero.reduce((s, a) => s + a.d, 0), diff: CM.acts.filter((a) => a.cat !== 'same').length }; }
+    const ipa = session.ipa ? { p: session.ipa.grand.claimed / session.ipa.grand.contract, ref: session.ipa.ipa } : null;
+    return { D, B, P, h, L, pct: L.e / B, lastW, avg4, plan, planAt, tg, finish, pctAt, V, clusters, actAvg, vAvg, vFin, vMep, bl, bAvg, trades, cm, ipa };
+  }
+  function azOpen() {
+    if (!session.an) { $('az-in').replaceChildren(el('div', 'wk-empty', 'No analyser data in this build.')); return; }
+    if (!AZ) { const M = azModel(); AZ = { M, pace: Math.max(1000, Math.round(M.avg4 / 500) * 500) }; }
+    azRender();
+  }
+  const azJump = (id) => { const n = document.getElementById(id); if (n) n.scrollIntoView({ behavior: azReduce() ? 'auto' : 'smooth', block: 'start' }); };
+  function azInsights() {
+    const M = AZ.M, out = [], add = (sev, k, t, d, go, cta) => out.push({ sev, k, t, d, go, cta });
+    const pl = M.planAt(M.L.t);
+    if (pl != null) { const g = pl - M.pct; add(g > 0.03 ? 'bad' : g > 0.005 ? 'warn' : 'good', (g > 0 ? '−' : '+') + Math.abs(g * 100).toFixed(1) + ' pts', g > 0 ? 'Behind the ' + M.D.plan_name + ' plan' : 'Ahead of the ' + M.D.plan_name + ' plan', 'Actual ' + azP(M.pct, 2) + ' against ' + azP(pl, 2) + ' planned for ' + azFd(M.L.t) + ': ' + azN(Math.abs(g) * M.B) + ' man-hours ' + (g > 0 ? 'to recover.' : 'in hand.'), () => azJump('az-fc'), 'See the S-curve'); }
+    const t0 = M.tg[0]; if (t0 && isFinite(t0.need) && M.lastW > 0) { const x = t0.need / M.lastW; add(x > 1.5 ? 'bad' : x > 1.05 ? 'warn' : 'good', '×' + x.toFixed(1), 'Pace needed for ' + azP(t0.p, 1) + ' by ' + azFs(t0.t), 'Last week earned ' + azN(M.lastW) + ' man-hours. The target needs ' + azN(t0.need) + ' a week from now on.', () => { AZ.pace = Math.round(t0.need / 500) * 500; azRender(); azJump('az-fc'); }, 'Load this pace in the forecast'); }
+    if (M.avg4 > 0) { const f = M.finish(M.avg4), last = M.tg[M.tg.length - 1]; add(last && f > last.t + 2 * AZW ? 'bad' : last && f > last.t ? 'warn' : 'good', azFs(f) + ' ' + new Date(f).getUTCFullYear(), 'Finish date at the recent pace', 'Recent average: ' + azN(M.avg4) + ' man-hours a week. ' + azN(M.B - M.L.e) + ' man-hours are still to earn' + (last ? '; the plan milestone is ' + azFd(last.t) + '.' : '.'), () => azJump('az-fc'), 'Try other paces'); }
+    if (M.cm) add(M.cm.gap > 0.01 * M.B ? 'warn' : 'info', azN(M.cm.gap), 'Man-hours MAK claims that PMC has not accepted', 'MAK ' + azP(M.cm.T.makp, 2) + ' against PMC ' + azP(M.cm.T.pmcp, 2) + '. ' + azN(M.cm.zeroN) + ' activities sit at 0% with PMC: settling them alone recovers ' + azN(M.cm.zeroMH) + ' man-hours.', () => { show('cmp'); }, 'Open MAK vs PMC');
+    const lo = M.clusters.slice(-2).reverse(), low = M.V.filter((v) => v.tot < 0.7).length;
+    add(low > 20 ? 'bad' : low > 0 ? 'warn' : 'good', String(low), 'Villas still below 70%', 'Weakest clusters: ' + lo.map((c) => c.c + ' (' + azP(c.tot, 0) + ')').join(' and ') + '. Best: ' + M.clusters[0].c + ' (' + azP(M.clusters[0].tot, 0) + ').', () => azJump('az-hm'), 'See the heatmap');
+    const open = M.actAvg.filter((a) => a.p < 0.999).sort((a, b) => a.p - b.p); if (open.length) { const a = open[0]; add(a.p < 0.3 ? 'bad' : 'warn', azP(a.p, 0), 'Bottleneck: ' + a.n + ' (' + a.g + ')', a.ns + ' of ' + M.V.length + ' villas have not started it; ' + a.done + (a.done === 1 ? ' is' : ' are') + ' done. Next: ' + open.slice(1, 3).map((x) => x.n + ' ' + azP(x.p, 0)).join(', ') + '.', () => azActModal(a.i), 'Villa by villa'); }
+    if (M.bl.length) { const w = M.bl[M.bl.length - 1], mepLag = M.bl.filter((b) => b.mep < b.fin - 0.1).length; add(M.bAvg < 0.5 ? 'bad' : 'warn', azP(M.bAvg, 0), 'Buildings average, far behind the villas', 'Villas are at ' + azP(M.vAvg, 0) + '. Lowest: ' + w.name + ' (' + azP(w.tot, 0) + '). MEP trails finishes by 10+ points in ' + mepLag + ' of ' + M.bl.length + ' buildings.', () => azJump('az-bl'), 'See the buildings'); }
+    if (M.trades.length) { const r = [...M.trades].sort((a, b) => b.rem - a.rem), tot = r.reduce((s, t) => s + t.rem, 0), t3 = r.slice(0, 3); add('info', azP(t3.reduce((s, t) => s + t.rem, 0) / tot, 0), 'Of the remaining man-hours sit in three trades', t3.map((t) => t.n + ' (' + azK(t.rem) + ')').join(', ') + '. Total remaining: ' + azN(tot) + ' man-hours.', () => azJump('az-tm'), 'See the treemap'); }
+    if (M.D.mp && M.D.mp.mh && M.lastW > 0) { const spent = M.D.mp.mh * 6, r = M.lastW / spent; add(r < 0.5 ? 'warn' : 'info', azP(r, 0), 'Earned against spent man-hours (indicative)', 'About ' + azN(spent) + ' man-hours are spent in a 6-day week at the reported ' + azN(M.D.mp.total) + ' people (report ' + M.D.mp.report + '); P6 earned ' + azN(M.lastW) + ' last week. One day\'s attendance is used for the whole week, so read it as a signal only.', () => azJump('az-mp'), 'See the workforce'); }
+    if (M.ipa && M.P) { const ec = M.P.total.ec / M.P.total.bc; add('info', azP(M.ipa.p, 1), 'Certified in IPA ' + M.ipa.ref.replace(/ REV.*/, ''), 'P6 earned cost stands at ' + azP(ec, 1) + ' and earned man-hours at ' + azP(M.pct, 1) + '. They are different measures, so the difference is a gap to reconcile, not an error.', () => { show('boq'); }, 'Open BOQ & payment'); }
+    const n90 = M.V.filter((v) => v.tot >= 0.9).length, full = M.actAvg.filter((a) => a.p >= 0.999).length;
+    add('good', String(n90), 'Villas at 90% or more', full + ' of ' + M.actAvg.length + ' villa activities are complete in every villa. ' + M.clusters.filter((c) => c.tot >= 0.9).map((c) => c.c).join(' and ') + (M.clusters.some((c) => c.tot >= 0.9) ? ' are above 90% as clusters.' : ''), () => azJump('az-vl'), 'See the villas');
+    const rank = { bad: 0, warn: 1, info: 2, good: 3 }; return out.sort((a, b) => rank[a.sev] - rank[b.sev]);
+  }
+  function azRender() {
+    const M = AZ.M, D = M.D, root = $('az-in'); root.replaceChildren(); azTipHide();
+    // hero
+    const hero = el('section', 'az-hero'), eb = el('div', 'az-eb'); eb.append(el('i'), 'Live analysis · site status ' + D.status + ' · P6 ' + azFd(M.L.t));
+    const pl = M.planAt(M.L.t), lead = el('p', 'az-lead');
+    lead.innerHTML = 'The project has earned <b>' + azP(M.pct, 2) + '</b> of its ' + azN(M.B) + ' man-hours' + (pl != null ? ', against <b>' + azP(pl, 1) + '</b> planned' : '') + '. Villas stand at <b>' + azP(M.vAvg, 0) + '</b>, buildings at <b>' + azP(M.bAvg, 0) + '</b>' + (M.avg4 > 0 ? ', and the recent pace points to a finish around <b>' + azFd(M.finish(M.avg4)) + '</b>' : '') + '.';
+    hero.append(eb, el('h1', 'az-title', 'SBARC Analyser'), lead);
+    const rings = el('div', 'az-rings'), C = 2 * Math.PI * 42;
+    const ring = (label, p, sub, col, go) => { const b = el('button', 'az-ring'); b.type = 'button'; const s = sv('svg', { viewBox: '0 0 104 104', 'aria-hidden': 'true' }), v = sv('circle', { class: 'vl', cx: 52, cy: 52, r: 42, stroke: col, 'stroke-dasharray': C, 'stroke-dashoffset': C }), tx = sv('text', { x: 52, y: 52 }); tx.textContent = azP(p, p < 0.995 && p * 100 % 1 ? 1 : 0); s.append(sv('circle', { class: 'tr', cx: 52, cy: 52, r: 42 }), v, tx); b.append(s, el('em', null, label), el('small', null, sub)); b.addEventListener('click', go); setTimeout(() => { v.setAttribute('stroke-dashoffset', C * (1 - Math.min(1, p))); }, 60); azCount(tx, 1300); return b; };
+    rings.append(ring('Man-hours earned', M.pct, azK(M.L.e) + ' of ' + azK(M.B), '#38BDF8', () => azJump('az-fc')));
+    if (M.cm) rings.append(ring('Accepted by PMC', M.cm.T.pmcp, azK(M.cm.gap) + ' MH gap', '#A78BFA', () => show('cmp')));
+    if (M.P) rings.append(ring('Earned cost (P6)', M.P.total.ec / M.P.total.bc, 'of contract value', '#F0ABFC', () => show('p6')));
+    if (M.ipa) rings.append(ring('Certified · IPA ' + M.ipa.ref.replace(/ REV.*/, ''), M.ipa.p, 'of contract value', '#FBBF24', () => show('boq')));
+    rings.append(ring('Villas', M.vAvg, 'fin ' + azP(M.vFin, 0) + ' · MEP ' + azP(M.vMep, 0), '#34D399', () => azJump('az-hm')), ring('Buildings', M.bAvg, M.bl.length + ' facilities', '#FB923C', () => azJump('az-bl')));
+    hero.append(rings); root.append(hero);
+    // nav
+    const nav = el('div', 'az-nav'); [['az-is', 'Insights'], ['az-fc', 'Forecast'], ['az-hm', 'Heatmap'], ['az-tm', 'Trades'], ['az-cp', 'MAK vs PMC'], ['az-vl', 'Villas'], ['az-bl', 'Buildings'], ['az-mp', 'Workforce']].forEach(([id, t]) => { const b = el('button', null, t); b.type = 'button'; b.addEventListener('click', () => azJump(id)); nav.append(b); }); root.append(nav);
+    const sec = (id, h, sub) => { const s = el('section', 'az-sec'); s.id = id; s.append(el('h2', 'az-h2', h)); if (sub) s.append(el('p', 'az-sub', sub)); root.append(s); return s; };
+    // insights
+    const is = sec('az-is', 'What the data says', 'Findings worked out from the figures on every build, most urgent first. Click one to see what is behind it.'), ig = el('div', 'az-ins');
+    azInsights().forEach((x, i) => { const c = el('button', 'az-in az-' + x.sev); c.type = 'button'; c.style.animationDelay = (i * 60) + 'ms'; const kb = el('b', null, x.k); c.append(el('span', 'tg', { bad: 'Act now', warn: 'Watch', info: 'Know', good: 'Good' }[x.sev]), kb, el('strong', null, x.t), el('p', null, x.d), el('span', 'azg', x.cta + ' →')); c.addEventListener('click', x.go); azCount(kb, 1000); ig.append(c); });
+    is.append(ig);
+    azForecast(sec('az-fc', 'Forecast and what-if', 'Earned man-hours to date, the ' + D.plan_name + ' plan and a projection you control. Move the slider or pick a pace.'));
+    azHeat(sec('az-hm', 'Villa heatmap', 'Average completion of each activity in each cluster. Click a cell for its villas, an activity name for the whole site, or a cluster for its villas.'));
+    if (M.trades.length) azTree(sec('az-tm', 'Where the remaining man-hours are', 'P6 trades sized by remaining man-hours and coloured by % complete. Click a block for its breakdown.'));
+    if (M.cm) azCmp(sec('az-cp', 'MAK vs PMC by trade', 'The ten trades with the largest gap. The purple dot is PMC, the blue dot is MAK; the bar between them is the gap.'));
+    const g2 = el('div', 'az-grid'); root.append(g2);
+    azVillas(g2); azBld(g2); azMp(g2); azMeasures(g2);
+  }
+  function azForecast(root) {
+    const M = AZ.M, card = el('div', 'az-card'); root.append(card);
+    const ctl = el('div', 'az-ctl'), rg = el('input'); rg.type = 'range'; const need = M.tg.map((t) => t.need).filter(isFinite);
+    rg.min = 5000; rg.max = Math.ceil(Math.max(250000, ...need.map((n) => n * 1.15)) / 5000) * 5000; rg.step = 500; rg.value = AZ.pace; rg.setAttribute('aria-label', 'Weekly pace in man-hours');
+    const presets = [['Last week', M.lastW], ['Recent average', M.avg4], ...M.tg.filter((t) => isFinite(t.need)).map((t) => ['Needed for ' + azP(t.p, t.p < 1 ? 1 : 0) + ' by ' + azFs(t.t), t.need])].filter((p) => p[1] > 0);
+    const chips = presets.map(([t, v]) => { const b = el('button', 'az-chip', t); b.type = 'button'; b.addEventListener('click', () => { AZ.pace = Math.round(v / 500) * 500; rg.value = AZ.pace; draw(); }); ctl.append(b); return [b, Math.round(v / 500) * 500]; });
+    ctl.append(rg); const holder = el('div'), out = el('div', 'az-out'), lg = el('div', 'az-lg');
+    [['#38BDF8', 'Actual (earned)'], ['#94A3B8', 'Plan · ' + M.D.plan_name], ['#F0ABFC', 'Forecast at the chosen pace'], ['#FBBF24', 'Plan milestones']].forEach(([c, t]) => { const s = el('span'); const i = el('i'); i.style.background = c; s.append(i, t); lg.append(s); });
+    card.append(el('h3', null, 'S-curve'), el('p', 'sb', 'Share of the ' + azN(M.B) + ' budgeted man-hours'), ctl, holder, lg, out);
+    const draw = () => {
+      const pace = AZ.pace, fin = M.finish(pace), W = 920, H = 340, m = { l: 44, r: 16, t: 14, b: 30 };
+      chips.forEach(([b, v]) => b.setAttribute('aria-pressed', String(v === pace)));
+      const x0 = M.h[0].t, x1 = Math.max(M.plan.length ? M.plan[M.plan.length - 1].t : 0, Math.min(fin, M.L.t + 60 * AZW), ...M.tg.map((t) => t.t)) + 2 * AZW, y0 = Math.floor(M.h[0].e / M.B * 20) / 20, y1 = 1.005;
+      const X = (t) => m.l + (t - x0) / (x1 - x0) * (W - m.l - m.r), Y = (p) => H - m.b - (p - y0) / (y1 - y0) * (H - m.t - m.b);
+      const s = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'S-curve: actual, plan and forecast' }), defs = sv('defs');
+      defs.innerHTML = '<linearGradient id="azg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#38BDF8" stop-opacity=".35"/><stop offset="1" stop-color="#38BDF8" stop-opacity="0"/></linearGradient><linearGradient id="azg2" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#A78BFA"/><stop offset="1" stop-color="#F0ABFC"/></linearGradient>'; s.append(defs);
+      for (let p = y0; p <= 1.0001; p += 0.05) { const y = Y(p); s.append(sv('line', { x1: m.l, x2: W - m.r, y1: y, y2: y, stroke: 'currentColor', 'stroke-opacity': p > 0.999 ? .5 : .12, 'stroke-dasharray': p > 0.999 ? '' : '3 4' })); const t = sv('text', { x: m.l - 6, y: y + 4, 'text-anchor': 'end' }); t.textContent = Math.round(p * 100) + '%'; s.append(t); }
+      const d0 = new Date(x0); let mt = Date.UTC(d0.getUTCFullYear(), d0.getUTCMonth() + 1, 1); while (mt < x1) { const x = X(mt); s.append(sv('line', { x1: x, x2: x, y1: m.t, y2: H - m.b, stroke: 'currentColor', 'stroke-opacity': .08 })); const t = sv('text', { x: x + 4, y: H - 10 }); t.textContent = new Date(mt).toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' }); s.append(t); const dd = new Date(mt); mt = Date.UTC(dd.getUTCFullYear(), dd.getUTCMonth() + 1, 1); }
+      const path = (pts) => pts.map((p, i) => (i ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1)).join('');
+      if (M.plan.length) s.append(sv('path', { d: path(M.plan.map((p) => [p.t, p.p])), fill: 'none', stroke: '#94A3B8', 'stroke-width': 2, 'stroke-dasharray': '6 5' }));
+      const act = M.h.map((p) => [p.t, p.e / M.B]);
+      s.append(sv('path', { d: path(act) + 'L' + X(M.L.t) + ' ' + Y(y0) + 'L' + X(x0) + ' ' + Y(y0) + 'Z', fill: 'url(#azg1)' }), sv('path', { d: path(act), fill: 'none', stroke: '#38BDF8', 'stroke-width': 3.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+      const fe = Math.min(fin, x1); s.append(sv('path', { d: path([[M.L.t, M.pct], [fe, M.pctAt(pace, fe)]]), fill: 'none', stroke: 'url(#azg2)', 'stroke-width': 3.5, 'stroke-dasharray': '2 7', 'stroke-linecap': 'round' }));
+      if (fin <= x1) { s.append(sv('circle', { cx: X(fin), cy: Y(1), r: 6, fill: '#F0ABFC' })); const t = sv('text', { x: X(fin), y: Y(1) - 11, 'text-anchor': X(fin) > W - 90 ? 'end' : 'middle', style: 'font-weight:700;fill:#F0ABFC' }); t.textContent = azFd(fin); s.append(t); }
+      M.tg.forEach((g) => { const x = X(g.t), y = Y(g.p); s.append(sv('path', { d: 'M' + x + ' ' + (y - 7) + 'l7 7l-7 7l-7-7Z', fill: '#FBBF24' })); const t = sv('text', { x: x + 10, y: y + 16, style: 'fill:#FBBF24' }); t.textContent = azP(g.p, g.p < 1 ? 1 : 0) + ' · ' + azFs(g.t); s.append(t); });
+      act.forEach((p) => s.append(sv('circle', { cx: X(p[0]), cy: Y(p[1]), r: 4.5, fill: '#0B1730', stroke: '#38BDF8', 'stroke-width': 2.5 })));
+      const guide = sv('line', { y1: m.t, y2: H - m.b, stroke: 'currentColor', 'stroke-opacity': .5, visibility: 'hidden' }); s.append(guide);
+      const hit = sv('rect', { x: m.l, y: m.t, width: W - m.l - m.r, height: H - m.t - m.b, fill: 'transparent' }); s.append(hit);
+      const actAt = (t) => { if (t > M.L.t || t < x0) return null; for (let i = 1; i < M.h.length; i++) if (t <= M.h[i].t) { const a = M.h[i - 1], b = M.h[i]; return (a.e + (b.e - a.e) * (t - a.t) / (b.t - a.t)) / M.B; } return M.pct; };
+      hit.addEventListener('pointermove', (e) => { const r = s.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * W, t = x0 + (px - m.l) / (W - m.l - m.r) * (x1 - x0); guide.setAttribute('x1', px); guide.setAttribute('x2', px); guide.setAttribute('visibility', 'visible'); const a = actAt(t), p = M.planAt(t); azTip(e, '<b>' + azFd(t) + '</b>' + (a != null ? '<br>Actual ' + azP(a, 2) : '<br>Forecast ' + azP(M.pctAt(pace, t), 2)) + (p != null ? '<br>Plan ' + azP(p, 2) : '')); });
+      hit.addEventListener('pointerleave', () => { guide.setAttribute('visibility', 'hidden'); azTipHide(); });
+      holder.replaceChildren(s);
+      out.replaceChildren(); const o = (a, b) => { const d = el('div'); d.append(el('span', null, a), el('b', null, b)); out.append(d); };
+      o('Chosen pace', azN(pace) + ' MH / week'); o('Projected finish', isFinite(fin) ? azFd(fin) : '—'); o('Weeks to go', isFinite(fin) ? ((fin - M.L.t) / AZW).toFixed(1) : '—');
+      M.tg.forEach((g) => { const p = M.pctAt(pace, g.t); o('On ' + azFs(g.t) + ' (target ' + azP(g.p, g.p < 1 ? 1 : 0) + ')', azP(p, 1) + (p + 0.0005 >= g.p ? ' ✓' : ' · short ' + azK((g.p - p) * M.B))); });
+      o('Against last week', M.lastW > 0 ? '×' + (pace / M.lastW).toFixed(2) : '—');
+    };
+    rg.addEventListener('input', () => { AZ.pace = +rg.value; draw(); }); draw();
+    card.append(el('p', 'az-mini', 'The forecast is a straight line at the chosen weekly pace from the last P6 update (' + azFd(M.L.t) + '). Milestones come from the recovery plan in Management Tracking.'));
+  }
+  function azVillaTable(md, vs, i) {
+    const t = el('table', 'pv-tbl bq-tbl'), hr = el('tr'); ['Villa', 'Cluster', ...(i != null ? ['This activity'] : []), 'Finishes', 'MEP', 'Total'].forEach((l, k) => hr.append(el('th', k > 1 ? 'n' : '', l))); const h = el('thead'); h.append(hr); const b = el('tbody');
+    vs.forEach((v) => { const r = el('tr'); r.append(td(v.code), td(v.c)); if (i != null) { const c = td(v.a[i] >= 100 ? 'Done' : v.a[i] > 0 ? v.a[i] + '%' : 'Not started', 'n'); c.style.color = v.a[i] >= 100 ? 'var(--ok)' : v.a[i] > 0 ? 'var(--warn)' : 'var(--nok)'; c.style.fontWeight = '700'; r.append(c); } r.append(td(azP(v.fin, 0), 'n'), td(azP(v.mep, 0), 'n'), td(azP(v.tot, 0), 'n')); b.append(r); });
+    t.append(h, b); const w = el('div', 'pv-tbl-w'); w.append(t); md.append(w);
+  }
+  function azActModal(i, cluster) {
+    const M = AZ.M, a = M.D.acts[i], vs = M.V.filter((v) => !cluster || v.c === cluster).sort((x, y) => x.a[i] - y.a[i] || x.code.localeCompare(y.code)), n = vs.length;
+    const md = ipModal(a[0] + (cluster ? ' · cluster ' + cluster : ' · all clusters'), a[1], [['Done', vs.filter((v) => v.a[i] >= 100).length + ' of ' + n], ['In progress', String(vs.filter((v) => v.a[i] > 0 && v.a[i] < 100).length)], ['Not started', String(vs.filter((v) => v.a[i] <= 0).length)], ['Average', azP(vs.reduce((s, v) => s + v.a[i], 0) / n / 100, 0)]]);
+    if (!cluster) { const box = el('div'); box.style.margin = '6px 0 12px'; M.clusters.forEach((c) => { const r = el('button', 'az-row'); r.type = 'button'; const tr = el('div', 'az-trk'), f = el('i'); f.style.cssText = 'left:0;width:' + (c.cells[i] * 100) + '%;background:' + azHue(c.cells[i]); tr.append(f); r.append(el('span', 'nm', c.c + ' · ' + c.n + ' villas'), tr, el('span', 'vl', azP(c.cells[i], 0))); r.addEventListener('click', () => azActModal(i, c.c)); box.append(r); }); md.append(box); }
+    azVillaTable(md, vs, i);
+  }
+  function azClusterModal(c) {
+    const md = ipModal('Cluster', c.c, [['Villas', String(c.n)], ['Total', azP(c.tot, 0)], ['Finishes', azP(c.fin, 0)], ['MEP', azP(c.mep, 0)], ['At 90%+', String(c.n90)]]);
+    const open = AZ.M.D.acts.map((a, i) => ({ a, i, p: c.cells[i] })).filter((x) => x.p < 0.999).sort((x, y) => x.p - y.p).slice(0, 6);
+    if (open.length) md.append(el('p', 'nv-note', 'Most open: ' + open.map((x) => x.a[1] + ' ' + azP(x.p, 0)).join(' · ')));
+    azVillaTable(md, c.v);
+  }
+  function azHeat(root) {
+    const M = AZ.M, acts = M.D.acts, card = el('div', 'az-card'), w = el('div', 'az-hm-w'), g = el('div', 'az-hm'); root.append(card); card.append(w); w.append(g);
+    g.style.gridTemplateColumns = '84px repeat(' + acts.length + ',minmax(24px,1fr)) 52px';
+    const groups = []; acts.forEach((a, i) => { const l = groups[groups.length - 1]; if (l && l.g === a[0]) l.n++; else groups.push({ g: a[0], n: 1, i }); });
+    g.append(el('div')); groups.forEach((x) => { const h = el('div', 'gh', x.g); h.style.gridColumn = 'span ' + x.n; h.title = x.g; g.append(h); }); g.append(el('div'));
+    g.append(el('div')); acts.forEach((a, i) => { const h = el('div', 'ch'), b = el('button', null, a[1]); b.type = 'button'; b.title = a[0] + ' · ' + a[1] + ': whole site'; b.addEventListener('click', () => azActModal(i)); h.append(b); g.append(h); }); g.append(el('div', 'gh', 'Total'));
+    M.clusters.forEach((c) => {
+      const rl = el('button', 'rl', c.c); rl.type = 'button'; rl.append(el('small', null, c.n + ' villas')); rl.addEventListener('click', () => azClusterModal(c)); g.append(rl);
+      c.cells.forEach((p, i) => { const b = el('button', 'az-cell', p >= 0.999 ? '✓' : String(Math.round(p * 100))); b.type = 'button'; b.style.background = azHue(p); b.setAttribute('aria-label', c.c + ', ' + acts[i][1] + ': ' + azP(p, 0)); b.addEventListener('click', () => azActModal(i, c.c)); b.addEventListener('pointermove', (e) => azTip(e, '<b>' + c.c + ' · ' + acts[i][1] + '</b><br>' + azP(p, 0) + ' average<br>' + c.v.filter((v) => v.a[i] >= 100).length + ' of ' + c.n + ' villas done')); b.addEventListener('pointerleave', azTipHide); g.append(b); });
+      const t = el('div', 'az-tot', azP(c.tot, 0)); t.style.color = azHue(c.tot); g.append(t);
+    });
+    g.append(el('div', 'rl', 'Site')); M.actAvg.forEach((a) => { const b = el('button', 'az-cell', a.p >= 0.999 ? '✓' : String(Math.round(a.p * 100))); b.type = 'button'; b.style.cssText = 'background:' + azHue(a.p) + ';height:22px;opacity:.9'; b.addEventListener('click', () => azActModal(a.i)); g.append(b); }); const t = el('div', 'az-tot', azP(M.vAvg, 0)); g.append(t);
+    const lg = el('div', 'az-lg'); [[0, 'Not started'], [0.35, ''], [0.7, ''], [1, 'Complete']].forEach(([p, tx]) => { const s = el('span'), i = el('i'); i.style.cssText = 'background:' + azHue(p) + ';height:10px'; s.append(i, tx); lg.append(s); }); card.append(lg);
+  }
+  function azSquarify(items, x, y, w, h, out) {  // items sorted desc with .v; simple squarified treemap
+    if (!items.length) return; const total = items.reduce((s, i) => s + i.v, 0); let row = [], rest = items.slice();
+    const worst = (r, side) => { const s = r.reduce((a, i) => a + i.v, 0), mx = Math.max(...r.map((i) => i.v)), mn = Math.min(...r.map((i) => i.v)), k = side * side / (w * h / total); return Math.max(k * mx / (s * s), s * s / (k * mn)); };
+    const side = Math.min(w, h);
+    while (rest.length) { const n = row.concat(rest[0]); if (!row.length || worst(n, side) <= worst(row, side)) { row = n; rest.shift(); } else break; }
+    const s = row.reduce((a, i) => a + i.v, 0), frac = s / total;
+    if (w >= h) { const cw = w * frac; let cy = y; row.forEach((i) => { const ch = h * i.v / s; out.push({ i, x, y: cy, w: cw, h: ch }); cy += ch; }); azSquarify(rest, x + cw, y, w - cw, h, out); }
+    else { const ch = h * frac; let cx = x; row.forEach((i) => { const cw = w * i.v / s; out.push({ i, x: cx, y, w: cw, h: ch }); cx += cw; }); azSquarify(rest, x, y + ch, w, h - ch, out); }
+  }
+  function azTradeModal(t) {
+    const md = ipModal('P6 trade', t.n, [['Complete', azP(t.eu / t.bu, 1)], ['Remaining', azN(t.rem) + ' MH'], ['Earned this week', azN(t.wk) + ' MH'], ['Budget', azN(t.bu) + ' MH']]);
+    const tb = el('table', 'pv-tbl bq-tbl'), hr = el('tr'); ['Area', 'Budget (MH)', 'Earned', '% complete', 'Remaining', 'This week'].forEach((l, k) => hr.append(el('th', k ? 'n' : '', l))); const h = el('thead'); h.append(hr); const b = el('tbody');
+    t.areas.forEach((a) => { const r = el('tr'); r.append(td(a.n), td(azN(a.bu), 'n'), td(azN(a.eu), 'n'), td(a.bu ? azP(a.eu / a.bu, 1) : '', 'n'), td(azN(a.rem), 'n'), td(azN(a.wk), 'n')); b.append(r); }); tb.append(h, b); const w = el('div', 'pv-tbl-w'); w.append(tb); md.append(w);
+    if (t.wk > 0) md.append(el('p', 'nv-note', 'At this week\'s rate of ' + azN(t.wk) + ' man-hours the trade needs ' + (t.rem / t.wk).toFixed(1) + ' more weeks.')); else if (t.rem > 0) md.append(el('p', 'nv-note', 'Nothing was earned on this trade in the last reporting week.'));
+    const act = el('div', 'ip-act'), bt = el('button', 'wk-btn', 'Open in P6 breakdown'); bt.type = 'button'; bt.addEventListener('click', () => { ipClose(); show('bk'); }); act.append(bt); md.append(act);
+  }
+  function azTree(root) {
+    const M = AZ.M, card = el('div', 'az-card'); root.append(card);
+    const items = M.trades.filter((t) => t.rem > 0).sort((a, b) => b.rem - a.rem).slice(0, 28).map((t) => ({ v: t.rem, t })), W = 920, H = 380, out = []; azSquarify(items, 0, 0, W, H, out);
+    const s = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, class: 'az-tm', role: 'img', 'aria-label': 'Treemap of remaining man-hours by trade' });
+    out.forEach((o) => { const t = o.i.t, p = t.eu / t.bu, g = sv('g'), r = sv('rect', { x: o.x, y: o.y, width: Math.max(0, o.w), height: Math.max(0, o.h), rx: 6, fill: azHue(p) }); g.append(r);
+      if (o.w > 70 && o.h > 34) { const a = sv('text', { x: o.x + 8, y: o.y + 18, style: 'font-size:' + (o.w > 160 ? 13 : 11) + 'px' }); const mx = Math.floor(o.w / (o.w > 160 ? 7.2 : 6.3)); a.textContent = t.n.length > mx ? t.n.slice(0, mx - 1) + '…' : t.n; const b = sv('text', { x: o.x + 8, y: o.y + 34, style: 'font-size:11px;font-weight:500;opacity:.9' }); b.textContent = azK(t.rem) + ' MH · ' + azP(p, 0); g.append(a, b); }
+      g.addEventListener('click', () => azTradeModal(t)); g.addEventListener('pointermove', (e) => azTip(e, '<b>' + t.n + '</b><br>Remaining ' + azN(t.rem) + ' MH<br>' + azP(p, 1) + ' complete<br>This week +' + azN(t.wk) + ' MH')); g.addEventListener('pointerleave', azTipHide); s.append(g); });
+    card.append(s); const tot = M.trades.reduce((a, t) => a + t.rem, 0); card.append(el('p', 'az-mini', azN(tot) + ' man-hours remain in total; the ' + items.length + ' largest trades are shown. Red is early, green is nearly complete.'));
+  }
+  function azCmp(root) {
+    const M = AZ.M, card = el('div', 'az-card'); root.append(card); const top = M.cm.trades.filter((t) => t.bud > 0).slice(0, 10);
+    top.forEach((t) => { const mp = t.me / t.bud, pp = t.pe / t.bud, r = el('button', 'az-row'); r.type = 'button'; r.style.gridTemplateColumns = 'minmax(110px,230px) 1fr 96px';
+      const tr = el('div', 'az-trk'), f = el('i'), a = el('u'), b = el('u'); f.style.cssText = 'left:' + pp * 100 + '%;width:' + Math.max(0, mp - pp) * 100 + '%;background:linear-gradient(90deg,#A78BFA,#38BDF8)'; a.style.cssText = 'left:' + pp * 100 + '%;background:#A78BFA'; b.style.cssText = 'left:' + mp * 100 + '%;background:#38BDF8'; tr.append(f, a, b);
+      r.append(el('span', 'nm', t.n), tr, el('span', 'vl', '+' + azN(t.d) + ' MH')); r.title = t.n + ': MAK ' + azP(mp, 1) + ', PMC ' + azP(pp, 1); r.addEventListener('click', () => { show('cmp'); cmGo({ trade: t.n }); }); card.append(r); });
+    const lg = el('div', 'az-lg'); [['#A78BFA', 'PMC'], ['#38BDF8', 'MAK']].forEach(([c, t]) => { const s = el('span'), i = el('i'); i.style.cssText = 'background:' + c + ';width:10px;height:10px;border-radius:50%'; s.append(i, t); lg.append(s); }); card.append(lg);
+    card.append(el('p', 'az-mini', 'Total gap ' + azN(M.cm.gap) + ' man-hours in ' + azN(M.cm.diff) + ' activities. Click a trade to open its activities in the MAK vs PMC tab.'));
+  }
+  function azVillas(root) {
+    const M = AZ.M, card = el('div', 'az-card'); card.id = 'az-vl'; card.classList.add('az-sec'); root.append(card);
+    card.append(el('h3', null, 'Villas by progress'), el('p', 'sb', M.V.length + ' villas · click a column for the list'));
+    const bins = [['Below 60%', 0, 0.6], ['60–70%', 0.6, 0.7], ['70–80%', 0.7, 0.8], ['80–90%', 0.8, 0.9], ['90%+', 0.9, 2]].map(([l, a, b]) => ({ l, vs: M.V.filter((v) => v.tot >= a && v.tot < b).sort((x, y) => x.tot - y.tot), mid: Math.min(1, (a + Math.min(b, 1)) / 2 + 0.05) })), mx = Math.max(1, ...bins.map((b) => b.vs.length));
+    const cols = el('div', 'az-cols'); bins.forEach((b) => { const c = el('button', 'az-col'); c.type = 'button'; const bar = el('i'); bar.style.cssText = 'height:0;background:linear-gradient(180deg,' + azHue(b.mid) + ',color-mix(in srgb,' + azHue(b.mid) + ' 55%,transparent))'; const nb = el('b', null, String(b.vs.length)); c.append(nb, bar, el('span', null, b.l)); c.addEventListener('click', () => { const md = ipModal('Villas', b.l, [['Villas', String(b.vs.length)], ['Share', azP(b.vs.length / M.V.length, 0)]]); azVillaTable(md, b.vs); }); setTimeout(() => { bar.style.height = Math.max(2, b.vs.length / mx * 100) + '%'; }, 80); bar.style.flex = '0 0 auto'; cols.append(c); }); card.append(cols);
+    const lowest = [...M.V].sort((a, b) => a.tot - b.tot).slice(0, 5); card.append(el('p', 'az-mini', 'Lowest: ' + lowest.map((v) => v.code + ' ' + azP(v.tot, 0)).join(' · ')));
+  }
+  function azBld(root) {
+    const M = AZ.M, card = el('div', 'az-card'); card.id = 'az-bl'; card.classList.add('az-sec'); root.append(card);
+    card.append(el('h3', null, 'Buildings'), el('p', 'sb', 'Total progress; the tick marks are finishes (green) and MEP (blue)'));
+    M.bl.forEach((b) => { const r = el('button', 'az-row'); r.type = 'button'; const tr = el('div', 'az-trk'), f = el('i'), a = el('u'), c = el('u'); f.style.cssText = 'left:0;width:0;background:' + azHue(b.tot); a.style.cssText = 'left:' + b.fin * 100 + '%;background:#34D399;width:6px;height:16px;border-radius:3px;margin-left:-3px;border:0'; c.style.cssText = 'left:' + b.mep * 100 + '%;background:#38BDF8;width:6px;height:16px;border-radius:3px;margin-left:-3px;border:0'; tr.append(f, a, c); setTimeout(() => { f.style.width = b.tot * 100 + '%'; }, 80);
+      r.append(el('span', 'nm', b.name), tr, el('span', 'vl', azP(b.tot, 0))); r.title = b.name; r.addEventListener('click', () => { const md = ipModal('Building ' + b.code, b.name, [['Total', azP(b.tot, 0)], ['Finishes', azP(b.fin, 0)], ['MEP', azP(b.mep, 0)], ['Not started', b.ns + ' activities'], ['In progress', b.ip + ' activities']]); md.append(el('p', 'nv-note', b.mep < b.fin - 0.1 ? 'MEP trails finishes by ' + Math.round((b.fin - b.mep) * 100) + ' points here.' : b.fin < b.mep - 0.1 ? 'Finishes trail MEP by ' + Math.round((b.mep - b.fin) * 100) + ' points here.' : 'Finishes and MEP are moving together.')); const act = el('div', 'ip-act'), bt = el('button', 'wk-btn', 'Open Executive Summary'); bt.type = 'button'; bt.addEventListener('click', () => { ipClose(); show('exec'); }); act.append(bt); md.append(act); }); card.append(r); });
+  }
+  function azMp(root) {
+    const M = AZ.M, mp = M.D.mp, card = el('div', 'az-card'); card.id = 'az-mp'; card.classList.add('az-sec'); root.append(card); if (!mp || !mp.disc) return;
+    card.append(el('h3', null, 'Workforce today'), el('p', 'sb', azN(mp.total) + ' on site · ' + azN(mp.direct) + ' direct · ' + azN(mp.mh) + ' man-hours · report ' + mp.report + ' (' + mp.date + ')'));
+    const mx = Math.max(1, ...mp.disc.map((d) => d[1])), C = ['#34D399', '#38BDF8', '#FBBF24'];
+    [...mp.disc].sort((a, b) => b[1] - a[1]).forEach((d) => { const r = el('div', 'az-row'); r.style.cursor = 'default'; const tr = el('div', 'az-trk'); let x = 0; [d[2], d[3], d[4]].forEach((v, k) => { if (!v) return; const f = el('i'); f.style.cssText = 'left:' + x / mx * 100 + '%;width:' + v / mx * 100 + '%;background:' + C[k] + ';border-radius:' + (x ? 0 : 5) + 'px ' + 5 + 'px ' + 5 + 'px ' + (x ? 0 : 5) + 'px'; tr.append(f); x += v; }); r.append(el('span', 'nm', d[0]), tr, el('span', 'vl', azN(d[1]))); r.title = d[0] + ': villas ' + d[2] + ', buildings ' + d[3] + ', site ' + d[4]; card.append(r); });
+    const lg = el('div', 'az-lg'); [['Villas', C[0]], ['Buildings', C[1]], ['Site / infra', C[2]]].forEach(([t, c]) => { const s = el('span'), i = el('i'); i.style.cssText = 'background:' + c + ';height:8px'; s.append(i, t); lg.append(s); }); card.append(lg);
+  }
+  function azMeasures(root) {
+    const M = AZ.M, card = el('div', 'az-card'); root.append(card);
+    card.append(el('h3', null, 'Six ways to read progress'), el('p', 'sb', 'Each measure counts something different. Side by side they show where the story agrees and where it does not.'));
+    const rows = [['Villas · site tracker', M.vAvg, '#34D399', () => azJump('az-hm')], ['Man-hours earned · P6 (MAK)', M.pct, '#38BDF8', () => show('p6')]];
+    if (M.cm) rows.push(['Man-hours accepted · PMC', M.cm.T.pmcp, '#A78BFA', () => show('cmp')]);
+    if (M.P) rows.push(['Earned cost · P6', M.P.total.ec / M.P.total.bc, '#F0ABFC', () => show('p6')]);
+    if (M.ipa) rows.push(['Certified · IPA ' + M.ipa.ref.replace(/ REV.*/, ''), M.ipa.p, '#FBBF24', () => show('boq')]);
+    rows.push(['Buildings · site tracker', M.bAvg, '#FB923C', () => azJump('az-bl')]);
+    rows.sort((a, b) => b[1] - a[1]).forEach(([n, p, c, go]) => { const r = el('button', 'az-row'); r.type = 'button'; r.style.gridTemplateColumns = 'minmax(120px,220px) 1fr 64px'; const tr = el('div', 'az-trk'), f = el('i'); f.style.cssText = 'left:0;width:0;background:' + c; tr.append(f); setTimeout(() => { f.style.width = p * 100 + '%'; }, 80); const v = el('span', 'vl', azP(p, 1)); r.append(el('span', 'nm', n), tr, v); r.title = n; r.addEventListener('click', go); card.append(r); });
+    card.append(el('p', 'az-mini', 'Spread between the highest and lowest measure: ' + ((Math.max(...rows.map((r) => r[1])) - Math.min(...rows.map((r) => r[1]))) * 100).toFixed(1) + ' points.'));
+  }
+  function azSheets() {
+    if (!AZ) { if (!session.an) return []; const M = azModel(); AZ = { M, pace: Math.round(M.avg4 / 500) * 500 }; } const M = AZ.M;
+    const ins = [['Priority', 'Figure', 'Finding', 'Detail'], ...azInsights().map((x) => [{ bad: 'Act now', warn: 'Watch', info: 'Know', good: 'Good' }[x.sev], x.k, x.t, x.d])];
+    const fc = [['Date', 'Actual %', 'Plan %', 'Forecast % at ' + azN(AZ.pace) + ' MH/week']]; M.h.forEach((p) => fc.push([azFd(p.t), Math.round(p.e / M.B * 10000) / 100, M.planAt(p.t) != null ? Math.round(M.planAt(p.t) * 10000) / 100 : '', '']));
+    for (let t = M.L.t + AZW, k = 0; k < 40 && M.pctAt(AZ.pace, t - AZW) < 1; t += AZW, k++) fc.push([azFd(t), '', M.planAt(t) != null ? Math.round(M.planAt(t) * 10000) / 100 : '', Math.round(M.pctAt(AZ.pace, t) * 10000) / 100]);
+    const hm = [['Cluster', 'Villas', ...M.D.acts.map((a) => a[0] + ' · ' + a[1]), 'Total %']]; M.clusters.forEach((c) => hm.push([c.c, c.n, ...c.cells.map((p) => Math.round(p * 100)), Math.round(c.tot * 1000) / 10]));
+    const tr = [['Trade', 'Budget (MH)', 'Earned (MH)', '% complete', 'Remaining (MH)', 'This week (MH)']]; [...M.trades].sort((a, b) => b.rem - a.rem).forEach((t) => tr.push([t.n, t.bu, t.eu, Math.round(t.eu / t.bu * 1000) / 10, t.rem, t.wk]));
+    return [{ name: 'Insights', rows: ins }, { name: 'Forecast', rows: fc }, { name: 'Villa heatmap', rows: hm }, { name: 'Trades', rows: tr }];
+  }
   // ----- MAK vs PMC: earned labour units, activity by activity (session.cmp, from tools/cmp_import.py) -----
   let CM = null;
   function cmReset() { CM = null; $('cm').hidden = true; $('cm-in').replaceChildren(); }

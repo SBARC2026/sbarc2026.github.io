@@ -151,6 +151,33 @@ def cmp_data():
     subprocess.run(['node', os.path.join(B, 'decrypt.js'), CMP_FILE, os.environ['SBARC_PASSWORD'], tmp], check=True)
     out = json.loads(rd(tmp)); os.remove(tmp); return out
 
+def an_data(p6, status):
+    """Cross-source figures for the Analyser tab: earned history, plan curve, villas (per activity), clusters, buildings, manpower."""
+    try:
+        per = {}; acts = []; idx = {}
+        for r in blob_rows('exec', 'villa_activities'):
+            k = (r['group'], r['activity'])
+            if k not in idx: idx[k] = len(acts); acts.append(list(k))
+            per.setdefault(r['villa'], {})[idx[k]] = 100 if r['status'] == 'Done' else (r.get('pct') or 0) if r['status'] == 'In progress' else 0
+        villas = [[v['villa'], v['cluster'], round(v['finishes'], 4), round(v['mep'], 4), round(v['total'], 4), [per.get(v['villa'], {}).get(i, 0) for i in range(len(acts))]] for v in blob_rows('exec', 'villas')]
+        bld = [[x['code'], x['name'], x['finishes'], x['mep'], x['total'], sum(1 for a in x['acts'].split(';') if a.split('|')[2] == 'N'), sum(1 for a in x['acts'].split(';') if a.split('|')[2] == 'P')] for x in blob_rows('exec', 'buildings')]
+        mpr = blob_rows('exec', 'manpower'); kp = {r['name']: r['value'] for r in mpr if r['kind'] == 'kpi'}
+        meta = next((r for r in mpr if r['kind'] == 'meta'), {})
+        mp = {'total': kp.get('Total workforce'), 'direct': kp.get('Direct workforce'), 'mh': kp.get('Man-hours'), 'report': meta.get('value'), 'date': (meta.get('extra') or '').split(' ')[0],
+              'disc': [[r['name'], r['value'], r.get('villas', 0), r.get('buildings', 0), r.get('site', 0)] for r in mpr if r['kind'] == 'discipline']}
+        hist = {u['data_date']: u['earned'] for u in blob_rows('p02b', 'updates')}
+        wk = {}
+        for r in blob_rows('p02b', 'actuals') + (p6['actuals'] if p6 else []): wk.setdefault(r['week_end'], {})[r['activity']] = r['earned_to_date']
+        for w, m in wk.items(): hist[w] = round(sum(m.values()))
+        budget = p6['total']['bu'] if p6 else max(u['budget'] for u in blob_rows('p02b', 'updates'))
+        if p6: hist[p6['week_end']] = p6['total']['eu']
+        sc = blob_rows('p02b', 's_curve'); last = sorted({r['lookahead'] for r in sc}, key=lambda n: max(r['week'] for r in sc if r['lookahead'] == n))[-1]
+        plan = sorted([r['week'], r['cum_planned_pct']] for r in sc if r['lookahead'] == last)
+        return {'status': status, 'budget': budget, 'hist': sorted(hist.items()), 'plan': plan, 'plan_name': last, 'targets': [['2026-12-31', 0.937], ['2027-01-31', 1.0]],
+                'acts': acts, 'villas': villas, 'bld': bld, 'mp': mp}
+    except Exception as e:  # the Analyser is an extra: never block the build
+        print('WARNING: Analyser data not built:', e); return None
+
 def apply_p6(dash, data):
     """Management Tracking: the P6 export sets the earned value of its reporting week, unless the dashboard already holds a later week."""
     p6 = p6_data()
@@ -339,11 +366,14 @@ def build():
     if cmp_: tabs.append({'id': 'cmp', 'title': 'MAK vs PMC', 'native': True, 'pinned': True})
     nov = nov_data()
     if nov: tabs.append({'id': 'nov', 'title': 'November plan', 'native': True, 'pinned': True})
+    an = an_data(p6, status)
+    if an: tabs.insert(0, {'id': 'an', 'title': 'Analyser', 'native': True, 'pinned': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     if boq: payload['boq'] = boq
     if ipa: payload['ipa'] = ipa
     if nov: payload['nov'] = nov
     if cmp_: payload['cmp'] = cmp_
+    if an: payload['an'] = an
     if p6:
         payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
         g = os.path.join(B, 'p6', 'gantt.bin')  # P6 schedule (.xer), encrypted; fetched by the browser when the Gantt opens
