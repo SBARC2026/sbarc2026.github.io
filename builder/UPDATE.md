@@ -66,6 +66,8 @@ daily task re-downloads from there. Landscape rows and the building-only rows ar
 may carry a duplicate villa code (R1-03 twice, the second is R1-04); the tool keeps the dashboard's villa list and reports it.
 Hard-coded dates in the page (`files/index.html`: site-status chip, buildings note, footer) are edited with ArtifactData str_replace.
 
+When only the report PDF arrives (no workbook): `python3 builder/tools/dpr_pdf_import.py <report.pdf> --src builder/_data/exec/blobs --out <dir> --date DD-MM-YYYY` (villa cells, buildings page, workforce page; self-checks against the printed totals). Upload and edit the dashboard as above.
+
 ## BOQ tab (items and amounts)
 `SBARC_PASSWORD=... python3 builder/tools/boq_import.py <"SBARC Rules of Credit" artifact .html or boq.json>` rewrites `builder/boq/boq.bin`
 (encrypted with the portal password; the repo is public, so amounts are never committed readable). `build.py` adds the "BOQ items & amounts" tab
