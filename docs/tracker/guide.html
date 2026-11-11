@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Site Tracker sign-in guide</title><meta name="robots" content="noindex">
+<style>body{margin:0;background:#F6F4EE;color:#14304F;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}header{background:#14304F;color:#fff;padding:14px 16px;border-bottom:4px solid #C9A227}main{max-width:720px;margin:0 auto;padding:16px}.card{background:#FFFEFB;border:1px solid #DDD8CA;border-radius:14px;padding:16px;margin-bottom:14px}h1{font-size:18px;margin:0}h2{font-size:17px;margin:0 0 8px}li{margin:6px 0}code{background:#ECE8DC;padding:1px 5px;border-radius:5px}a{color:#2E6FB7}</style></head>
+<body><header><h1>SBARC Site Tracker · how to sign in</h1></header><main>
+<div class="card"><h2>1. Get on the team (once)</h2><ol><li>Make a free account at <a href="https://github.com/signup">github.com</a> if you don't have one.</li><li>Send your GitHub username to the project manager.</li><li>You will get an email invitation to <b>SBARC2026/sbarc-site-data</b>. Open it and press <b>Accept invitation</b>.</li></ol></div>
+<div class="card"><h2>2. Make your access key (once, about 1 minute)</h2><ol>
+<li>On GitHub open <a href="https://github.com/settings/personal-access-tokens/new">Settings → Developer settings → Fine-grained tokens → Generate new token</a>.</li>
+<li><b>Token name:</b> <code>SBARC tracker</code>. <b>Expiration:</b> the longest allowed (for example 1 year).</li>
+<li><b>Resource owner:</b> choose <b>SBARC2026</b>.</li>
+<li><b>Repository access:</b> <i>Only select repositories</i> → <b>sbarc-site-data</b>.</li>
+<li><b>Permissions → Repository permissions → Contents:</b> <b>Read and write</b>. Leave everything else as it is.</li>
+<li>Press <b>Generate token</b> and copy it (it starts with <code>github_pat_</code>). GitHub shows it only once.</li>
+<li>If GitHub says the token is <b>pending approval</b>, tell the project manager: they approve it once.</li></ol></div>
+<div class="card"><h2>3. Sign in and install</h2><ol><li>Open <a href="./">sbarc2026.github.io/tracker</a> on your phone, paste the key and press <b>Sign in</b>.</li>
+<li>Install it: on iPhone, Safari → Share → <b>Add to Home Screen</b>; on Android, Chrome menu → <b>Install app</b>.</li>
+<li>Keep the key private, like a password. If your phone is lost, delete the token on GitHub and make a new one.</li></ol></div>
+<div class="card"><h2>Every day</h2><ol><li>Pick the villa, building or external item.</li><li>Type today's <b>total % complete</b> for the activities that moved (not the daily increase).</li><li>Add manpower, blockers and a photo if you have them, then <b>Send report</b>. No signal? It saves on the phone and sends later.</li></ol></div>
+</main></body></html>

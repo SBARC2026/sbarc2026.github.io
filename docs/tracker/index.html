@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SBARC Site Tracker</title>
+<meta name="theme-color" content="#14304F">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="../icons/favicon-32.png">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<meta name="robots" content="noindex">
+<style>
+:root{--navy:#14304F;--gold:#C9A227;--gold-d:#8A6A12;--bg:#F6F4EE;--card:#FFFEFB;--line:#DDD8CA;--soft:#5A6577;--ok:#17694A;--bad:#A8440F;--blue:#2E6FB7}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--navy);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding-bottom:84px}
+header{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:12px;border-bottom:4px solid var(--gold)}
+header h1{font-size:18px;margin:0;flex:1;letter-spacing:.3px}header small{opacity:.75;font-size:13px}
+main{max-width:860px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 10px}h3{font-size:15px;margin:14px 0 6px;color:var(--soft);text-transform:uppercase;letter-spacing:1px}
+label{display:block;font-size:14px;color:var(--soft);margin:10px 0 4px}
+input,select,textarea,button{font:inherit;color:inherit}
+input[type=text],input[type=password],input[type=number],input[type=date],select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+textarea{min-height:84px;resize:vertical}
+button{border:0;border-radius:10px;padding:12px 16px;background:var(--navy);color:#fff;font-weight:600;cursor:pointer}
+button.sec{background:#E9E5D8;color:var(--navy)}button.warn{background:#F3E1D6;color:var(--bad)}button:disabled{opacity:.5}
+.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}.grow{flex:1}
+.seg{display:flex;background:#E9E5D8;border-radius:10px;padding:3px;gap:3px}.seg button{flex:1;background:transparent;color:var(--navy);padding:9px 6px;font-size:14px}.seg button.on{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.act{display:grid;grid-template-columns:1fr 64px 88px;gap:8px;align-items:center;padding:8px 0;border-top:1px solid #ECE8DC}
+.act .nm{font-size:15px}.act .was{font-size:13px;color:var(--soft);text-align:right}.act input{padding:8px;text-align:right}
+.act.changed .nm{font-weight:700}.act.changed input{border-color:var(--blue);background:#EEF4FB}
+.bar{height:8px;border-radius:4px;background:#E9ECF2;overflow:hidden}.bar i{display:block;height:8px;background:var(--blue)}
+.muted{color:var(--soft);font-size:14px}.ok{color:var(--ok)}.bad{color:var(--bad)}
+.pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:#E9E5D8;margin:2px 4px 2px 0}
+.pill.ok{background:#E3F1EA}.pill.bad{background:#F6E3D8}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav button{flex:1;background:transparent;color:var(--soft);padding:8px 4px;font-size:13px}nav button.on{color:var(--navy);font-weight:700;box-shadow:inset 0 3px 0 var(--gold)}
+.entry{border-top:1px solid #ECE8DC;padding:10px 0}.entry:first-child{border-top:0}
+.entry img{max-width:100%;border-radius:10px;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:6px 4px;border-top:1px solid #ECE8DC;text-align:left}th{color:var(--soft);font-weight:600}td.n,th.n{text-align:right}
+.toast{position:fixed;left:16px;right:16px;bottom:96px;background:var(--navy);color:#fff;padding:12px 14px;border-radius:10px;z-index:9;text-align:center}
+.chk{display:flex;flex-wrap:wrap;gap:6px}.chk label{display:flex;gap:6px;align-items:center;margin:0;padding:6px 10px;border:1px solid var(--line);border-radius:99px;background:#fff;color:var(--navy);font-size:14px}
+details summary{cursor:pointer;font-weight:600;padding:6px 0}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<header><h1>SBARC Site Tracker</h1><small id="who"></small></header>
+<main id="app"><div class="card">Loading…</div></main>
+<nav id="nav" class="hide"></nav>
+<script>
+'use strict';
+const REPO = 'SBARC2026/sbarc-site-data', API = 'https://api.github.com';
+const AREAS = { villa: 'villas', building: 'buildings', external: 'external' }, LABEL = { villa: 'Villas', building: 'Buildings', external: 'External' };
+const S = { tok: null, login: null, users: null, usersSha: null, master: null, cur: null, role: null, me: null, tab: null, f: { area: 'villa', id: '', vals: {} } };
+const $ = (s, r = document) => r.querySelector(s), esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const store = { get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }, set(k, v) { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} } };
+const b64e = (s) => btoa(unescape(encodeURIComponent(s))), b64d = (s) => decodeURIComponent(escape(atob(s.replace(/\n/g, ''))));
+function today() { const d = new Date(Date.now() + ((S.users?.timezone_offset_hours ?? 3) * 3600e3)); return d.toISOString().slice(0, 10); }
+function stamp() { const off = (S.users?.timezone_offset_hours ?? 3); const d = new Date(Date.now() + off * 3600e3); return d.toISOString().slice(0, 19) + '+0' + off + ':00'; }
+function toast(m, ms = 2600) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), ms); }
+
+async function gh(path, opt = {}) {
+  const r = await fetch(API + path, { ...opt, headers: { Authorization: 'Bearer ' + S.tok, Accept: 'application/vnd.github+json', ...(opt.headers || {}) } });
+  if (r.status === 404) return null;
+  if (!r.ok) { const e = new Error((await r.json().catch(() => ({}))).message || r.status); e.status = r.status; throw e; }
+  return r.status === 204 ? {} : r.json();
+}
+async function getJSON(p) { const r = await gh(`/repos/${REPO}/contents/${p}?t=${Date.now()}`); if (!r) return [null, null]; let txt = r.content ? b64d(r.content) : null;
+  if (txt == null) { const raw = await fetch(`${API}/repos/${REPO}/contents/${p}`, { headers: { Authorization: 'Bearer ' + S.tok, Accept: 'application/vnd.github.raw' } }); txt = await raw.text(); }
+  return [JSON.parse(txt), r.sha]; }
+async function put(p, b64, msg, sha) { return gh(`/repos/${REPO}/contents/${p}`, { method: 'PUT', body: JSON.stringify({ message: msg, content: b64, ...(sha ? { sha } : {}) }) }); }
+
+// ---------- sign in
+function signIn(msg) {
+  $('#nav').classList.add('hide'); $('#who').textContent = '';
+  $('#app').innerHTML = `<div class="card"><h2>Sign in</h2>
+  <p class="muted">Paste your SBARC access key (a GitHub personal access token). You only do this once on each phone. <a href="guide.html">How to get your key</a></p>
+  ${msg ? `<p class="bad">${esc(msg)}</p>` : ''}
+  <label>Access key</label><input id="tk" type="password" autocomplete="off" placeholder="github_pat_…">
+  <p><button id="go">Sign in</button></p></div>`;
+  $('#go').onclick = () => { const v = $('#tk').value.trim(); if (!v) return; S.tok = v; boot(true); };
+}
+
+async function boot(fresh) {
+  S.tok = S.tok || store.get('sbarc_tok');
+  if (!S.tok) return signIn();
+  $('#app').innerHTML = '<div class="card">Loading project…</div>';
+  try {
+    const u = await gh('/user'); if (!u) throw Object.assign(new Error('bad key'), { status: 401 });
+    S.login = u.login;
+    const [users, sha] = await getJSON('config/users.json');
+    if (!users) throw Object.assign(new Error('no access'), { status: 403 });
+    S.users = users; S.usersSha = sha;
+    [S.master] = await getJSON('config/master.json');
+    [S.cur] = await getJSON('state/current.json');
+  } catch (e) {
+    if (e.status === 401) { store.set('sbarc_tok', null); S.tok = null; return signIn('That key did not work. Check it and try again.'); }
+    if (e.status === 403 || e.status === 404) { store.set('sbarc_tok', null); S.tok = null; return signIn('Your GitHub account has no access to the SBARC tracker yet. Ask the project manager to add you.'); }
+    if (!navigator.onLine) { $('#app').innerHTML = '<div class="card">You are offline. Open the tracker again when you have signal.</div>'; return; }
+    return signIn('Could not load: ' + e.message);
+  }
+  store.set('sbarc_tok', S.tok);
+  S.me = (S.users.engineers || []).find((x) => x.login.toLowerCase() === S.login.toLowerCase()) || null;
+  S.role = (S.users.managers || []).map((x) => x.toLowerCase()).includes(S.login.toLowerCase()) ? 'manager' : (S.me ? 'engineer' : null);
+  if (!S.role) { signIn(`Signed in as ${S.login}, but this account is not on the SBARC team list yet. Ask the project manager to add “${S.login}”.`); store.set('sbarc_tok', null); S.tok = null; return; }
+  $('#who').textContent = (S.me?.name || S.login) + (S.role === 'manager' ? ' · manager' : '');
+  const tabs = S.role === 'manager' ? [['today', 'Today'], ['report', 'Report'], ['progress', 'Progress'], ['team', 'Team']] : [['report', 'Report'], ['mine', 'My day']];
+  $('#nav').innerHTML = tabs.map(([k, l]) => `<button data-t="${k}">${l}</button>`).join('') + '<button data-t="out">Sign out</button>';
+  $('#nav').classList.remove('hide');
+  $('#nav').onclick = (e) => { const t = e.target.closest('button')?.dataset.t; if (!t) return; if (t === 'out') { if (window.confirm('Sign out of the tracker on this phone?')) { store.set('sbarc_tok', null); location.reload(); } return; } go(t); };
+  go(S.tab || tabs[0][0]); flushQueue();
+}
+function go(t) { S.tab = t; document.querySelectorAll('#nav button').forEach((b) => b.classList.toggle('on', b.dataset.t === t)); ({ report: viewReport, mine: viewMine, today: viewToday, progress: viewProgress, team: viewTeam })[t](); window.scrollTo(0, 0); }
+
+// ---------- what each person may report on
+function allowed(area) {
+  const m = S.master, me = S.me, mgr = S.role === 'manager';
+  if (area === 'villa') { const cl = mgr || !me ? null : (me.villas || []); return m.villas.filter((v) => !cl || cl.includes('all') || cl.includes(v.cluster)); }
+  if (area === 'building') { const b = mgr || !me ? null : (me.buildings || []); return m.buildings.filter((x) => !b || b.includes('all') || b.includes(x.id)); }
+  return (mgr || me?.external) ? m.external : [];
+}
+function curVal(area, id, act) { const st = S.cur?.state?.[AREAS[area]]?.[id]; if (st && act in st) return st[act]; const x = S.master[AREAS[area]].find((i) => i.id === id); return x?.acts?.[act] ?? 0; }
+
+// ---------- report form
+function viewReport() {
+  const f = S.f, areas = Object.keys(AREAS).filter((a) => allowed(a).length);
+  if (!areas.includes(f.area)) f.area = areas[0];
+  if (!areas.length) { $('#app').innerHTML = '<div class="card">No areas are assigned to you yet. Ask the project manager.</div>'; return; }
+  const items = allowed(f.area);
+  if (!items.find((i) => i.id === f.id)) { f.id = items[0].id; f.vals = {}; }
+  const item = items.find((i) => i.id === f.id);
+  let opts;
+  if (f.area === 'villa') { const g = {}; items.forEach((v) => (g[v.cluster] = g[v.cluster] || []).push(v)); opts = Object.keys(g).sort((a, b) => +a.split('-')[1] - +b.split('-')[1]).map((c) => `<optgroup label="Cluster ${c}">${g[c].map((v) => `<option value="${v.id}" ${v.id === f.id ? 'selected' : ''}>${v.id}</option>`).join('')}</optgroup>`).join(''); }
+  else opts = items.map((i) => `<option value="${esc(i.id)}" ${i.id === f.id ? 'selected' : ''}>${esc(i.id)}${i.name ? ' · ' + esc(i.name) : ''}</option>`).join('');
+  const acts = Object.keys(item.acts);
+  const pend = JSON.parse(store.get('sbarc_queue') || '[]').length;
+  $('#app').innerHTML = `
+  ${pend ? `<div class="card bad">${pend} report(s) saved on this phone, waiting for signal. They send automatically.</div>` : ''}
+  <div class="card"><h2>Daily progress · ${today()}</h2>
+    <div class="seg" id="ar">${areas.map((a) => `<button data-a="${a}" class="${a === f.area ? 'on' : ''}">${LABEL[a]}</button>`).join('')}</div>
+    <label>${f.area === 'villa' ? 'Villa' : f.area === 'building' ? 'Building' : 'External item'}</label><select id="it">${opts}</select>
+    <h3>Activities · enter today’s total % complete</h3>
+    <div id="acts">${rows(acts.filter((a) => curVal(f.area, f.id, a) < 99.5 || f.vals[a] != null))}
+    ${(() => { const done = acts.filter((a) => curVal(f.area, f.id, a) >= 99.5 && f.vals[a] == null); return done.length ? `<details><summary class="muted">Completed activities (${done.length})</summary>${rows(done)}</details>` : ''; })()}</div>
+  </div>
+  <div class="card"><details ${f.mpOpen ? 'open' : ''} id="mpd"><summary>Manpower today (optional)</summary>
+    ${S.master.disciplines.map((d) => `<div class="act"><div class="nm">${esc(d)}</div><div></div><input type="number" inputmode="numeric" min="0" data-d="${esc(d)}" value="${f.mp?.[d] ?? ''}"></div>`).join('')}
+  </details>
+  <label>Blockers or issues</label><textarea id="blk" placeholder="Material, access, drawings, inspections…">${esc(f.blk || '')}</textarea>
+  <label>Photo (optional)</label><input id="ph" type="file" accept="image/*" capture="environment">
+  <p class="row"><button id="send">Send report</button></p>
+  <p class="muted">Only activities you change are sent. You can send several reports a day, one per ${f.area === 'villa' ? 'villa' : 'item'}.</p></div>`;
+  $('#ar').onclick = (e) => { const a = e.target.dataset.a; if (a && a !== f.area) { keep(); f.area = a; f.id = ''; f.vals = {}; viewReport(); } };
+  $('#it').onchange = (e) => { keep(); if (Object.keys(f.vals).length && !window.confirm('Discard the % you typed for ' + f.id + '?')) { e.target.value = f.id; return; } f.id = e.target.value; f.vals = {}; viewReport(); };
+  $('#acts').oninput = (e) => { const row = e.target.closest('.act'); const k = row.dataset.k, v = e.target.value; if (v === '') delete f.vals[k]; else f.vals[k] = Math.max(0, Math.min(100, +v)); row.classList.toggle('changed', v !== ''); row.querySelector('i').style.width = Math.min(100, v === '' ? curVal(f.area, f.id, k) : +v) + '%'; };
+  $('#send').onclick = send;
+}
+function rows(list) { const f = S.f; return list.map((a) => { const was = curVal(f.area, f.id, a), v = f.vals[a]; return `<div class="act ${v != null ? 'changed' : ''}" data-k="${esc(a)}">
+      <div><div class="nm">${esc(a)}</div><div class="bar"><i style="width:${Math.min(100, v ?? was)}%"></i></div></div>
+      <div class="was">was ${Math.round(was)}%</div><input type="number" inputmode="numeric" min="0" max="100" step="1" value="${v ?? ''}" placeholder="${Math.round(was)}"></div>`; }).join(''); }
+function keep() { const f = S.f; f.blk = $('#blk')?.value; f.mpOpen = $('#mpd')?.open; f.mp = {}; document.querySelectorAll('[data-d]').forEach((i) => { if (i.value !== '') f.mp[i.dataset.d] = +i.value; }); }
+async function shrink(file) {
+  const img = await createImageBitmap(file); const k = Math.min(1, 1400 / Math.max(img.width, img.height));
+  const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+  return c.toDataURL('image/jpeg', 0.72).split(',')[1];
+}
+async function send() {
+  keep(); const f = S.f;
+  if (!Object.keys(f.vals).length && !(f.blk || '').trim() && !Object.keys(f.mp).length) return toast('Nothing to send yet: enter a %, manpower or a blocker.');
+  const down = Object.entries(f.vals).filter(([k, v]) => v < curVal(f.area, f.id, k) - 0.5);
+  if (down.length && !window.confirm(`These go DOWN from the last value: ${down.map(([k]) => k).join(', ')}. Send anyway?`)) return;
+  $('#send').disabled = true;
+  const t = stamp(), d = today(), base = `${d}/${S.login}-${t.slice(11, 19).replace(/:/g, '')}`;
+  const entry = { date: d, time: t, by: S.login, area: f.area, id: f.id, updates: f.vals, manpower: f.mp, blockers: (f.blk || '').trim(), photo: null };
+  let photo = null; const file = $('#ph').files[0];
+  if (file) { try { photo = await shrink(file); entry.photo = `photos/${base}.jpg`; } catch (e) { toast('Photo could not be read; sending without it.'); } }
+  const job = { entry, photo, path: `entries/${base}.json` };
+  try { await deliver(job); toast('Report sent ✓'); applyLocal(entry); }
+  catch (e) { const q = JSON.parse(store.get('sbarc_queue') || '[]'); q.push(job); try { store.set('sbarc_queue', JSON.stringify(q)); toast('No signal: saved on this phone, it will send automatically.', 3500); } catch (x) { toast('Could not send or save: ' + e.message, 4000); $('#send').disabled = false; return; } }
+  S.f = { area: f.area, id: f.id, vals: {} }; viewReport();
+}
+async function deliver(job) {
+  if (job.photo) await put(job.entry.photo, job.photo, `Photo ${job.entry.area} ${job.entry.id}`);
+  await put(job.path, b64e(JSON.stringify(job.entry, null, 1)), `Report ${job.entry.area} ${job.entry.id} by ${job.entry.by}`);
+}
+function applyLocal(e) { S.cur = S.cur || { state: {} }; const k = AREAS[e.area]; S.cur.state[k] = S.cur.state[k] || {}; S.cur.state[k][e.id] = { ...(S.cur.state[k][e.id] || S.master[k].find((i) => i.id === e.id).acts), ...e.updates }; }
+async function flushQueue() {
+  let q = JSON.parse(store.get('sbarc_queue') || '[]'); if (!q.length || !navigator.onLine) return;
+  const left = []; for (const j of q) { try { await deliver(j); applyLocal(j.entry); } catch (e) { left.push(j); } }
+  store.set('sbarc_queue', left.length ? JSON.stringify(left) : null); if (q.length > left.length) toast(`${q.length - left.length} saved report(s) sent ✓`);
+}
+window.addEventListener('online', flushQueue);
+
+// ---------- entries of a day
+async function dayEntries(d) {
+  const list = await gh(`/repos/${REPO}/contents/entries/${d}?t=${Date.now()}`); if (!list) return [];
+  const files = list.filter((x) => x.name.endsWith('.json'));
+  const out = await Promise.all(files.map(async (x) => { try { const [e] = await getJSON(x.path); e._file = x.path; return e; } catch (err) { return null; } }));
+  return out.filter(Boolean).sort((a, b) => a.time < b.time ? 1 : -1);
+}
+async function photoURL(p) { const r = await fetch(`${API}/repos/${REPO}/contents/${p}`, { headers: { Authorization: 'Bearer ' + S.tok, Accept: 'application/vnd.github.raw' } }); return r.ok ? URL.createObjectURL(await r.blob()) : null; }
+function entryHTML(e, mgr, rejected) {
+  const name = (S.users.engineers || []).find((x) => x.login === e.by)?.name || e.by;
+  const ups = Object.entries(e.updates || {}).map(([k, v]) => `<span class="pill">${esc(k)} → <b>${Math.round(v)}%</b></span>`).join('');
+  const mp = Object.entries(e.manpower || {}); const mpt = mp.reduce((s, [, n]) => s + (+n || 0), 0);
+  return `<div class="entry" data-f="${esc(e._file)}"><div class="row"><b class="grow">${LABEL[e.area].replace(/s$/, '')} ${esc(e.id)}</b><span class="muted">${esc(e.time.slice(11, 16))} · ${esc(name)}</span></div>
+   ${rejected ? '<span class="pill bad">Rejected: not counted</span>' : ''}<div>${ups}</div>
+   ${mpt ? `<div class="muted">Manpower ${mpt}: ${mp.map(([d, n]) => esc(d) + ' ' + n).join(', ')}</div>` : ''}
+   ${e.blockers ? `<div class="bad">⚠ ${esc(e.blockers)}</div>` : ''}
+   ${e.photo ? `<div class="ph" data-p="${esc(e.photo)}"><button class="sec">Show photo</button></div>` : ''}
+   ${mgr ? `<p><button class="${rejected ? 'sec' : 'warn'}" data-rej="${esc(e._file)}">${rejected ? 'Count it again' : 'Reject (do not count)'}</button></p>` : ''}</div>`;
+}
+function wirePhotos(root) { root.onclick = async (ev) => { const b = ev.target.closest('.ph button'); if (b) { const box = b.parentNode; b.textContent = 'Loading…'; const u = await photoURL(box.dataset.p); box.innerHTML = u ? `<img src="${u}" alt="Site photo">` : 'Photo not found'; return; } const r = ev.target.closest('[data-rej]'); if (r) toggleReject(r.dataset.rej); }; }
+
+async function viewMine() {
+  $('#app').innerHTML = '<div class="card">Loading…</div>';
+  const es = (await dayEntries(today())).filter((e) => e.by === S.login);
+  $('#app').innerHTML = `<div class="card"><h2>My reports today · ${today()}</h2>${es.length ? es.map((e) => entryHTML(e)).join('') : '<p class="muted">Nothing sent yet today.</p>'}</div>`;
+  wirePhotos($('#app'));
+}
+
+async function viewToday(d) {
+  d = d || S.day || today(); S.day = d;
+  $('#app').innerHTML = '<div class="card">Loading…</div>';
+  const [es, [apv]] = await Promise.all([dayEntries(d), getJSON('state/approvals.json')]);
+  S.apv = apv || { rejected: [] }; const rej = new Set(S.apv.rejected);
+  const eng = S.users.engineers || [], sent = new Set(es.map((e) => e.by));
+  const miss = eng.filter((x) => !sent.has(x.login)), blk = es.filter((e) => e.blockers);
+  const mp = es.reduce((s, e) => s + Object.values(e.manpower || {}).reduce((a, n) => a + (+n || 0), 0), 0);
+  $('#app').innerHTML = `<div class="card"><div class="row"><h2 class="grow" style="margin:0">Site day</h2><input type="date" id="dd" value="${d}" style="max-width:180px"></div>
+    <p><span class="pill">${es.length} reports</span><span class="pill ${miss.length ? 'bad' : 'ok'}">${sent.size} of ${eng.length} engineers reported</span><span class="pill">${mp} manpower</span><span class="pill ${blk.length ? 'bad' : 'ok'}">${blk.length} blockers</span></p>
+    ${miss.length ? `<p class="bad"><b>Not reported:</b> ${miss.map((x) => esc(x.name || x.login)).join(', ')}</p>` : (eng.length ? '<p class="ok">Everyone has reported.</p>' : '<p class="muted">No engineers on the team yet. Add them in Team.</p>')}
+    <p class="muted">The full daily report is posted to GitHub at 6 pm and arrives as a notification.</p></div>
+    <div class="card"><h2>Reports</h2><div id="el">${es.length ? es.map((e) => entryHTML(e, true, rej.has(e._file))).join('') : '<p class="muted">No reports for this day.</p>'}</div></div>`;
+  $('#dd').onchange = (e) => viewToday(e.target.value);
+  wirePhotos($('#el'));
+}
+async function toggleReject(file) {
+  const [apv, sha] = await getJSON('state/approvals.json'); const a = apv || { rejected: [] };
+  const i = a.rejected.indexOf(file); i >= 0 ? a.rejected.splice(i, 1) : a.rejected.push(file);
+  try { await put('state/approvals.json', b64e(JSON.stringify(a, null, 1)), (i >= 0 ? 'Count again ' : 'Reject ') + file, sha); toast(i >= 0 ? 'Counted again' : 'Rejected: it will not count'); viewToday(); }
+  catch (e) { toast('Could not save: ' + e.message); }
+}
+
+// ---------- progress overview (manager)
+function viewProgress() {
+  const area = S.parea || 'villa'; S.parea = area; const m = S.master, key = AREAS[area];
+  const avg = (o) => { const v = Object.values(o); return v.length ? v.reduce((s, x) => s + x, 0) / v.length : 0; };
+  const items = m[key].map((i) => ({ ...i, now: { ...i.acts, ...(S.cur?.state?.[key]?.[i.id] || {}) } }));
+  let body;
+  if (area === 'villa') {
+    const g = {}; items.forEach((v) => (g[v.cluster] = g[v.cluster] || []).push(v));
+    body = `<table><tr><th>Cluster</th><th class="n">Villas</th><th class="n">Average</th><th class="n">≥ 90%</th></tr>${m.clusters.map((c) => { const vs = g[c] || []; const a = vs.map((v) => avg(v.now)); return `<tr><td>${c}</td><td class="n">${vs.length}</td><td class="n">${(a.reduce((s, x) => s + x, 0) / (a.length || 1)).toFixed(0)}%</td><td class="n">${a.filter((x) => x >= 90).length}</td></tr>`; }).join('')}</table>
+    <h3>By activity, all villas</h3><table>${m.villa_activities.map((k) => { const a = items.map((v) => v.now[k] ?? 0); return `<tr><td>${esc(k)}</td><td class="n">${(a.reduce((s, x) => s + x, 0) / a.length).toFixed(0)}%</td></tr>`; }).join('')}</table>`;
+  } else body = `<table><tr><th>${area === 'building' ? 'Building' : 'Item'}</th><th class="n">Average</th></tr>${items.map((i) => `<tr><td>${esc(i.id)}${i.name ? ' · ' + esc(i.name) : ''}</td><td class="n">${avg(i.now).toFixed(0)}%</td></tr>`).join('')}</table>`;
+  $('#app').innerHTML = `<div class="card"><h2>Progress now</h2><div class="seg" id="pa">${Object.keys(AREAS).map((a) => `<button data-a="${a}" class="${a === area ? 'on' : ''}">${LABEL[a]}</button>`).join('')}</div>
+   <p class="muted">Baseline from the ${esc(m.source)}, updated by ${S.cur?.entries || 0} reports${S.cur?.updated ? ' (last ' + esc(S.cur.updated.slice(0, 16).replace('T', ' ')) + ')' : ''}. Plain averages of activity %, not weighted by man-hours.</p>${body}</div>`;
+  $('#pa').onclick = (e) => { if (e.target.dataset.a) { S.parea = e.target.dataset.a; viewProgress(); } };
+}
+
+// ---------- team (manager)
+function viewTeam() {
+  const U = S.users, m = S.master;
+  $('#app').innerHTML = `<div class="card"><h2>Engineers (${(U.engineers || []).length})</h2>
+    ${(U.engineers || []).map((x, i) => `<div class="entry"><div class="row"><b class="grow">${esc(x.name || x.login)}</b><span class="muted">@${esc(x.login)}</span></div>
+      <div class="muted">Villas: ${esc((x.villas || []).join(', ') || 'none')} · Buildings: ${esc((x.buildings || []).join(', ') || 'none')} · External: ${x.external ? 'yes' : 'no'}</div>
+      <p class="row"><button class="sec" data-ed="${i}">Edit</button><button class="warn" data-del="${i}">Remove</button></p></div>`).join('') || '<p class="muted">No engineers yet.</p>'}
+    <p><button id="add">Add engineer</button></p></div>
+    <div class="card"><h2>Adding someone</h2><ol class="muted"><li>They make a free GitHub account and tell you their username.</li><li>On GitHub, open the <b>sbarc-site-data</b> repository → Settings → Collaborators → Add people, with <b>Write</b> access.</li><li>Add them here with their areas.</li><li>Send them the <a href="guide.html">sign-in guide</a>.</li></ol></div>`;
+  $('#add').onclick = () => editEng(-1);
+  $('#app').onclick = (e) => { const ed = e.target.dataset.ed, del = e.target.dataset.del; if (ed != null) editEng(+ed); if (del != null && window.confirm('Remove ' + (U.engineers[del].name || U.engineers[del].login) + ' from the team?')) { U.engineers.splice(+del, 1); saveUsers(); } };
+  function editEng(i) {
+    const x = i >= 0 ? U.engineers[i] : { login: '', name: '', villas: [], buildings: [], external: false };
+    const cb = (name, val, on, lab) => `<label><input type="checkbox" name="${name}" value="${esc(val)}" ${on ? 'checked' : ''}> ${esc(lab)}</label>`;
+    $('#app').innerHTML = `<div class="card"><h2>${i >= 0 ? 'Edit' : 'Add'} engineer</h2>
+      <label>GitHub username</label><input id="lg" type="text" value="${esc(x.login)}" autocapitalize="off" autocomplete="off">
+      <label>Name shown in reports</label><input id="nm" type="text" value="${esc(x.name)}">
+      <label>Villa clusters</label><div class="chk">${cb('v', 'all', (x.villas || []).includes('all'), 'All')}${m.clusters.map((c) => cb('v', c, (x.villas || []).includes(c), c)).join('')}</div>
+      <label>Buildings</label><div class="chk">${cb('b', 'all', (x.buildings || []).includes('all'), 'All')}${m.buildings.map((b) => cb('b', b.id, (x.buildings || []).includes(b.id), b.id)).join('')}</div>
+      <label>External works</label><div class="chk">${cb('x', '1', x.external, 'Can report external works')}</div>
+      <p class="row"><button id="sv">Save</button><button class="sec" id="cx">Cancel</button></p></div>`;
+    $('#app').onclick = null; $('#cx').onclick = viewTeam;
+    $('#sv').onclick = () => {
+      const val = (n) => [...document.querySelectorAll(`input[name=${n}]:checked`)].map((c) => c.value);
+      const y = { login: $('#lg').value.trim().replace(/^@/, ''), name: $('#nm').value.trim(), villas: val('v'), buildings: val('b'), external: val('x').length > 0 };
+      if (!/^[A-Za-z0-9-]{1,39}$/.test(y.login)) return toast('Enter a valid GitHub username.');
+      if ((U.engineers || []).some((z, j) => j !== i && z.login.toLowerCase() === y.login.toLowerCase())) return toast('That username is already on the team.');
+      U.engineers = U.engineers || []; i >= 0 ? (U.engineers[i] = y) : U.engineers.push(y); saveUsers();
+    };
+  }
+}
+async function saveUsers() {
+  try { const r = await put('config/users.json', b64e(JSON.stringify(S.users, null, 2)), 'Update team', S.usersSha); S.usersSha = r.content.sha; toast('Team saved ✓'); }
+  catch (e) { toast(e.status === 409 ? 'Someone else changed the team. Reloading.' : 'Could not save: ' + e.message); const [u, s] = await getJSON('config/users.json'); S.users = u; S.usersSha = s; }
+  viewTeam();
+}
+
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js', { scope: './' }).catch(() => {});
+boot();
+</script>
+</body>
+</html>
