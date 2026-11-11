@@ -179,16 +179,21 @@ def s_manpower(M):
         return f'<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#FFFEFB;border:1px solid #DDD8CA;border-radius:14px;box-shadow:0 2px 8px rgba(20,48,79,0.06);padding:24px 28px"><div style="width:40px;height:5px;border-radius:3px;background:{c}"></div><p style="font-size:24px;color:#5A6577">{l}</p><p style="{SG};font-size:60px;font-weight:700;line-height:1.1;color:#14304F">{v}</p><p style="font-size:24px;color:#5A6577">{s}</p></div>'
     cards = (card('#14304F', 'Direct workforce on site', f'{direct:,}', dlab) + card('#14304F', 'Villas', f'{vi:,}', f'{vi / direct * 100:.1f}% of direct') +
              card('#6FA3DC', 'Buildings', f'{bu:,}', f'{bu / direct * 100:.1f}% of direct') + card('#D9822B', 'Site / infrastructure', f'{si:,}', f'{si / direct * 100:.1f}% of direct'))
-    bars = ''
+    G2 = 'display:grid;grid-template-columns:380px 120px 150px 110px 90px;column-gap:12px;align-items:center'
+    H2 = lambda t, r=1: f'<p style="font-size:24px;color:#5A6577;{"text-align:right" if r else ""}">{t}</p>'
+    cells = H2('DISCIPLINE', 0) + H2('VILLAS') + H2('BUILDINGS') + H2('SITE') + H2('TOTAL')
     for r in D:
-        seg = ''.join(f'<div style="width:{r[k] / mx * 100:.1f}%;background:{c}"></div>' for k, c in (('villas', '#14304F'), ('buildings', '#6FA3DC'), ('site', '#D9822B')) if r[k])
-        bars += f'<div style="display:grid;grid-template-columns:330px 1fr 60px;gap:16px;align-items:center"><p style="font-size:24px;line-height:1.2">{esc(r["name"].replace(" and ", " & ", 1) if r["name"].startswith("Infra") else r["name"])}</p><div style="display:flex;height:14px;border-radius:7px;background:#E5E0D2;overflow:hidden">{seg}</div><p style="font-size:24px;line-height:1.2;font-weight:600;text-align:right">{r["value"]}</p></div>'
+        z = lambda v: '<span style="color:#9AA3B2">–</span>' if not v else str(v)
+        nm2 = esc(r["name"].replace(" and ", " & ", 1) if r["name"].startswith("Infra") else r["name"])
+        cells += (f'<p style="font-size:24px;line-height:1.2;border-top:1px solid #ECE8DC;padding:1px 0">{nm2}</p>' + ''.join(f'<p style="font-size:24px;line-height:1.2;text-align:right;border-top:1px solid #ECE8DC;padding:1px 0">{z(r[k])}</p>' for k in ('villas', 'buildings', 'site'))
+                  + f'<p style="font-size:24px;line-height:1.2;font-weight:700;text-align:right;border-top:1px solid #ECE8DC;padding:1px 0">{r["value"]}</p>')
+    bars = f'<div style="{G2}">{cells}</div>'
     top2 = D[0]['value'] + D[1]['value']
-    area = f'<div style="display:flex;height:28px;border-radius:8px;overflow:hidden"><div style="width:{vi / direct * 100:.1f}%;background:#14304F"></div><div style="width:{bu / direct * 100:.1f}%;background:#6FA3DC"></div><div style="width:{si / direct * 100:.1f}%;background:#D9822B"></div></div>'
+    area = ''
 
     def leg(c, l, v): return f'<div style="display:flex;gap:14px;align-items:center"><div style="width:18px;height:18px;border-radius:4px;background:{c}"></div><p style="flex:1;font-size:24px">{l}</p><p style="font-size:24px;font-weight:600">{v:,} · {v / direct * 100:.1f}%</p></div>'
     right = f'''<div style="flex:1;display:flex;flex-direction:column;gap:14px">
-<h3 style="{SG};font-size:28px;font-weight:700;color:#14304F">Distribution by area</h3>{area}
+<h3 style="{SG};font-size:28px;font-weight:700;color:#14304F">Distribution by area</h3>
 <div style="display:flex;flex-direction:column;gap:4px">{leg('#14304F', 'Villas', vi)}{leg('#6FA3DC', 'Buildings', bu)}{leg('#D9822B', 'Site / infrastructure', si)}</div>
 <h3 style="{SG};font-size:28px;font-weight:700;color:#14304F;padding:10px 0 0 0">Concentration</h3>
 <div style="display:flex;flex-direction:column;gap:4px"><div style="display:flex;gap:14px;align-items:center"><p style="flex:1;font-size:24px">Top two disciplines</p><p style="font-size:24px;font-weight:600">{top2:,} · {top2 / direct * 100:.1f}%</p></div><div style="display:flex;gap:14px;align-items:center"><p style="flex:1;font-size:24px">Other {len(D) - 2} disciplines</p><p style="font-size:24px;font-weight:600">{direct - top2:,} · {(direct - top2) / direct * 100:.1f}%</p></div></div>
@@ -196,7 +201,7 @@ def s_manpower(M):
     body = f'''<div style="display:flex;gap:24px">{cards}</div>
 <div style="display:flex;gap:56px;align-items:flex-start"><div style="width:940px;display:flex;flex-direction:column;gap:11px;background:#FFFEFB;border:1px solid #DDD8CA;border-radius:14px;box-shadow:0 2px 8px rgba(20,48,79,0.06);padding:24px 28px">{bars}</div>{right}</div>'''
     aside = (f"The direct workforce on site on {dlab} was {direct:,}: {vi:,} on villas, {bu:,} on buildings and {si:,} on site and infrastructure. {D[0]['name']} ({D[0]['value']}) and {D[1]['name']} ({D[1]['value']}) are the two largest disciplines, together {top2:,} people or {top2 / direct * 100:.1f}% of the direct workforce. "
-             "In the discipline bars, navy is villas, light blue is buildings and orange is site and infrastructure. Main contractor site support is not included.")
+             "Main contractor site support is not included.")
     return slide('manpower', f"SBARC · Resources · Daily report {meta.get('value', '')}", 'Site manpower', body, aside, pad='72px 128px 72px', gap=28, tsize=60, font="'Inter', Arial, sans-serif").replace(f'<h1 style="{BC};font-size:60px', f'<h1 style="{SG};font-size:60px')
 
 
@@ -243,13 +248,13 @@ def s_plan(F, V, B, ext, today):
         return f'<p style="{BC};font-size:{size}px;font-weight:700;color:{"#A8440F" if od else "#14304F"};{bt}">{fd(r["fin"])}</p>'
 
     def full(rows):
-        G = 'display:grid;grid-template-columns:520px 1fr 96px 110px 110px 200px;column-gap:20px;align-items:center;padding:0 4px'
-        h = HDR('ACTIVITY') + HDR('DONE ' + fd(date).upper()) + HDR('', 1) + HDR('NOV', 1) + HDR('DEC', 1) + HDR('EXPECTED FINISH')
+        G = 'display:grid;grid-template-columns:760px 150px 150px 150px 250px;column-gap:20px;align-items:center;padding:0 4px'
+        h = HDR('ACTIVITY') + HDR('DONE ' + fd(date).upper(), 1) + HDR('NOV', 1) + HDR('DEC', 1) + HDR('EXPECTED FINISH')
         c = ''
         for r in rows:
             p = r['er'] / r['budget'] * 100; bt = 'border-top:1px solid #ECE8DC;padding:7px 0'
-            c += (f'<p style="{BC};font-size:28px;font-weight:600;{bt}">{esc(r["name"])}</p><div style="{bt}"><div style="height:14px;background:#E9ECF2;border-radius:7px"><div style="width:{min(max(p, 1), 100):.1f}%;height:14px;background:{"#17694A" if p >= 90 else dc(p)};border-radius:7px"></div></div></div>'
-                  f'<p style="{BC};font-size:30px;font-weight:700;text-align:right;color:{dc(p)};{bt}">{round(p)}%</p><p style="{BC};font-size:28px;font-weight:700;text-align:right;{bt}">{pc(r["nov"], r["budget"])}</p><p style="{BC};font-size:28px;font-weight:700;text-align:right;{bt}">{pc(r["dec"], r["budget"])}</p>{fin(r, 28, bt)}')
+            c += (f'<p style="{BC};font-size:30px;font-weight:600;{bt}">{esc(r["name"])}</p>'
+                  f'<p style="{BC};font-size:30px;font-weight:700;text-align:right;color:{dc(p)};{bt}">{round(p)}%</p><p style="{BC};font-size:30px;font-weight:700;text-align:right;{bt}">{pc(r["nov"], r["budget"])}</p><p style="{BC};font-size:30px;font-weight:700;text-align:right;{bt}">{pc(r["dec"], r["budget"])}</p>{fin(r, 30, bt)}')
         return f'<div style="{G}">{h}{c}</div>'
 
     def half(rows):
