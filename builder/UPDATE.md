@@ -91,3 +91,14 @@ Insights, forecast (straight line at a chosen weekly pace; milestones 93.7% by 3
 are recalculated from those figures; nothing to do on a daily update. If its data cannot be built the build prints a WARNING and publishes without the tab.
 Every native tab also carries an automatic "What the data says" strip (`INS` in `portal.html`), recalculated in the browser from the data already in the page;
 the Analyser takes the weekly recovery plan (Plan A) from the Management Tracking page once it has loaded, so all tabs measure against the same plan.
+
+## Weekly presentation (Slides artifact "SBARC Earned Value Presentation")
+
+The six slides (progress, manpower, works, villas, external, handover) are generated from the same data as the portal; nothing is typed by hand.
+Artifact: https://claude.ai/artifact/3e73xLnZ2DMo6zJSHhTXD5 (private; the owner shares it from the Share menu).
+
+1. Make sure the dashboards are downloaded into `builder/_data` (steps above) and `builder/p6/p6.bin` is current.
+2. `SBARC_PASSWORD='<password>' python3 -I builder/tools/deck_build.py --out <scratch folder> --today <YYYY-MM-DD>` writes `<scratch>/project/slides/*.html`. Needs `python3 -m playwright` (preinstalled). Watch for the element-count WARNING (200 per slide limit).
+3. Read the artifact first (Artifact action read), then publish with `url`, `root` = the scratch folder, `file_path` = `<scratch>/project/slides/progress.html` and the other five in `files` (only those; never send deck.json). If refused because the owner edited meanwhile, re-read the named files and publish again.
+4. Handover slide: edit `builder/deck_config.json` (steps, clusters, target dates, status note) when the plan changes; the user tells you the new dates. Commit that file only (no data).
+5. Never print the password or figures. Hand edits made in the editor on these six slides are overwritten by a rebuild; the user changes content through the data, the config, or by asking.
