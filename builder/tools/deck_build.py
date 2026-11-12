@@ -13,6 +13,8 @@ Writes  <folder>/project/slides/{progress,manpower,works,villas,external,handove
 Nothing readable is stored in the repository: the folder is a scratch folder.
 """
 import argparse, datetime, json, math, os, re, subprocess, sys, tempfile
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import deck_style
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 EXEC = os.path.join(ROOT, 'builder', '_data', 'exec')
@@ -80,10 +82,10 @@ def pct2(v): return f"{v * 100:.2f}%"
 def esc(s): return s.replace('&', '&amp;')
 
 
-def slide(sid, kick, title, body, aside, note=None, pad='96px 128px 120px', gap=20, tsize=72, font="'Barlow', Arial, sans-serif"):
+def slide(sid, kick, title, body, aside, note=None, pad='96px 128px 120px', gap=20, tsize=64, font="'Barlow', Arial, sans-serif"):
     foot = f'<p style="position:absolute;left:128px;bottom:56px;width:1664px;font-size:24px;color:#5A6577">{note}</p>\n' if note else ''
     return f'''<section id="{sid}" data-transition="fade" style="background:#F6F4EE;color:#14304F;font-family:{font};padding:{pad};display:flex;flex-direction:column;gap:{gap}px">
-{STRIPE}{logos_html()}<div style="display:flex;flex-direction:column;gap:6px">
+{STRIPE}{logos_html()}<div style="position:relative;display:flex;flex-direction:column;gap:6px">
 <p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#8A6A12">{kick}</p>
 <h1 style="{BC};font-size:{tsize}px;font-weight:700;line-height:1">{title}</h1>
 </div>
@@ -364,6 +366,7 @@ def main():
     for k, s in slides.items():
         flat = re.sub(r'<svg\b.*?</svg>', '<svg></svg>', s, flags=re.S)  # an svg counts as one element
         n = len(re.findall(r'<(?:div|p|h1|h2|h3|svg|img|tr|td|th|table|span|b)\b', flat))
+        s = deck_style.band(s)
         open(os.path.join(out, k + '.html'), 'w').write(s)
         print(f'{k}: {len(s):,} bytes, ~{n} elements' + ('  WARNING: near the 200-element limit' if n > 190 else ''))
 
