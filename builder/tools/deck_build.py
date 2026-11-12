@@ -305,14 +305,14 @@ def s_handover(L, VI, VA):
     rows = ''; planned = set()
     for i, s in enumerate(cfg['steps']):
         planned.update(s['clusters'])
-        rows += f'<tr style="background:{TINT[i]}"><td>{i + 1}</td><td>{", ".join(s["clusters"])}</td><td style="text-align:right">{cnt(s["clusters"])}</td><td style="text-align:right">{(str(s['pct']) + '%') if s.get('pct') else ' · '.join(f'{cavg(c) * 100:.0f}%' for c in s['clusters'])}</td><td style="text-align:right">{tgt(s)}</td></tr>'
+        rows += f'<tr style="background:{TINT[i]}"><td>{i + 1}</td><td>{", ".join(s["clusters"])}</td><td style="text-align:right">{cnt(s["clusters"])}</td><td style="text-align:right">{' · '.join(f'{cavg(c) * 100:.0f}%' for c in s['clusters'])}</td><td style="text-align:right">{s.get('target_pct', cfg.get('handover_pct', ''))}%</td><td style="text-align:right">{tgt(s)}</td></tr>'
     rest = sorted(set(cls) - planned, key=lambda c: -cavg(c))
     if rest:
         av = [cavg(c) * 100 for c in rest]
-        rows += f'<tr><td>–</td><td>{", ".join(rest)}</td><td style="text-align:right">{cnt(rest)}</td><td style="text-align:right">{min(av):.0f}% to {max(av):.0f}%</td><td style="text-align:right">Not yet set</td></tr>'
+        rows += f'<tr><td>–</td><td>{", ".join(rest)}</td><td style="text-align:right">{cnt(rest)}</td><td style="text-align:right">{min(av):.0f}% to {max(av):.0f}%</td><td style="text-align:right">–</td><td style="text-align:right">Not yet set</td></tr>'
     th = lambda w, t, r=0: f'<th style="width:{w}%;text-align:{"right" if r else "left"};color:#5A6577;font-weight:600">{t}</th>'
-    tbl = f'<table style="font-size:24px;color:#14304F"><tr>{th(7, "#")}{th(26, "Clusters")}{th(11, "Villas", 1)}{th(21, "Progress", 1)}{th(35, "Status", 1)}</tr>{rows}</table>'
-    dot = lambda c, t: f'<div style="display:flex;gap:10px;align-items:center"><div style="width:20px;height:20px;border-radius:50%;background:{c}"></div><p style="font-size:24px">{t}</p></div>'
+    tbl = f'<table style="font-size:24px;color:#14304F"><tr>{th(5, "#")}{th(27, "Clusters")}{th(9, "Villas", 1)}{th(20, "Progress", 1)}{th(12, "Target", 1)}{th(27, "Status", 1)}</tr>{rows}</table>'
+    dot = lambda c, t: f'<p style="font-size:24px"><span style="color:{c}">●</span> {t}</p>'
     legend = '<div style="display:flex;gap:20px;flex-wrap:wrap">' + ''.join(dot(COL[i], cfg['steps'][i].get('legend') or (['Ready, first', 'Second', 'Third', 'Fourth'][i] if i < 4 else f'Step {i + 1}')) for i in range(len(COL))) + dot('#C4CAD3', 'Later') + '</div>'
     first = [v for v in cl_of if cl_of[v] in cfg['steps'][0]['clusters']]; ready = [v for v in first if tot[v] >= 0.9]
     allready = len(ready) == len(first)
@@ -327,7 +327,7 @@ def s_handover(L, VI, VA):
 
     def stat(c, big, tc, t):
         return f'<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFEFB;border:1px solid #DDD8CA;border-radius:14px;box-shadow:0 2px 8px rgba(20,48,79,0.06);padding:20px 24px"><div style="width:40px;height:5px;border-radius:3px;background:{c}"></div><p style="{SG};font-size:48px;font-weight:700;line-height:1.1;color:{tc}">{big}</p><p style="font-size:24px;line-height:1.3;color:#46546A">{t}</p></div>'
-    stats = ('<div style="display:flex;gap:20px">' + (stat(COL[0], f'{len(first)} villas · {s0["pct"]}%' if s0.get('pct') else f'{len(first)} villas', '#17694A', f'Partially handed over: clusters {" and ".join(s0["clusters"])}' + (f' at {s0["pct"]}% progress' if s0.get('pct') else '')) if s0.get('done') else stat(COL[0], f'{len(ready)} villas', '#17694A', f'Ready: every villa in {" and ".join(cfg["steps"][0]["clusters"])} is at 90% or more' if allready else f'At 90% or more, of {len(first)} in {" and ".join(cfg["steps"][0]["clusters"])}')) +
+    stats = ('<div style="display:flex;gap:20px">' + (stat(COL[0], f'{len(first)} villas', '#17694A', f'Partially handed over: clusters {" and ".join(s0["clusters"])}' + (f' (target {thr}%)' if thr else '')) if s0.get('done') else stat(COL[0], f'{len(ready)} villas', '#17694A', f'Ready: every villa in {" and ".join(cfg["steps"][0]["clusters"])} is at 90% or more' if allready else f'At 90% or more, of {len(first)} in {" and ".join(cfg["steps"][0]["clusters"])}')) +
              stat('#C2571A', f'{need} villas', '#A8440F', f'Of the {len(todo_v)} still to hand over need external doors') + '</div>')
     right = f'<div style="flex:1;display:flex;flex-direction:column;gap:18px"><h3 style="{SG};font-size:28px;font-weight:700;color:#14304F">Handover sequence and target dates</h3>{tbl}{legend}{stats}<p style="font-size:24px;line-height:1.3;color:#5A6577">{esc(cfg['status_note'] + nxt)}</p></div>'
     body = f'<div style="display:flex;gap:48px;align-items:flex-start">{mp}{right}</div>'

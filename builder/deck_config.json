@@ -8,11 +8,10 @@
           "05-10"
         ],
         "done": true,
-        "done_label": "Partially handed over",
+        "done_label": "Partial handover",
         "legend": "Handed over (partial)",
         "color": "#1F8A5B",
-        "tint": "#E3F1EA",
-        "pct": 92
+        "tint": "#E3F1EA"
       },
       {
         "clusters": [
@@ -35,7 +34,7 @@
         "tint": "#FAEBD9"
       }
     ],
-    "status_note": "Partial handover is at 92% progress. Clusters 05-9 and 05-10 are partially handed over.",
+    "status_note": "Target for each partial handover: 92% progress. Clusters 05-9 and 05-10 are partially handed over.",
     "handover_pct": 92
   },
   "_help": "Edit the steps (clusters, target date) and status_note here when the handover plan changes. A step handed over gets \"done\": true. Clusters not listed show as 'Not yet set'. Add a step by copying a line (give it its own color and tint)."
