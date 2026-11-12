@@ -158,8 +158,7 @@ def s_progress(F, P6):
         return f'<div style="display:flex; flex-direction:column; gap:8px; flex:1; padding:24px 28px; background:#fffefb; border:1px solid #ddd8ca; border-radius:14px"><p style="font-family:Inter, Arial, sans-serif; font-size:24px; color:#5a6577">{l}</p><p style="font-family:\'Space Grotesk\', Arial, sans-serif; font-size:60px; font-weight:700; line-height:1.1; color:{c}">{v}</p><p style="font-family:Inter, Arial, sans-serif; font-size:24px; color:#5a6577">{s}</p></div>'
     sign = '−' if gap > 0 else '+'
     cards = (kpi('Actual earned', pct2(actual), f'{n0(la["earned"])} of {n0(T)} MH') + kpi('Recovery plan (Plan A)', pct2(plan), f'planned at {fd(date)} 2026') +
-             kpi('Variance to Plan A', f'{sign}{abs(gap) * 100:.2f} pts', f'{n0(abs(gap) * T)} MH {"behind" if gap > 0 else "ahead"}', '#a8440f' if gap > 0 else '#17694a') +
-             kpi('P6 programme plan', pct2(pv), f'{"−" if pv > actual else "+"}{abs(pv - actual) * 100:.2f} pts · SPI {spi:.2f}'))
+             kpi('Variance to Plan A', f'{sign}{abs(gap) * 100:.2f} pts', f'{n0(abs(gap) * T)} MH {"behind" if gap > 0 else "ahead"}', '#a8440f' if gap > 0 else '#17694a'))
     body = f'''<div style="display:flex; flex-direction:row; gap:24px">{cards}</div>
 <div style="display:flex; flex-direction:row; gap:40px; align-items:start">
 <div style="position:relative; width:1000px; height:420px; display:flex; flex-direction:column">{svg}{labels}</div>
@@ -169,7 +168,7 @@ def s_progress(F, P6):
 <p style="font-family:Inter, Arial, sans-serif; font-size:24px; line-height:1.3; color:#46546a">{len(G)} activities gained <b>+{n0(wk_total)} MH</b>; {behind} of them are still behind plan.</p>
 </div></div>'''
     aside = (f"Actual earned labour units are {pct2(actual)} at the {fdl(date)} data date. The recovery plan (Plan A) called for {pct2(plan)}, so the project is {abs(gap) * 100:.2f} points, or {n0(abs(gap) * T)} man-hours, {'behind' if gap > 0 else 'ahead of'} it. "
-             f"Against the P6 programme plan of {pct2(pv)} the gap is {abs(pv - actual) * 100:.2f} points (SPI {spi:.2f}). The table lists the {len(G)} P6 activities that gained progress in the week, {n0(wk_total)} man-hours in total; {behind} of them are still behind plan.")
+             f"The table lists the {len(G)} P6 activities that gained progress in the week, {n0(wk_total)} man-hours in total; {behind} of them are still behind plan.")
     return slide('progress', 'SBARC · Earned value · Labour units', 'Actual vs planned progress', body, aside, pad='96px 128px 96px', gap=28, tsize=60, font="'Inter', Arial, sans-serif").replace(f'<h1 style="{BC};font-size:60px', f'<h1 style="{SG};font-size:60px')
 
 
