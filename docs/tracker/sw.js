@@ -1,5 +1,5 @@
 // SBARC Site Tracker: opens offline from cache; data always comes live from GitHub.
-const CACHE = 'sbarc-tracker-1';
+const CACHE = 'sbarc-tracker-2';
 const CORE = ['./', 'index.html', 'guide.html', 'manifest.webmanifest'];
 self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting())));
 self.addEventListener('activate', (e) => e.waitUntil(caches.keys().then((k) => Promise.all(k.filter((x) => x.startsWith('sbarc-tracker-') && x !== CACHE).map((x) => caches.delete(x)))).then(() => self.clients.claim())));

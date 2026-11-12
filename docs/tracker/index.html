@@ -105,20 +105,47 @@ async function boot(fresh) {
   S.role = (S.users.managers || []).map((x) => x.toLowerCase()).includes(S.login.toLowerCase()) ? 'manager' : (S.me ? 'engineer' : null);
   if (!S.role) { signIn(`Signed in as ${S.login}, but this account is not on the SBARC team list yet. Ask the project manager to add “${S.login}”.`); store.set('sbarc_tok', null); S.tok = null; return; }
   $('#who').textContent = (S.me?.name || S.login) + (S.role === 'manager' ? ' · manager' : '');
-  const tabs = S.role === 'manager' ? [['today', 'Today'], ['report', 'Report'], ['progress', 'Progress'], ['team', 'Team']] : [['report', 'Report'], ['mine', 'My day']];
+  const tabs = S.role === 'manager' ? [['today', 'Today'], ['areas', 'Areas'], ['report', 'Report'], ['progress', 'Progress'], ['team', 'Team']] : [['areas', 'My areas'], ['report', 'Report'], ['mine', 'My day']];
   $('#nav').innerHTML = tabs.map(([k, l]) => `<button data-t="${k}">${l}</button>`).join('') + '<button data-t="out">Sign out</button>';
   $('#nav').classList.remove('hide');
   $('#nav').onclick = (e) => { const t = e.target.closest('button')?.dataset.t; if (!t) return; if (t === 'out') { if (window.confirm('Sign out of the tracker on this phone?')) { store.set('sbarc_tok', null); location.reload(); } return; } go(t); };
   go(S.tab || tabs[0][0]); flushQueue();
 }
-function go(t) { S.tab = t; document.querySelectorAll('#nav button').forEach((b) => b.classList.toggle('on', b.dataset.t === t)); ({ report: viewReport, mine: viewMine, today: viewToday, progress: viewProgress, team: viewTeam })[t](); window.scrollTo(0, 0); }
+function go(t) { S.tab = t; document.querySelectorAll('#nav button').forEach((b) => b.classList.toggle('on', b.dataset.t === t)); ({ areas: viewAreas, report: viewReport, mine: viewMine, today: viewToday, progress: viewProgress, team: viewTeam })[t](); window.scrollTo(0, 0); }
 
 // ---------- what each person may report on
-function allowed(area) {
-  const m = S.master, me = S.me, mgr = S.role === 'manager';
-  if (area === 'villa') { const cl = mgr || !me ? null : (me.villas || []); return m.villas.filter((v) => !cl || cl.includes('all') || cl.includes(v.cluster)); }
-  if (area === 'building') { const b = mgr || !me ? null : (me.buildings || []); return m.buildings.filter((x) => !b || b.includes('all') || b.includes(x.id)); }
-  return (mgr || me?.external) ? m.external : [];
+function allowed(area, who) {
+  const m = S.master, me = who === undefined ? S.me : who, all = who === undefined ? S.role === 'manager' : who === null;
+  if (area === 'villa') { const cl = all || !me ? null : (me.villas || []); return m.villas.filter((v) => !cl || cl.includes('all') || cl.includes(v.cluster) || cl.includes(v.id)); }
+  if (area === 'building') { const b = all || !me ? null : (me.buildings || []); return m.buildings.filter((x) => !b || b.includes('all') || b.includes(x.id)); }
+  return (all || me?.external) ? m.external : [];
+}
+function avgNow(area, id) { const x = S.master[AREAS[area]].find((i) => i.id === id); const ks = Object.keys(x.acts); return ks.reduce((s, k) => s + curVal(area, id, k), 0) / (ks.length || 1); }
+
+// ---------- my areas: every villa / building / item in the engineer's designated area
+async function viewAreas() {
+  const mgr = S.role === 'manager', eng = S.users.engineers || [];
+  const who = mgr ? (S.aw == null ? null : eng.find((x) => x.login === S.aw) || null) : S.me;
+  $('#app').innerHTML = '<div class="card">Loading…</div>';
+  let es = []; try { es = await dayEntries(today()); } catch (e) {}
+  const done = new Set(es.map((e) => e.area + '|' + e.id));
+  const by = {}; es.forEach((e) => { by[e.area + '|' + e.id] = (S.users.engineers || []).find((x) => x.login === e.by)?.name || e.by; });
+  let total = 0, upd = 0;
+  const row = (area, i) => { const k = area + '|' + i.id, p = avgNow(area, i.id), ok = done.has(k); total++; if (ok) upd++;
+    return `<div class="act" data-go="${area}|${esc(i.id)}" style="cursor:pointer;grid-template-columns:1fr 70px 120px"><div><div class="nm">${esc(i.id)}${i.name ? ' · ' + esc(i.name) : ''}</div><div class="bar"><i style="width:${Math.min(100, p)}%;background:${p >= 92 ? 'var(--ok)' : 'var(--blue)'}"></i></div></div>
+      <div class="was" style="font-size:15px;color:var(--navy);font-weight:700">${Math.round(p)}%</div><div class="was ${ok ? 'ok' : 'bad'}">${ok ? '✓ ' + esc(mgr ? by[k] : 'today') : 'not updated'}</div></div>`; };
+  const sec = [];
+  const vs = allowed('villa', who); if (vs.length) { const g = {}; vs.forEach((v) => (g[v.cluster] = g[v.cluster] || []).push(v));
+    Object.keys(g).sort((a, b) => +a.split('-')[1] - +b.split('-')[1]).forEach((c) => sec.push(`<details ${Object.keys(g).length <= 2 ? 'open' : ''}><summary>Cluster ${c} · ${g[c].length} villas · ${g[c].filter((v) => done.has('villa|' + v.id)).length} updated today</summary>${g[c].map((v) => row('villa', v)).join('')}</details>`)); }
+  const bs = allowed('building', who); if (bs.length) sec.push(`<details open><summary>Buildings · ${bs.length} · ${bs.filter((b) => done.has('building|' + b.id)).length} updated today</summary>${bs.map((b) => row('building', b)).join('')}</details>`);
+  const xs = allowed('external', who); if (xs.length) sec.push(`<details><summary>External works · ${xs.length} items · ${xs.filter((x) => done.has('external|' + x.id)).length} updated today</summary>${xs.map((x) => row('external', x)).join('')}</details>`);
+  const pick = mgr ? `<label>Engineer</label><select id="aw"><option value="">Whole site</option>${eng.map((x) => `<option value="${esc(x.login)}" ${S.aw === x.login ? 'selected' : ''}>${esc(x.name || x.login)}</option>`).join('')}</select>` : '';
+  $('#app').innerHTML = `<div class="card"><h2>${mgr ? 'Areas' : 'My areas'} · ${today()}</h2>${pick}
+    <p><span class="pill ${upd === total && total ? 'ok' : 'bad'}">${upd} of ${total} updated today</span></p>
+    <p class="muted">${mgr ? 'Each villa, building and external item with its current % and whether it was updated today.' : 'Tap a villa or building to update its activities. Green bar = at 92% or more.'}</p>
+    ${sec.join('') || '<p class="muted">No areas assigned yet.</p>'}</div>`;
+  if ($('#aw')) $('#aw').onchange = (e) => { S.aw = e.target.value || null; viewAreas(); };
+  $('#app').onclick = (e) => { const g = e.target.closest('[data-go]'); if (!g) return; const [a, ...id] = g.dataset.go.split('|'); S.f = { area: a, id: id.join('|'), vals: {} }; go('report'); };
 }
 function curVal(area, id, act) { const st = S.cur?.state?.[AREAS[area]]?.[id]; if (st && act in st) return st[act]; const x = S.master[AREAS[area]].find((i) => i.id === id); return x?.acts?.[act] ?? 0; }
 
@@ -137,6 +164,7 @@ function viewReport() {
   const pend = JSON.parse(store.get('sbarc_queue') || '[]').length;
   $('#app').innerHTML = `
   ${pend ? `<div class="card bad">${pend} report(s) saved on this phone, waiting for signal. They send automatically.</div>` : ''}
+  <p><button class="sec" id="back">← ${S.role === 'manager' ? 'Areas' : 'My areas'}</button></p>
   <div class="card"><h2>Daily progress · ${today()}</h2>
     <div class="seg" id="ar">${areas.map((a) => `<button data-a="${a}" class="${a === f.area ? 'on' : ''}">${LABEL[a]}</button>`).join('')}</div>
     <label>${f.area === 'villa' ? 'Villa' : f.area === 'building' ? 'Building' : 'External item'}</label><select id="it">${opts}</select>
@@ -154,7 +182,7 @@ function viewReport() {
   $('#ar').onclick = (e) => { const a = e.target.dataset.a; if (a && a !== f.area) { keep(); f.area = a; f.id = ''; f.vals = {}; viewReport(); } };
   $('#it').onchange = (e) => { keep(); if (Object.keys(f.vals).length && !window.confirm('Discard the % you typed for ' + f.id + '?')) { e.target.value = f.id; return; } f.id = e.target.value; f.vals = {}; viewReport(); };
   $('#acts').oninput = (e) => { const row = e.target.closest('.act'); const k = row.dataset.k, v = e.target.value; if (v === '') delete f.vals[k]; else f.vals[k] = Math.max(0, Math.min(100, +v)); row.classList.toggle('changed', v !== ''); row.querySelector('i').style.width = Math.min(100, v === '' ? curVal(f.area, f.id, k) : +v) + '%'; };
-  $('#send').onclick = send;
+  $('#send').onclick = send; $('#back').onclick = () => go('areas');
 }
 function rows(list) { const f = S.f; return list.map((a) => { const was = curVal(f.area, f.id, a), v = f.vals[a]; return `<div class="act ${v != null ? 'changed' : ''}" data-k="${esc(a)}">
       <div><div class="nm">${esc(a)}</div><div class="bar"><i style="width:${Math.min(100, v ?? was)}%"></i></div></div>
@@ -264,7 +292,7 @@ function viewTeam() {
   const U = S.users, m = S.master;
   $('#app').innerHTML = `<div class="card"><h2>Engineers (${(U.engineers || []).length})</h2>
     ${(U.engineers || []).map((x, i) => `<div class="entry"><div class="row"><b class="grow">${esc(x.name || x.login)}</b><span class="muted">@${esc(x.login)}</span></div>
-      <div class="muted">Villas: ${esc((x.villas || []).join(', ') || 'none')} · Buildings: ${esc((x.buildings || []).join(', ') || 'none')} · External: ${x.external ? 'yes' : 'no'}</div>
+      <div class="muted">Villas: ${esc((x.villas || []).join(', ') || 'none')} (${allowed('villa', x).length}) · Buildings: ${esc((x.buildings || []).join(', ') || 'none')} · External: ${x.external ? 'yes' : 'no'}</div>
       <p class="row"><button class="sec" data-ed="${i}">Edit</button><button class="warn" data-del="${i}">Remove</button></p></div>`).join('') || '<p class="muted">No engineers yet.</p>'}
     <p><button id="add">Add engineer</button></p></div>
     <div class="card"><h2>Adding someone</h2><ol class="muted"><li>They make a free GitHub account and tell you their username.</li><li>On GitHub, open the <b>sbarc-site-data</b> repository → Settings → Collaborators → Add people, with <b>Write</b> access.</li><li>Add them here with their areas.</li><li>Send them the <a href="guide.html">sign-in guide</a>.</li></ol></div>`;
@@ -277,6 +305,7 @@ function viewTeam() {
       <label>GitHub username</label><input id="lg" type="text" value="${esc(x.login)}" autocapitalize="off" autocomplete="off">
       <label>Name shown in reports</label><input id="nm" type="text" value="${esc(x.name)}">
       <label>Villa clusters</label><div class="chk">${cb('v', 'all', (x.villas || []).includes('all'), 'All')}${m.clusters.map((c) => cb('v', c, (x.villas || []).includes(c), c)).join('')}</div>
+      <details><summary>Or pick individual villas</summary>${m.clusters.map((c) => `<label>Cluster ${c}</label><div class="chk">${m.villas.filter((v) => v.cluster === c).map((v) => cb('v', v.id, (x.villas || []).includes(v.id), v.id)).join('')}</div>`).join('')}</details>
       <label>Buildings</label><div class="chk">${cb('b', 'all', (x.buildings || []).includes('all'), 'All')}${m.buildings.map((b) => cb('b', b.id, (x.buildings || []).includes(b.id), b.id)).join('')}</div>
       <label>External works</label><div class="chk">${cb('x', '1', x.external, 'Can report external works')}</div>
       <p class="row"><button id="sv">Save</button><button class="sec" id="cx">Cancel</button></p></div>`;
