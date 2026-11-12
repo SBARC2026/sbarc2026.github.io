@@ -1,6 +1,6 @@
 {
   "handover": {
-    "kicker": "SBARC · Partial handover · Two clusters a week",
+    "kicker": "SBARC · Villa clusters · Handover plan",
     "steps": [
       {
         "clusters": [
@@ -9,7 +9,7 @@
         ],
         "done": true,
         "done_label": "Partial handover",
-        "legend": "Handed over (partial)",
+        "legend": "Handed over",
         "color": "#1F8A5B",
         "tint": "#E3F1EA"
       },
@@ -35,7 +35,28 @@
       }
     ],
     "status_note": "Target for each partial handover: 92% progress. Clusters 05-9 and 05-10 are partially handed over.",
-    "handover_pct": 92
+    "handover_pct": 92,
+    "title": "Partial handover · two clusters a week"
   },
-  "_help": "Edit the steps (clusters, target date) and status_note here when the handover plan changes. A step handed over gets \"done\": true. Clusters not listed show as 'Not yet set'. Add a step by copying a line (give it its own color and tint)."
+  "_help": "Edit the steps (clusters, target date) and status_note here when the handover plan changes. A step handed over gets \"done\": true. Clusters not listed show as 'Not yet set'. Add a step by copying a line (give it its own color and tint).",
+  "logos": [
+    {
+      "src": "/_blob/6509df92c1fdc17a4ca9899156215601",
+      "alt": "Mohammed Abdulmohsin Al-Kharafi & Sons",
+      "w": 64,
+      "file": "builder/logos/kharafi.png"
+    },
+    {
+      "src": "/_blob/a2d06ba92f6dfad0425f50d81cee369c",
+      "alt": "Gulf Coast Development",
+      "w": 118,
+      "file": "builder/logos/gcd.png"
+    },
+    {
+      "src": "/_blob/4b541406e751a881c668b354f87265f8",
+      "alt": "Sterling Ark",
+      "w": 68,
+      "file": "builder/logos/sterling.png"
+    }
+  ]
 }

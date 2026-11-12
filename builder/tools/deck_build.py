@@ -23,6 +23,13 @@ BC = "font-family:'Barlow Condensed', Arial, sans-serif"
 SG = "font-family:'Space Grotesk', Arial, sans-serif"
 STRIPE = ('<div style="position:absolute;left:0;top:0;width:960px;height:10px;background:#14304F"></div>'
           '<div style="position:absolute;left:960px;top:0;width:960px;height:10px;background:#C9A227"></div>\n')
+def logos_html():
+    L = json.load(open(CFG)).get('logos') or []
+    if not L: return ''
+    imgs = ''.join(f'<img src="{l["src"]}" alt="{esc(l["alt"])}" style="width:{l["w"]}px;height:68px;object-fit:contain;border-radius:8px">' for l in L)
+    return f'<div style="position:absolute;right:128px;top:30px;display:flex;flex-direction:row;gap:14px;align-items:center">{imgs}</div>\n'
+
+
 MO = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 
@@ -76,7 +83,7 @@ def esc(s): return s.replace('&', '&amp;')
 def slide(sid, kick, title, body, aside, note=None, pad='96px 128px 120px', gap=20, tsize=72, font="'Barlow', Arial, sans-serif"):
     foot = f'<p style="position:absolute;left:128px;bottom:56px;width:1664px;font-size:24px;color:#5A6577">{note}</p>\n' if note else ''
     return f'''<section id="{sid}" data-transition="fade" style="background:#F6F4EE;color:#14304F;font-family:{font};padding:{pad};display:flex;flex-direction:column;gap:{gap}px">
-{STRIPE}<div style="display:flex;flex-direction:column;gap:6px">
+{STRIPE}{logos_html()}<div style="display:flex;flex-direction:column;gap:6px">
 <p style="font-size:24px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:#8A6A12">{kick}</p>
 <h1 style="{BC};font-size:{tsize}px;font-weight:700;line-height:1">{title}</h1>
 </div>
@@ -240,7 +247,7 @@ def s_plan(F, V, B, ext, today):
     NOTE = (f'Done = earned share of the activity at the {fd(date)} P6 update. Nov and Dec = share of the activity planned for that month in the recovery plan (Plan A). '
             'Expected finish = Plan A finish; red = past its finish date and not complete.')
     HDR = lambda t, r=0: f'<p style="font-size:24px;letter-spacing:2px;color:#5A6577;{"text-align:right" if r else ""}">{t}</p>'
-    pc = lambda v, b: '<span style="color:#9AA3B2">–</span>' if v < 0.5 else ('&lt;1%' if v / b * 100 < 0.5 else f'{round(v / b * 100)}%')
+    pc = lambda v, b: '–' if v < 0.5 else ('&lt;1%' if v / b * 100 < 0.5 else f'{round(v / b * 100)}%')
     dc = lambda p: '#17694A' if p >= 90 else ('#14304F' if p >= 30 else '#A8440F')
 
     def fin(r, size, bt):
@@ -301,40 +308,47 @@ def s_handover(L, VI, VA):
           f'<p style="position:absolute;left:24px;top:20px;width:420px;font-size:24px;color:#5A6577">Numbers = cluster 05-n</p><p style="position:absolute;left:24px;bottom:18px;width:420px;font-size:24px;color:#5A6577">■ Buildings ({len(bld)})</p></div>')
     cavg = lambda c: sum(tot[v] for v in tot if cl_of[v] == c) / sum(1 for v in tot if cl_of[v] == c)
     cnt = lambda cs: sum(1 for v in cl_of if cl_of[v] in cs)
-    tgt = lambda s: s.get('done_label', 'Done') if s.get('done') else fdl(s['date'])
+    thr = cfg.get('handover_pct')
+    wd = lambda d: datetime.date.fromisoformat(d).strftime('%a') + ' ' + fd(d)
+    pcol = lambda v: '#17694A' if thr and v * 100 >= thr - 0.5 else '#A8440F'
     rows = ''; planned = set()
     for i, s in enumerate(cfg['steps']):
         planned.update(s['clusters'])
-        rows += f'<tr style="background:{TINT[i]}"><td>{i + 1}</td><td>{", ".join(s["clusters"])}</td><td style="text-align:right">{cnt(s["clusters"])}</td><td style="text-align:right">{' · '.join(f'{cavg(c) * 100:.0f}%' for c in s['clusters'])}</td><td style="text-align:right">{s.get('target_pct', cfg.get('handover_pct', ''))}%</td><td style="text-align:right">{tgt(s)}</td></tr>'
+        prog = ' · '.join(f'<span style="color:{pcol(cavg(c))}">{cavg(c) * 100:.0f}%</span>' for c in s['clusters'])
+        st = f'<span style="color:#17694A">✓ {s.get("done_label", "Done")}</span>' if s.get('done') else wd(s['date'])
+        rows += (f'<tr style="background:{TINT[i]}"><td>{i + 1}</td><td>{", ".join(s["clusters"])}</td><td style="text-align:right">{cnt(s["clusters"])}</td>'
+                 f'<td style="text-align:right">{prog}</td><td style="text-align:right">{s.get("target_pct", thr)}%</td><td style="text-align:right">{st}</td></tr>')
     rest = sorted(set(cls) - planned, key=lambda c: -cavg(c))
-    if rest:
-        av = [cavg(c) * 100 for c in rest]
-        rows += f'<tr><td>–</td><td>{", ".join(rest)}</td><td style="text-align:right">{cnt(rest)}</td><td style="text-align:right">{min(av):.0f}% to {max(av):.0f}%</td><td style="text-align:right">–</td><td style="text-align:right">Not yet set</td></tr>'
     th = lambda w, t, r=0: f'<th style="width:{w}%;text-align:{"right" if r else "left"};color:#5A6577;font-weight:600">{t}</th>'
-    tbl = f'<table style="font-size:24px;color:#14304F"><tr>{th(5, "#")}{th(27, "Clusters")}{th(9, "Villas", 1)}{th(20, "Progress", 1)}{th(12, "Target", 1)}{th(27, "Status", 1)}</tr>{rows}</table>'
-    dot = lambda c, t: f'<p style="font-size:24px"><span style="color:{c}">●</span> {t}</p>'
-    legend = '<div style="display:flex;gap:20px;flex-wrap:wrap">' + ''.join(dot(COL[i], cfg['steps'][i].get('legend') or (['Ready, first', 'Second', 'Third', 'Fourth'][i] if i < 4 else f'Step {i + 1}')) for i in range(len(COL))) + dot('#C4CAD3', 'Later') + '</div>'
-    first = [v for v in cl_of if cl_of[v] in cfg['steps'][0]['clusters']]; ready = [v for v in first if tot[v] >= 0.9]
-    allready = len(ready) == len(first)
+    tbl = f'<table style="font-size:24px;color:#14304F;padding:12px 10px"><tr>{th(5, "#")}{th(24, "Clusters")}{th(10, "Villas", 1)}{th(20, "Progress", 1)}{th(11, "Target", 1)}{th(30, "Status", 1)}</tr>{rows}</table>'
+    dot = lambda c, t: f'<p style="font-size:24px;color:#46546A"><span style="color:{c}">●</span> {t}</p>'
+    legend = '<div style="display:flex;gap:24px;flex-wrap:wrap">' + ''.join(dot(COL[i], cfg['steps'][i].get('legend') or f'Step {i + 1}') for i in range(len(COL))) + dot('#C4CAD3', 'Later') + '</div>'
+    first = [v for v in cl_of if cl_of[v] in cfg['steps'][0]['clusters']]
     plan_v = [v for v in cl_of if cl_of[v] in planned]
     done_ed = {r['villa'] for r in VA if r['activity'] == 'External doors' and r['status'] == 'Done'}
     todo_cl = {c for s in cfg['steps'] if not s.get('done') for c in s['clusters']}
     todo_v = [v for v in cl_of if cl_of[v] in todo_cl]
     need = sum(1 for v in todo_v if v not in done_ed)
     s0 = cfg['steps'][0]
-    ns = next((x for x in cfg['steps'] if not x.get('done')), None); thr = cfg.get('handover_pct')
+    ns = next((x for x in cfg['steps'] if not x.get('done')), None)
     nxt = (f" Next: {' and '.join(ns['clusters'])} at {' and '.join(f'{cavg(c) * 100:.0f}%' for c in ns['clusters'])} now, to reach {thr}% by {fd(ns['date'])}." if ns and thr else '')
 
-    def stat(c, big, tc, t):
-        return f'<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFEFB;border:1px solid #DDD8CA;border-radius:14px;box-shadow:0 2px 8px rgba(20,48,79,0.06);padding:20px 24px"><div style="width:40px;height:5px;border-radius:3px;background:{c}"></div><p style="{SG};font-size:48px;font-weight:700;line-height:1.1;color:{tc}">{big}</p><p style="font-size:24px;line-height:1.3;color:#46546A">{t}</p></div>'
-    stats = ('<div style="display:flex;gap:20px">' + (stat(COL[0], f'{len(first)} villas', '#17694A', f'Partially handed over: clusters {" and ".join(s0["clusters"])}' + (f' (target {thr}%)' if thr else '')) if s0.get('done') else stat(COL[0], f'{len(ready)} villas', '#17694A', f'Ready: every villa in {" and ".join(cfg["steps"][0]["clusters"])} is at 90% or more' if allready else f'At 90% or more, of {len(first)} in {" and ".join(cfg["steps"][0]["clusters"])}')) +
-             stat('#C2571A', f'{need} villas', '#A8440F', f'Of the {len(todo_v)} still to hand over need external doors') + '</div>')
-    right = f'<div style="flex:1;display:flex;flex-direction:column;gap:18px"><h3 style="{SG};font-size:28px;font-weight:700;color:#14304F">Handover sequence and target dates</h3>{tbl}{legend}{stats}<p style="font-size:24px;line-height:1.3;color:#5A6577">{esc(cfg['status_note'] + nxt)}</p></div>'
+    def stat(big, tc, t):
+        return f'<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#FFFEFB;border:1px solid #DDD8CA;border-radius:14px;box-shadow:0 2px 8px rgba(20,48,79,0.06);padding:20px 22px"><p style="{SG};font-size:44px;font-weight:700;line-height:1.1;color:{tc}">{big}</p><p style="font-size:24px;line-height:1.3;color:#46546A">{t}</p></div>'
+    cards = []
+    done_v = [v for v in cl_of if any(cl_of[v] in s['clusters'] for s in cfg['steps'] if s.get('done'))]
+    if done_v: cards.append(stat(f'{len(done_v)} villas', '#17694A', 'Partially handed over: ' + ', '.join(c for s in cfg['steps'] if s.get('done') for c in s['clusters'])))
+    if ns:
+        gap = max(0, thr - min(cavg(c) * 100 for c in ns['clusters'])) if thr else 0
+        cards.append(stat(fd(ns['date']), '#2E6FB7', f'Next: {", ".join(ns["clusters"])} · {cnt(ns["clusters"])} villas' + (f' · +{gap:.0f} pts to {thr}%' if gap >= 0.5 else '')))
+    cards.append(stat(f'{need} villas', '#A8440F', f'of the {len(todo_v)} still to hand over need external doors'))
+    stats = '<div style="display:flex;gap:16px">' + ''.join(cards) + '</div>'
+    right = f'<div style="flex:1;display:flex;flex-direction:column;gap:22px"><h3 style="{SG};font-size:28px;font-weight:700;color:#14304F">Sequence · partial handover at {thr}% progress</h3>{tbl}{legend}{stats}</div>'
     body = f'<div style="display:flex;gap:48px;align-items:flex-start">{mp}{right}</div>'
     seq = '; '.join(f'step {i + 1}: {", ".join(s["clusters"])} ({cnt(s["clusters"])} villas), {"handed over (partial)" if s.get("done") else "target " + fdl(s["date"])}' for i, s in enumerate(cfg['steps']))
     aside = (f'The November plan covers {len(cfg["steps"][0]["clusters"]) + sum(len(s["clusters"]) for s in cfg["steps"][1:])} villa clusters, {len(plan_v)} villas. Sequence and target dates: {seq}. '
              f'{"The other clusters are not in the plan and have no target date yet. " if rest else ""}{cfg["status_note"]}{nxt} Target dates are the dates set in the handover configuration, not contractual handover dates.')
-    return slide('handover', cfg['kicker'], 'Partial handover layout &amp; plan', body, aside, pad='96px 128px 96px', gap=28, tsize=60, font="'Inter', Arial, sans-serif").replace(f'<h1 style="{BC};font-size:60px', f'<h1 style="{SG};font-size:60px')
+    return slide('handover', cfg['kicker'], cfg.get('title', 'Partial handover layout &amp; plan'), body, aside, pad='96px 128px 96px', gap=28, tsize=60, font="'Inter', Arial, sans-serif").replace(f'<h1 style="{BC};font-size:60px', f'<h1 style="{SG};font-size:60px')
 
 
 # ---------------------------------------------------------------- main
@@ -348,7 +362,8 @@ def main():
     slides = {'progress': s_progress(F, P6), 'manpower': s_manpower(exec_ds('manpower')), 'works': s3, 'villas': s4, 'external': s5,
               'handover': s_handover(exec_ds('layouts'), exec_ds('villas'), exec_ds('villa_activities'))}
     for k, s in slides.items():
-        n = len(re.findall(r'<(?:div|p|h1|h3|svg|circle|path|rect|line|tr|td|th|section|aside|span)\b', s))
+        flat = re.sub(r'<svg\b.*?</svg>', '<svg></svg>', s, flags=re.S)  # an svg counts as one element
+        n = len(re.findall(r'<(?:div|p|h1|h2|h3|svg|img|tr|td|th|table|span|b)\b', flat))
         open(os.path.join(out, k + '.html'), 'w').write(s)
         print(f'{k}: {len(s):,} bytes, ~{n} elements' + ('  WARNING: near the 200-element limit' if n > 190 else ''))
 
