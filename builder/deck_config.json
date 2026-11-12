@@ -1,12 +1,12 @@
 {
   "handover": {
-    "kicker": "SBARC · November plan · Villa clusters",
+    "kicker": "SBARC · Partial handover · Two clusters a week",
     "steps": [
-      {"clusters": ["05-9", "05-10"], "date": "2026-11-19", "color": "#1F8A5B", "tint": "#E3F1EA"},
-      {"clusters": ["05-5", "05-1"], "date": "2026-11-26", "color": "#2E6FB7", "tint": "#E4EDF8"},
-      {"clusters": ["05-6", "05-7"], "date": "2026-11-30", "color": "#E0912B", "tint": "#FAEBD9"}
+      {"clusters": ["05-9", "05-10"], "done": true, "done_label": "Done (partial)", "legend": "Handed over (partial)", "color": "#1F8A5B", "tint": "#E3F1EA"},
+      {"clusters": ["05-5", "05-6"], "date": "2026-11-17", "legend": "Tue 17 Nov", "color": "#2E6FB7", "tint": "#E4EDF8"},
+      {"clusters": ["05-1", "05-7"], "date": "2026-11-24", "legend": "Tue 24 Nov", "color": "#E0912B", "tint": "#FAEBD9"}
     ],
-    "status_note": "No area is recorded as handed over yet."
+    "status_note": "Clusters 05-9 and 05-10 are partially handed over. Two more clusters follow each Tuesday."
   },
-  "_help": "Edit the steps (clusters, target date) and status_note here when the handover plan changes. Clusters not listed show as 'Not yet set'. Add a step by copying a line (give it its own color and tint)."
+  "_help": "Edit the steps (clusters, target date) and status_note here when the handover plan changes. A step handed over gets \"done\": true. Clusters not listed show as 'Not yet set'. Add a step by copying a line (give it its own color and tint)."
 }
