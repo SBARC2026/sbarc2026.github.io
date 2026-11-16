@@ -58,5 +58,116 @@
       "w": 68,
       "file": "builder/logos/sterling.png"
     }
+  ],
+  "engineers": [
+    {
+      "name": "Hussien",
+      "clusters": [
+        "05-1",
+        "05-2"
+      ],
+      "buildings": [],
+      "color": "#7A5C9E",
+      "tags": [
+        {
+          "x": 880,
+          "y": 1010
+        }
+      ]
+    },
+    {
+      "name": "Abdelrahman",
+      "clusters": [
+        "05-3",
+        "05-4",
+        "05-8"
+      ],
+      "buildings": [
+        "CO",
+        "MQ",
+        "RG",
+        "SR",
+        "SG"
+      ],
+      "color": "#2E6FB7",
+      "tags": [
+        {
+          "x": 1520,
+          "y": 1180
+        }
+      ]
+    },
+    {
+      "name": "Omar",
+      "clusters": [
+        "05-5",
+        "05-7"
+      ],
+      "buildings": [
+        "AD",
+        "UT",
+        "WS"
+      ],
+      "color": "#E0912B",
+      "tags": [
+        {
+          "x": 2010,
+          "y": 580
+        },
+        {
+          "x": 950,
+          "y": 2130
+        }
+      ]
+    },
+    {
+      "name": "Khaled",
+      "clusters": [
+        "05-6"
+      ],
+      "buildings": [
+        "CC",
+        "HB",
+        "PA",
+        "SC"
+      ],
+      "color": "#C2412F",
+      "tags": [
+        {
+          "x": 2540,
+          "y": 1080
+        }
+      ]
+    },
+    {
+      "name": "Saleh",
+      "clusters": [
+        "05-9",
+        "05-10"
+      ],
+      "buildings": [],
+      "color": "#1F8A5B",
+      "tags": [
+        {
+          "x": 1080,
+          "y": 1560
+        }
+      ]
+    },
+    {
+      "name": "Ahmed Diaa",
+      "clusters": [],
+      "buildings": [
+        "IS",
+        "BA"
+      ],
+      "color": "#0F7C86",
+      "tags": [
+        {
+          "x": 420,
+          "y": 1960
+        }
+      ]
+    }
   ]
 }
