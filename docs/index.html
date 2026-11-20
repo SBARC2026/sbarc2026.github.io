@@ -10534,6 +10534,311 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   function active(a) { on = a; if (a && st) { st.resize(); st.loop(); } }
   function reset() { if (st) st.dispose(); st = null; data = null; if (root) root.innerHTML = ''; root = null; }
 
+  // ===== Scene: SBARC architecture (cream plaster, crenellated parapets, arched recesses, brown aluminium, timber pergolas) =====
+  function buildScene(T, cv, D, V, BL) {
+    const U = 0.5; // plan units are ~0.5 m: all sizes below are in plan units
+    const R = new T.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+    R.shadowMap.enabled = true; R.shadowMap.type = T.PCFSoftShadowMap; R.outputColorSpace = T.SRGBColorSpace;
+    R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.08;
+    const maxTex = R.capabilities.maxTextureSize, mobile = Math.min(screen.width, screen.height) < 700;
+    const S = new T.Scene();
+    const cam = new T.PerspectiveCamera(40, 16 / 9, 2, 60000);
+    // ---------- sky (gradient dome with sun glow) and image-based lighting from it
+    const SUN = new T.Vector3(-0.55, 0.62, -0.56).normalize();
+    const skyMat = new T.ShaderMaterial({ side: T.BackSide, depthWrite: false, fog: false,
+      uniforms: { sun: { value: SUN } },
+      vertexShader: 'varying vec3 vD; void main(){ vD = normalize((modelMatrix*vec4(position,1.0)).xyz - cameraPosition); gl_Position = projectionMatrix*viewMatrix*modelMatrix*vec4(position,1.0); gl_Position.z = gl_Position.w; }',
+      fragmentShader: 'uniform vec3 sun; varying vec3 vD; void main(){ float h = clamp(vD.y,-1.0,1.0); vec3 top = vec3(0.10,0.28,0.62); vec3 mid = vec3(0.36,0.56,0.82); vec3 hor = vec3(0.86,0.86,0.84); vec3 gnd = vec3(0.80,0.74,0.64);' +
+        ' vec3 c = h > 0.0 ? mix(hor, mix(mid, top, smoothstep(0.15,0.9,h)), smoothstep(0.0,0.22,h)) : mix(hor, gnd, smoothstep(0.0,0.08,-h));' +
+        ' float s = max(dot(vD, sun), 0.0); c += vec3(1.0,0.92,0.75)*(pow(s, 900.0)*6.0 + pow(s, 12.0)*0.18); gl_FragColor = vec4(c,1.0); }' });
+    const sky = new T.Mesh(new T.SphereGeometry(1, 48, 24), skyMat); sky.scale.setScalar(50000); sky.frustumCulled = false; sky.renderOrder = -1; S.add(sky);
+    { const es = new T.Scene(); const s2 = new T.Mesh(new T.SphereGeometry(1, 32, 16), skyMat); s2.scale.setScalar(50); es.add(s2);
+      const pm = new T.PMREMGenerator(R); S.environment = pm.fromScene(es, 0.02).texture; pm.dispose(); }
+    S.fog = new T.Fog(0xd9d6cd, 2500, 16000);
+    S.add(new T.HemisphereLight(0xcfe0ff, 0xb59a74, 0.15));
+    const sun = new T.DirectionalLight(0xfff0d8, 3.6); sun.castShadow = true; const SM = mobile ? 2048 : 4096; sun.shadow.mapSize.set(SM, SM);
+    sun.shadow.camera.near = 10; sun.shadow.camera.far = 9000; sun.shadow.normalBias = 0.6; S.add(sun, sun.target);
+    function fitShadow(tx, tz, r) {
+      const s = Math.min(2300, Math.max(110, r * 0.85)), c = sun.shadow.camera;
+      const tex = (2 * s) / SM; const ux = Math.round(tx / tex) * tex, uz = Math.round(tz / tex) * tex; // snap to texels: no shimmer
+      sun.target.position.set(ux, 0, uz);
+      sun.position.set(ux + SUN.x * 4000, SUN.y * 4000, uz + SUN.z * 4000);
+      if (c.right !== s) { c.left = -s; c.right = s; c.top = s; c.bottom = -s; c.updateProjectionMatrix(); sun.shadow.bias = -0.00012 * (s / 400); }
+    }
+    // ---------- procedural textures
+    const cnv = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+    let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    function noiseTex(size, base, amp, tile) {
+      const c = cnv(size, size), g = c.getContext('2d'), im = g.createImageData(size, size);
+      for (let i = 0; i < size * size; i++) { const n = (rnd() - 0.5) * amp; im.data[i * 4] = base[0] + n; im.data[i * 4 + 1] = base[1] + n; im.data[i * 4 + 2] = base[2] + n; im.data[i * 4 + 3] = 255; }
+      g.putImageData(im, 0, 0); g.globalAlpha = 0.5; g.drawImage(c, 0, 0, size / 2, size / 2, 0, 0, size, size); // low-frequency blotches
+      const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; if (tile) t.repeat.set(tile, tile); t.colorSpace = T.SRGBColorSpace; return t;
+    }
+    const plasterTex = noiseTex(256, [236, 231, 220], 14, 1);
+    const detailTex = noiseTex(512, [128, 128, 128], 70, 1); detailTex.colorSpace = T.NoColorSpace;
+    // ---------- materials
+    const std = (o) => new T.MeshStandardMaterial(o);
+    const M = {
+      wall: std({ color: 0xf2ece0, map: plasterTex, roughness: 0.92, envMapIntensity: 0.6 }),
+      recess: std({ color: 0xe2d8c6, map: plasterTex, roughness: 0.95, envMapIntensity: 0.5 }),
+      roof: std({ color: 0xd8cfbf, roughness: 0.95, envMapIntensity: 0.4 }),
+      plinth: std({ color: 0x8c8378, roughness: 0.55 }),
+      frame: std({ color: 0x4e3326, roughness: 0.45, metalness: 0.35 }),
+      glass: std({ color: 0x1c2730, roughness: 0.04, metalness: 0.85, envMapIntensity: 1.4 }),
+      wood: std({ color: 0x6a4331, roughness: 0.7 }),
+      turf: std({ color: 0x6c923c, roughness: 1 }),
+      metal: std({ color: 0xa7adb2, roughness: 0.4, metalness: 0.6 }),
+      dome: std({ color: 0xf4efe4, map: plasterTex, roughness: 0.6, envMapIntensity: 0.8 }),
+      water: std({ color: 0x2aa8c9, roughness: 0.05, metalness: 0.2, envMapIntensity: 1.2, emissive: 0x063445, emissiveIntensity: 0.35 }),
+      deck: std({ color: 0xe3dccd, roughness: 0.8 }),
+      bark: std({ color: 0x7b6650, roughness: 1 }), leafA: std({ color: 0x66783b, roughness: 0.9 }), leafB: std({ color: 0x7c8c45, roughness: 0.9 }),
+      paint: std({ color: 0xf5f6f7, roughness: 0.3, metalness: 0.4, envMapIntensity: 1.1 }), tyre: std({ color: 0x1b1b1b, roughness: 0.9 }),
+    };
+    // ---------- geometry kit: everything merged per material
+    function flip(g) { for (const k in g.attributes) { const a = g.attributes[k], n = a.itemSize, arr = a.array; for (let i = 0; i < a.count; i += 3) for (let j = 0; j < n; j++) { const t = arr[(i + 1) * n + j]; arr[(i + 1) * n + j] = arr[(i + 2) * n + j]; arr[(i + 2) * n + j] = t; } } return g; }
+    function mergeList(list) {
+      let n = 0; const gs = list.map(([g, m]) => { const x = (g.index ? g.toNonIndexed() : g.clone()).applyMatrix4(m); n += x.attributes.position.count; return x; });
+      const P = new Float32Array(n * 3), N = new Float32Array(n * 3), UV = new Float32Array(n * 2); let o = 0;
+      gs.forEach((g) => { P.set(g.attributes.position.array, o * 3); N.set(g.attributes.normal.array, o * 3); if (g.attributes.uv) UV.set(g.attributes.uv.array, o * 2); o += g.attributes.position.count; g.dispose(); });
+      const out = new T.BufferGeometry(); out.setAttribute('position', new T.BufferAttribute(P, 3)); out.setAttribute('normal', new T.BufferAttribute(N, 3)); out.setAttribute('uv', new T.BufferAttribute(UV, 2)); out.computeBoundingSphere(); return out;
+    }
+    class Kit {
+      constructor() { this.p = {}; }
+      add(mat, geo, x, y, z, ry = 0, rx = 0) { (this.p[mat] = this.p[mat] || []).push([geo, new T.Matrix4().compose(new T.Vector3(x, y, z), new T.Quaternion().setFromEuler(new T.Euler(rx, ry, 0)), new T.Vector3(1, 1, 1))]); }
+      box(mat, x0, y0, z0, x1, y1, z1) { this.add(mat, new T.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); }
+      build(mirror) { const out = {}; for (const k in this.p) { let g = mergeList(this.p[k]); if (mirror) { g.applyMatrix4(new T.Matrix4().makeScale(-1, 1, 1)); flip(g); } out[k] = g; } return out; }
+    }
+    const shapeArch = (w, h) => { const s = new T.Shape(); s.moveTo(-w / 2, 0); s.lineTo(w / 2, 0); s.lineTo(w / 2, h - w / 2); s.absarc(0, h - w / 2, w / 2, 0, Math.PI, false); s.lineTo(-w / 2, 0); return s; };
+    const shapeRect = (w, h) => { const s = new T.Shape(); s.moveTo(-w / 2, 0); s.lineTo(w / 2, 0); s.lineTo(w / 2, h); s.lineTo(-w / 2, h); s.lineTo(-w / 2, 0); return s; };
+    const ext = (s, d) => new T.ExtrudeGeometry(s, { depth: d, bevelEnabled: false, curveSegments: 10 });
+    // a face of a block: origin on the wall surface, +z outward
+    function face(b, side) {
+      const cx = (b.x0 + b.x1) / 2, cz = (b.z0 + b.z1) / 2;
+      return ({ f: [cx, b.z1, 0, b.x1 - b.x0], k: [cx, b.z0, Math.PI, b.x1 - b.x0], r: [b.x1, cz, Math.PI / 2, b.z1 - b.z0], l: [b.x0, cz, -Math.PI / 2, b.z1 - b.z0] })[side];
+    }
+    function onFace(K, b, side, u, y, mat, geo, out = 0) {
+      const [a, c, ry, len] = face(b, side); const s = Math.sin(ry), co = Math.cos(ry);
+      // local (u along face, out along normal) -> world
+      let x, z; if (side === 'f' || side === 'k') { x = a + (side === 'f' ? u : -u); z = c + (side === 'f' ? out : -out); } else { z = c + (side === 'r' ? -u : u); x = a + (side === 'r' ? out : -out); }
+      K.add(mat, geo, x, y, z, ry); return len;
+    }
+    // window: brown frame, dark reflective glass, mullion
+    function win(K, b, side, u, y, w, h, arched) {
+      const sh = arched ? shapeArch : shapeRect;
+      onFace(K, b, side, u, y - 0.4, 'recess', ext(sh(w + 1.6, h + 1.2), 0.08), 0.02);
+      onFace(K, b, side, u, y, 'frame', ext(sh(w + 0.6, h + 0.3), 0.18), 0.03);
+      onFace(K, b, side, u, y + 0.15, 'glass', ext(sh(w - 0.2, h - 0.25), 0.1), 0.12);
+      onFace(K, b, side, u, y + 0.15, 'frame', new T.BoxGeometry(0.35, h - (arched ? w / 2 : 0.3), 0.12).translate(0, (h - (arched ? w / 2 : 0.3)) / 2, 0.06), 0.18);
+    }
+    const blind = (K, b, side, u, y, w, h) => onFace(K, b, side, u, y, 'recess', ext(shapeArch(w, h), 0.12), 0.01);
+    // block with parapet, crenellations, plinth band and roof slab
+    function block(K, b, h, cren = true) {
+      K.box('wall', b.x0, 0.8, b.z0, b.x1, h - 2.6, b.z1);
+      K.box('plinth', b.x0 - 0.15, 0, b.z0 - 0.15, b.x1 + 0.15, 0.8, b.z1 + 0.15);
+      K.box('roof', b.x0 + 0.5, h - 2.6, b.z0 + 0.5, b.x1 - 0.5, h - 2.45, b.z1 - 0.5);
+      const t = 0.6; // parapet walls
+      K.box('wall', b.x0, h - 2.6, b.z0, b.x1, h, b.z0 + t); K.box('wall', b.x0, h - 2.6, b.z1 - t, b.x1, h, b.z1);
+      K.box('wall', b.x0, h - 2.6, b.z0, b.x0 + t, h, b.z1); K.box('wall', b.x1 - t, h - 2.6, b.z0, b.x1, h, b.z1);
+      K.box('wall', b.x0 - 0.25, h - 4.2, b.z0 - 0.25, b.x1 + 0.25, h - 3.8, b.z1 + 0.25); // cornice line
+      if (!cren) return;
+      for (const side of ['f', 'k', 'l', 'r']) { const len = face(b, side)[3], n = Math.max(1, Math.floor(len / 6));
+        for (let i = 0; i < n; i++) { const u = -len / 2 + (i + 0.5) * len / n; if (i % 2 === 0) continue; onFace(K, b, side, u, h, 'wall', new T.BoxGeometry(2.2, 1.6, 0.6).translate(0, 0.8, -0.3), 0); onFace(K, b, side, u, h + 1.6, 'wall', new T.BoxGeometry(1.0, 0.8, 0.6).translate(0, 0.4, -0.3), 0); } }
+    }
+    function railing(K, x0, x1, z, y, alongX = true) {
+      const n = Math.floor(Math.abs(x1 - x0) / 0.9);
+      for (let i = 0; i <= n; i++) { const p = x0 + (x1 - x0) * i / n; K.add('frame', new T.BoxGeometry(0.22, 2.1, 0.22), alongX ? p : z, y + 1.05, alongX ? z : p); }
+      K.add('frame', new T.BoxGeometry(alongX ? Math.abs(x1 - x0) : 0.35, 0.3, alongX ? 0.35 : Math.abs(x1 - x0)), alongX ? (x0 + x1) / 2 : z, y + 2.15, alongX ? z : (x0 + x1) / 2);
+    }
+    function pergola(K, x0, x1, z0, z1, y) {
+      for (const [px, pz] of [[x0, z0], [x1, z0], [x0, z1], [x1, z1]]) K.add('wood', new T.BoxGeometry(0.8, 6.2, 0.8), px, y + 3.1, pz);
+      K.box('wood', x0 - 0.5, y + 6.2, z1 - 0.4, x1 + 0.5, y + 7.0, z1 + 0.4); K.box('wood', x0 - 0.5, y + 6.2, z0 - 0.4, x1 + 0.5, y + 7.0, z0 + 0.4);
+      for (let x = x0; x <= x1 + 0.01; x += 1.1) K.add('wood', new T.BoxGeometry(0.35, 0.5, z1 - z0 + 1.2), x, y + 7.2, (z0 + z1) / 2);
+    }
+    function arcade(K, x0, x1, z, h, n, d) { // front wall with arched openings, depth d back from z
+      const w = x1 - x0, s = new T.Shape(); s.moveTo(0, 0); s.lineTo(w, 0); s.lineTo(w, h); s.lineTo(0, h); s.lineTo(0, 0);
+      const aw = Math.min(5.2, w / n - 1.4), ah = h - 2.2;
+      for (let i = 0; i < n; i++) { const cx = (i + 0.5) * w / n, p = new T.Path(); p.moveTo(cx - aw / 2, 0.01); p.lineTo(cx - aw / 2, ah - aw / 2); p.absarc(cx, ah - aw / 2, aw / 2, Math.PI, 0, true); p.lineTo(cx + aw / 2, 0.01); p.lineTo(cx - aw / 2, 0.01); s.holes.push(p); }
+      K.add('wall', ext(s, 1.4), x0, 0, z - 1.4);
+      K.box('wall', x0, h - 0.1, z - d, x1, h + 0.9, z); K.box('roof', x0 + 0.4, h + 0.9, z - d + 0.4, x1 - 0.4, h + 1.0, z - 0.4);
+      K.box('wall', x0 - 0.2, h + 0.9, z - 0.6, x1 + 0.2, h + 2.0, z);
+    }
+    // ---------- villa templates (R1 / R2 / R3), front = +z
+    function villaKit(type) {
+      const K = new Kit();
+      const big = type === 'R1', small = type === 'R3';
+      const A = { x0: -18, x1: small ? -3 : -1, z0: -13, z1: 8 }, Cw = { x0: small ? -3 : -1, x1: big ? 18 : 15, z0: -13, z1: 3 };
+      const hA = 18.5, hC = 15;
+      block(K, A, hA); block(K, Cw, hC);
+      // tower front: 3 tall windows ground floor, 3 blind arches above, vents under parapet
+      const aw = A.x1 - A.x0;
+      for (let i = -1; i <= 1; i++) { win(K, A, 'f', i * aw / 4, 1.2, 2.8, 6.0, false); blind(K, A, 'f', i * aw / 4, 8.6, 3.2, 5.8); onFace(K, A, 'f', i * aw / 4, hA - 6.3, 'recess', new T.BoxGeometry(3.0, 1.5, 0.1), 0.02); }
+      // tower sides: arched windows
+      win(K, A, 'l', -4, 9.2, 2.4, 5.0, true); win(K, A, 'l', 4, 9.2, 2.4, 5.0, true); win(K, A, 'l', 0, 1.6, 2.6, 5.0, false);
+      win(K, A, 'k', -4, 9.2, 2.4, 5.0, true); win(K, A, 'k', 4, 1.6, 2.4, 5.0, false);
+      // wing: first-floor arched windows to the terrace, ground windows
+      const cw = Cw.x1 - Cw.x0;
+      win(K, Cw, 'f', -cw / 4, 1.4, 3.0, 5.4, false); win(K, Cw, 'f', cw / 4, 1.4, 3.0, 5.4, false);
+      win(K, Cw, 'r', -3, 8.6, 2.4, 5.0, true); win(K, Cw, 'r', 3, 8.6, 2.4, 5.0, true); win(K, Cw, 'k', 0, 8.6, 2.4, 5.0, true); win(K, Cw, 'k', -6, 1.6, 2.4, 4.6, false);
+      // roof terrace on the wing (open part over the front), pergola and railing
+      const tx0 = Cw.x0 + 3, tx1 = Cw.x1 - 1.5;
+      pergola(K, tx0, tx1, -6, 2.4, hC - 2.45); railing(K, tx0, tx1, 2.6, hC);
+      // first-floor balcony with pergola on the tower side
+      K.box('wall', A.x0 + 2, 7.2, A.z1, A.x0 + 9, 7.8, A.z1 + 3.2); railing(K, A.x0 + 2.2, A.x0 + 8.8, A.z1 + 3.0, 7.8);
+      // arched carport / entrance arcade in front of the wing
+      if (!small) arcade(K, Cw.x0 + 1, Cw.x1, Cw.z1 + 10, 7.5, big ? 3 : 2, 10);
+      else arcade(K, A.x0 + 2, A.x1 - 1, A.z1 + 8, 7.2, 2, 8);
+      // boundary wall with a gap for the gate, turf garden at the back
+      const W0 = -23, W1 = 23, Z0 = -19, Z1 = 19, wh = 5, t = 0.6;
+      K.box('wall', W0, 0, Z0, W1, wh, Z0 + t); K.box('wall', W0, 0, Z0, W0 + t, wh, Z1); K.box('wall', W1 - t, 0, Z0, W1, wh, Z1);
+      K.box('wall', W0, 0, Z1 - t, -1, wh, Z1); K.box('wall', 13, 0, Z1 - t, W1, wh, Z1);
+      for (const x of [W0, W1]) K.box('wall', x - 0.3, wh, Z0 - 0.3, x + 0.3, wh + 0.5, Z1 + 0.3);
+      K.box('turf', W0 + 1, 0, Z0 + 1, W1 - 1, 0.15, -14); K.box('turf', A.x0 - 4, 0, -13, A.x0 - 0.5, 0.15, Z1 - 1);
+      K.box('deck', -1, 0, Cw.z1, 13, 0.12, Z1);
+      return K;
+    }
+    // ---------- roads and land from the site plan (ground texture)
+    const PW = D.w, PH = D.h, Kp = Math.min(1.6, (Math.min(maxTex, mobile ? 4096 : 8192)) / PW);
+    const gc = cnv(Math.round(PW * Kp), Math.round(PH * Kp)), g = gc.getContext('2d'); g.scale(Kp, Kp);
+    const pat = (size, draw) => { const c = cnv(size, size), x = c.getContext('2d'); draw(x, size); return g.createPattern(c, 'repeat'); };
+    const sandP = pat(256, (x, s) => { x.fillStyle = '#d6c6a3'; x.fillRect(0, 0, s, s); for (let i = 0; i < 2600; i++) { x.fillStyle = `rgba(${rnd() < 0.5 ? '120,100,70' : '255,248,230'},${0.05 + rnd() * 0.08})`; x.fillRect(rnd() * s, rnd() * s, 1 + rnd() * 3, 1 + rnd() * 3); } });
+    const baseP = pat(256, (x, s) => { x.fillStyle = '#d3ccbd'; x.fillRect(0, 0, s, s); for (let i = 0; i < 1800; i++) { x.fillStyle = `rgba(${rnd() < 0.5 ? '110,100,85' : '250,246,236'},${0.05 + rnd() * 0.07})`; x.fillRect(rnd() * s, rnd() * s, 1 + rnd() * 4, 1 + rnd() * 2); } });
+    const stampP = pat(128, (x, s) => { x.fillStyle = '#cdc9c1'; x.fillRect(0, 0, s, s); x.strokeStyle = 'rgba(95,90,82,.45)'; x.lineWidth = 0.6;
+      for (let i = 0; i < 140; i++) { const cx = rnd() * s, cy = rnd() * s, r = 3 + rnd() * 4; x.beginPath(); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2 + rnd() * 0.5; x.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } x.closePath(); x.stroke(); }
+      for (let i = 0; i < 300; i++) { x.fillStyle = `rgba(255,255,255,${rnd() * 0.08})`; x.fillRect(rnd() * s, rnd() * s, 1, 1); } });
+    const turfP = pat(64, (x, s) => { x.fillStyle = '#6b9139'; x.fillRect(0, 0, s, s); for (let i = 0; i < 900; i++) { x.fillStyle = `rgba(${rnd() < 0.5 ? '40,70,20' : '160,190,90'},${0.12 + rnd() * 0.15})`; x.fillRect(rnd() * s, rnd() * s, 1, 1 + rnd() * 2); } });
+    stampP.setTransform(new DOMMatrix().scale(0.12)); turfP.setTransform(new DOMMatrix().scale(0.25)); baseP.setTransform(new DOMMatrix().scale(0.5));
+    g.fillStyle = sandP; g.fillRect(-PW, -PH, PW * 3, PH * 3);
+    const bnd = new Path2D(D.boundary); g.fillStyle = baseP; g.fill(bnd);
+    const L = D.land || {}, fill = (p, st) => { if (p) { g.fillStyle = st; g.fill(new Path2D(p)); } }, line = (p, c, w) => { if (p) { g.strokeStyle = c; g.lineWidth = w; g.lineCap = g.lineJoin = 'round'; g.stroke(new Path2D(p)); } };
+    if (L.interlock) { fill(L.interlock[0], stampP); fill(L.interlock[1], stampP); }
+    if (L.soft) { fill(L.soft[0], turfP); g.globalAlpha = 0.75; fill(L.soft[1], turfP); g.globalAlpha = 1; }
+    if (L.curb) { line(L.curb[2], 'rgba(70,66,60,.55)', 1.6); line(L.curb[2], '#ebe7df', 0.9); }
+    if (L.bike) { line(L.bike[2], '#b4846c', 2.6); line(L.bike[3], '#b4846c', 2.6); }
+    const gtx = new T.CanvasTexture(gc); gtx.colorSpace = T.SRGBColorSpace; gtx.anisotropy = R.capabilities.getMaxAnisotropy();
+    gtx.generateMipmaps = true; gtx.minFilter = T.LinearMipmapLinearFilter;
+    const groundMat = std({ map: gtx, roughness: 0.97, envMapIntensity: 0.3 });
+    groundMat.onBeforeCompile = (sh) => { sh.uniforms.detailMap = { value: detailTex };
+      sh.fragmentShader = 'uniform sampler2D detailMap;\n' + sh.fragmentShader.replace('#include <map_fragment>', '#include <map_fragment>\n float dn = texture2D(detailMap, vMapUv * vec2(' + (PW / 9).toFixed(1) + ',' + (PH / 9).toFixed(1) + ')).r; float dn2 = texture2D(detailMap, vMapUv * vec2(' + (PW / 80).toFixed(1) + ',' + (PH / 80).toFixed(1) + ')).r; diffuseColor.rgb *= (0.86 + 0.28 * dn) * (0.93 + 0.14 * dn2);'); };
+    const ground = new T.Mesh(new T.PlaneGeometry(PW * 3, PH * 3), groundMat); ground.rotation.x = -Math.PI / 2; ground.position.set(PW / 2, 0, PH / 2); ground.receiveShadow = true;
+    { const uv = ground.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 3 - 1, uv.getY(i) * 3 - 1); }
+    gtx.wrapS = gtx.wrapT = T.ClampToEdgeWrapping; S.add(ground);
+    const desert = new T.Mesh(new T.CircleGeometry(60000, 64), std({ color: 0xcdbd9c, roughness: 1 })); desert.rotation.x = -Math.PI / 2; desert.position.set(PW / 2, -0.8, PH / 2); S.add(desert);
+    // perimeter wall along the site boundary
+    const bp = (D.boundary.match(/-?\d+(?:\.\d+)? -?\d+(?:\.\d+)?/g) || []).map((s) => s.split(' ').map(Number));
+    { const K = new Kit(); for (let i = 0; i < bp.length; i++) { const [x0, z0] = bp[i], [x1, z1] = bp[(i + 1) % bp.length], len = Math.hypot(x1 - x0, z1 - z0);
+        K.add('wall', new T.BoxGeometry(len, 6, 0.8), (x0 + x1) / 2, 3, (z0 + z1) / 2, -Math.atan2(z1 - z0, x1 - x0)); K.add('wall', new T.BoxGeometry(len, 0.6, 1.3), (x0 + x1) / 2, 6.3, (z0 + z1) / 2, -Math.atan2(z1 - z0, x1 - x0)); }
+      const gs = K.build(false); for (const k in gs) { const m = new T.Mesh(gs[k], M[k]); m.castShadow = m.receiveShadow = true; S.add(m); } }
+    // curb lines -> street points (for tree rows, cars and villa orientation)
+    const curbPts = [];
+    if (L.curb && L.curb[2]) { const segs = L.curb[2].split('M').filter(Boolean).map((s) => { const n = s.trim().split(/[\s,]+/).map(Number), out = []; for (let i = 0; i + 1 < n.length; i += 2) out.push([n[i], n[i + 1]]); return out; });
+      segs.forEach((pts) => { let acc = 0; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); acc += d; if (acc >= 5) { acc = 0; curbPts.push([pts[i][0], pts[i][1], Math.atan2(pts[i][1] - pts[i - 1][1], pts[i][0] - pts[i - 1][0])]); } } }); }
+    // ---------- villas: one template per type and hand, instanced
+    const ROT = -Math.atan2(553, 980), pick = [], wallMeshes = [];
+    const nearest = (x, y) => { let b = null, bd = 1e9; for (const p of curbPts) { const d = (p[0] - x) ** 2 + (p[1] - y) ** 2; if (d < bd) { bd = d; b = p; } } return b; };
+    const kits = {}, groups = {};
+    V.forEach((v, i) => {
+      const t = ['R1', 'R2', 'R3'].includes(v.t) ? v.t : 'R2', mir = i % 2 === 1, key = t + (mir ? 'm' : '');
+      const n = nearest(v.x, v.y); let rot = ROT;
+      if (n) { const a = Math.atan2(n[0] - v.x, n[1] - v.y); let best = 0, bd = 9; for (let k = 0; k < 4; k++) { const r = ROT + k * Math.PI / 2; let dd = Math.abs(((a - r) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI); if (dd < bd) { bd = dd; best = r; } } rot = best; }
+      v.rot = rot; v.hl = [48, 22, 40]; v.h = 22; v.kind = 'V';
+      (groups[key] = groups[key] || []).push(v);
+    });
+    const m4 = new T.Matrix4(), q4 = new T.Quaternion(), one = new T.Vector3(1, 1, 1), yAx = new T.Vector3(0, 1, 0), white = new T.Color(1, 1, 1);
+    for (const key in groups) {
+      const t = key.slice(0, 2), mir = key.endsWith('m'); kits[t] = kits[t] || villaKit(t); const geos = kits[t].build(mir), list = groups[key];
+      for (const mat in geos) {
+        const im = new T.InstancedMesh(geos[mat], M[mat], list.length); im.castShadow = mat !== 'turf' && mat !== 'deck'; im.receiveShadow = true;
+        list.forEach((v, i) => { im.setMatrixAt(i, m4.compose(new T.Vector3(v.x, 0, v.y), q4.setFromAxisAngle(yAx, v.rot), one)); if (mat === 'wall' || mat === 'recess') im.setColorAt(i, white); });
+        im.userData.list = list; S.add(im);
+        if (mat === 'wall') { pick.push(im); wallMeshes.push(im); } if (mat === 'recess') wallMeshes.push(im);
+      }
+    }
+    // ---------- community buildings
+    const SPEC = { AD: [120, 80, 3, 'civic'], BA: [150, 70, 3, 'civic'], CC: [150, 110, 3, 'civic'], CO: [160, 90, 2, 'shed'], HB: [130, 90, 4, 'civic'], IS: [170, 120, 3, 'shed'],
+      MQ: [90, 90, 2, 'mosque'], PA: [90, 60, 1, 'pav'], RG: [55, 30, 1, 'gate'], SC: [110, 70, 2, 'pool'], SG: [55, 30, 1, 'gate'], SR: [80, 55, 2, 'civic'], UT: [90, 60, 2, 'shed'], WS: [140, 90, 2, 'shed'] };
+    const FH = 8.4;
+    function civicFacade(K, b, floors, h) {
+      for (const side of ['f', 'k', 'l', 'r']) { const len = face(b, side)[3], n = Math.max(2, Math.floor((len - 8) / 9));
+        for (let i = 0; i < n; i++) { const u = -len / 2 + 4 + (i + 0.5) * (len - 8) / n;
+          for (let f = 0; f < floors; f++) { const y = 1.4 + f * FH;
+            if (f === floors - 1 && floors > 1) win(K, b, side, u, y + 0.4, 3.4, 6.2, true);
+            else if (f === 0 && side === 'f') win(K, b, side, u, y, 4.4, 6.0, false);
+            else { win(K, b, side, u - 1.3, y + 0.8, 1.6, 4.6, false); win(K, b, side, u + 1.3, y + 0.8, 1.6, 4.6, false); } } }
+        for (const s2 of [-1, 1]) onFace(K, b, side, s2 * (len / 2 - 1.5), 0.8, 'wall', new T.BoxGeometry(3, h - 3.4, 0.7).translate(0, (h - 3.4) / 2, 0.35), 0); }
+    }
+    BL.forEach((bd) => {
+      const [w, d, floors, kind] = SPEC[bd.c] || [100, 70, 2, 'civic'], K = new Kit(), b = { x0: -w / 2, x1: w / 2, z0: -d / 2, z1: d / 2 };
+      let h = floors * FH + 3.5, top = h;
+      if (kind === 'civic' || kind === 'pool' || kind === 'pav') { block(K, b, h); civicFacade(K, b, floors, h);
+        if (floors >= 3) { const c = { x0: -w / 2 + 10, x1: w / 2 - 10, z0: -d / 2 + 8, z1: d / 2 - 8 }; K.box('wall', c.x0 + 6, h - 2.5, c.z0 + 6, c.x0 + 26, h + 8, c.z0 + 20); } }
+      if (kind === 'pav') { pergola(K, -w / 2 - 6, w / 2 + 6, d / 2 + 2, d / 2 + 18, 0); K.box('deck', -w / 2 - 14, 0, -d / 2 - 10, w / 2 + 14, 0.25, d / 2 + 24); }
+      if (kind === 'pool') { K.box('deck', -w / 2 - 6, 0, d / 2, w / 2 + 6, 0.3, d / 2 + 52); K.box('water', -w / 2 + 6, 0, d / 2 + 10, w / 2 - 6, 0.42, d / 2 + 44); pergola(K, w / 2 - 30, w / 2 - 2, d / 2 + 2, d / 2 + 10, 0.3); }
+      if (kind === 'shed') { const hb = floors * FH + 8; h = hb; block(K, b, hb, false);
+        for (let x = -w / 2 + 8; x < w / 2 - 4; x += 10) onFace(K, b, 'k', x, 4, 'recess', new T.BoxGeometry(6, hb - 9, 0.15), 0.02);
+        const a = { x0: -w / 2 + 8, x1: w / 2 - 8, z0: d / 2, z1: d / 2 + 16 }; block(K, a, 13.5); const len = a.x1 - a.x0, n = Math.floor(len / 9);
+        for (let i = 0; i < n; i++) { win(K, a, 'f', -len / 2 + (i + 0.5) * len / n, 1.0, 3.6, 7.6, true); }
+        for (let i = 0; i < 10; i++) K.box('metal', -w / 2 + 10 + (i % 5) * (w - 20) / 5, hb - 2.45, -d / 2 + 12 + Math.floor(i / 5) * 24, -w / 2 + 16 + (i % 5) * (w - 20) / 5, hb + 1.5, -d / 2 + 18 + Math.floor(i / 5) * 24);
+        top = hb; }
+      if (kind === 'mosque') { block(K, b, 17); for (const side of ['f', 'k', 'l', 'r']) for (let i = -2; i <= 2; i++) win(K, b, side, i * 14, 2.2, 3.4, 9.5, true);
+        K.add('dome', new T.CylinderGeometry(21, 21, 4, 48), 0, 16.5, 0); K.add('dome', new T.SphereGeometry(21, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), 0, 18.5, 0);
+        K.add('frame', new T.CylinderGeometry(0.5, 0.5, 6, 8), 0, 42, 0); K.add('dome', new T.SphereGeometry(1.2, 12, 8), 0, 45.5, 0);
+        const mx = w / 2 + 9, mz = -d / 2 + 9; K.box('wall', mx - 4.5, 0, mz - 4.5, mx + 4.5, 28, mz + 4.5); K.add('wall', new T.CylinderGeometry(3.2, 3.6, 30, 24), mx, 43, mz);
+        K.add('wall', new T.CylinderGeometry(5, 5, 1.2, 24), mx, 46, mz); K.add('dome', new T.ConeGeometry(3.4, 9, 24), mx, 62.5, mz); K.add('wall', new T.CylinderGeometry(3, 3, 12, 24), mx, 52, mz);
+        for (let i = -1; i <= 1; i++) win(K, { x0: mx - 4.5, x1: mx + 4.5, z0: mz - 4.5, z1: mz + 4.5 }, 'f', 0, 6 + (i + 1) * 7, 1.6, 4, true);
+        top = 46; h = 17; }
+      if (kind === 'gate') { block(K, b, 11); win(K, b, 'f', -8, 1.4, 3, 5.6, true); win(K, b, 'f', 8, 1.4, 3, 5.6, true);
+        K.box('wall', -w / 2 - 30, 9.5, d / 2 + 4, w / 2 + 30, 12, d / 2 + 18); for (const x of [-w / 2 - 28, -10, 10, w / 2 + 28]) K.box('wall', x - 1.2, 0, d / 2 + 15, x + 1.2, 9.5, d / 2 + 17.4); top = 14; }
+      const G = new T.Group(); G.position.set(bd.x, 0, bd.y); G.rotation.y = ROT; S.add(G);
+      const gs = K.build(false); for (const k in gs) { const m = new T.Mesh(gs[k], M[k]); m.castShadow = k !== 'deck' && k !== 'water'; m.receiveShadow = true; G.add(m); if (k === 'wall') { m.userData.it = bd; pick.push(m); bd.wallMesh = m; } }
+      bd.kind = 'B'; bd.rot = ROT; bd.hl = [w + 8, top + 3, d + 8]; bd.h = top; bd.size = Math.max(w, d);
+    });
+    // ---------- trees along the streets, palms near the community buildings, a few parked cars
+    const blockers = [...V.map((v) => [v.x, v.y, 31]), ...BL.map((b) => [b.x, b.y, (SPEC[b.c] || [100])[0] * 0.75 + 14])];
+    const free = (x, y) => !blockers.some((p) => (p[0] - x) ** 2 + (p[1] - y) ** 2 < p[2] * p[2]);
+    const nearB = (x, y) => BL.some((b) => (b.x - x) ** 2 + (b.y - y) ** 2 < 260 * 260);
+    const treePos = [], palmPos = [];
+    curbPts.forEach((p, i) => { if (i % 5) return; const off = (i % 10 ? 3.5 : -3.5), x = p[0] + Math.sin(p[2]) * off, y = p[1] - Math.cos(p[2]) * off; if (!free(x, y)) return; (nearB(x, y) && i % 3 === 0 ? palmPos : treePos).push([x, y, 0.75 + rnd() * 0.5]); });
+    if (L.soft && L.soft[0]) { const sp = new Path2D(L.soft[0]), tc = cnv(4, 4).getContext('2d'); for (let k = 0; k < 9000 && treePos.length < 2600; k++) { const x = rnd() * PW, y = rnd() * PH; if (tc.isPointInPath(sp, x, y) && free(x, y) && rnd() < 0.5) treePos.push([x, y, 0.8 + rnd() * 0.6]); } }
+    { // young street tree: slim trunk, open crown of several clumps
+      const K = new Kit(); K.add('bark', new T.CylinderGeometry(0.22, 0.32, 7, 6), 0, 3.5, 0);
+      const KL = new Kit(); for (let i = 0; i < 10; i++) { const a = i * 2.4, r = 0.6 + (i % 4) * 0.5; KL.add('leafA', new T.IcosahedronGeometry(1.1 + (i % 3) * 0.35, 1), Math.cos(a) * r, 6.6 + (i % 5) * 0.6, Math.sin(a) * r); }
+      const gt = K.build(false).bark, gl = KL.build(false).leafA, n = treePos.length;
+      const it = new T.InstancedMesh(gt, M.bark, n), il = new T.InstancedMesh(gl, std({ color: 0xffffff, roughness: 0.9 }), n); it.castShadow = il.castShadow = true; il.receiveShadow = true;
+      const col = new T.Color(); treePos.forEach((p, i) => { const s = p[2]; m4.compose(new T.Vector3(p[0], 0, p[1]), q4.setFromAxisAngle(yAx, rnd() * 6.28), new T.Vector3(s, s * (0.9 + rnd() * 0.3), s)); it.setMatrixAt(i, m4); il.setMatrixAt(i, m4); il.setColorAt(i, col.setHSL(0.2 + rnd() * 0.06, 0.38 + rnd() * 0.15, 0.17 + rnd() * 0.08)); });
+      S.add(it, il);
+    }
+    { // date palm: tall trunk and drooping fronds (alpha-textured leaf blades)
+      const fc = cnv(64, 256), fx = fc.getContext('2d'); fx.strokeStyle = '#5f7a34'; fx.lineWidth = 3; fx.beginPath(); fx.moveTo(32, 0); fx.lineTo(32, 256); fx.stroke();
+      for (let y = 6; y < 250; y += 5) { const w = 30 * Math.sin((y / 256) * Math.PI) + 3; fx.strokeStyle = y % 10 ? '#6f8c3c' : '#58722e'; fx.lineWidth = 2; fx.beginPath(); fx.moveTo(32, y); fx.lineTo(32 - w, y + 9); fx.moveTo(32, y); fx.lineTo(32 + w, y + 9); fx.stroke(); }
+      const ft = new T.CanvasTexture(fc); ft.colorSpace = T.SRGBColorSpace;
+      const frondMat = std({ map: ft, alphaTest: 0.4, side: T.DoubleSide, roughness: 0.85 });
+      const crown = []; for (let i = 0; i < 16; i++) { const g2 = new T.PlaneGeometry(2.6, 9, 1, 6); const p = g2.attributes.position; for (let k = 0; k < p.count; k++) { const yy = p.getY(k) + 4.5; p.setY(k, yy); p.setZ(k, -0.035 * yy * yy); }
+        g2.computeVertexNormals(); g2.rotateX(-Math.PI / 2 + (i < 8 ? 0.55 : 1.05)); g2.rotateY(i * (Math.PI * 2 / 8) + (i < 8 ? 0 : 0.4)); g2.translate(0, 15, 0); crown.push([g2, new T.Matrix4()]); }
+      const gc2 = mergeList(crown), n = palmPos.length, trunkG = new T.CylinderGeometry(0.55, 0.8, 15, 8).translate(0, 7.5, 0);
+      const pt = new T.InstancedMesh(trunkG, M.bark, n), pf = new T.InstancedMesh(gc2, frondMat, n); pt.castShadow = pf.castShadow = true;
+      palmPos.forEach((p, i) => { const s = p[2] * 1.1; m4.compose(new T.Vector3(p[0], 0, p[1]), q4.setFromAxisAngle(yAx, rnd() * 6.28), new T.Vector3(s, s, s)); pt.setMatrixAt(i, m4); pf.setMatrixAt(i, m4); });
+      S.add(pt, pf);
+    }
+    { // cars: parked in front of the community buildings and here and there along villa streets
+      const K = new Kit(); K.box('paint', -4.6, 0.7, -1.9, 4.6, 2.4, 1.9); K.box('paint', -2.4, 2.4, -1.75, 1.6, 3.7, 1.75); K.box('glass', -2.3, 2.5, -1.8, 1.5, 3.55, 1.8); K.box('glass', 1.55, 2.5, -1.6, 1.75, 3.5, 1.6);
+      for (const [x, z] of [[-3, -1.7], [3, -1.7], [-3, 1.7], [3, 1.7]]) K.add('tyre', new T.CylinderGeometry(0.8, 0.8, 0.6, 12), x, 0.8, z, 0, Math.PI / 2);
+      const gs = K.build(false), cars = [];
+      BL.forEach((b) => { const [w, d] = SPEC[b.c] || [100, 70]; const n = Math.min(10, Math.floor(w / 14)); for (let i = 0; i < n; i++) { if (rnd() < 0.35) continue; const lx = -w / 2 + 8 + i * 6.5 * 2, lz = d / 2 + (b.c === 'SC' ? 62 : 26);
+        const cx = Math.cos(ROT), sx = Math.sin(ROT); cars.push([b.x + lx * cx + lz * sx, b.y - lx * sx + lz * cx, ROT + Math.PI / 2 + (rnd() < 0.5 ? Math.PI : 0)]); } });
+      curbPts.forEach((p, i) => { if (i % 37 || rnd() < 0.5) return; const x = p[0] + Math.sin(p[2]) * -5, y = p[1] - Math.cos(p[2]) * -5; if (free(x, y)) cars.push([x, y, -p[2]]); });
+      const tint = [0xf5f6f7, 0xf5f6f7, 0xe9e9e6, 0x2b2f36, 0x9ea4aa, 0x1d3f74, 0xf5f6f7], col = new T.Color();
+      for (const k in gs) { const im = new T.InstancedMesh(gs[k], M[k], cars.length); im.castShadow = true; cars.forEach((c, i) => { im.setMatrixAt(i, m4.compose(new T.Vector3(c[0], 0, c[1]), q4.setFromAxisAngle(yAx, c[2]), one)); if (k === 'paint') im.setColorAt(i, col.set(tint[i % tint.length])); }); S.add(im); }
+    }
+    // ---------- progress colours
+    const pmats = {};
+    function setProgress(on, pcol) {
+      wallMeshes.forEach((im) => { im.userData.list.forEach((v, i) => im.setColorAt(i, on ? new T.Color(pcol(v.tot)).lerp(white, im.material === M.recess ? 0.25 : 0.1) : white)); im.instanceColor.needsUpdate = true; });
+      BL.forEach((b) => { if (!b.wallMesh) return; if (on) { const k = pcol(b.tot); b.wallMesh.material = pmats[k] || (pmats[k] = std({ color: k, map: plasterTex, roughness: 0.85 })); } else b.wallMesh.material = M.wall; });
+    }
+    const itemFromHit = (h) => (h.object.isInstancedMesh ? h.object.userData.list[h.instanceId] : h.object.userData.it);
+    return { R, S, cam, pick, itemFromHit, setProgress, fitShadow };
+  }
+
   function build(el, D) {
     const T = THREE;
     el.innerHTML = `<canvas></canvas><div class="v3-shade"></div><div class="v3-lbls"></div>
@@ -10554,97 +10859,17 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     q('#v3-list').innerHTML = [...V.map((v) => v.c), ...BL.map((b) => b.n)].map((s) => `<option value="${esc(s)}">`).join('');
     q('.v3-menu').innerHTML = MENU.map((m) => `<button class="v3-mi" data-go="${m[0]}"><svg viewBox="0 0 24 24">${IC[m[2]]}</svg>${m[1]}</button>`).join('');
     q('.v3-leg').innerHTML = '<b style="font-size:11px">Total progress</b>' + [['#2e9e5b', '100%'], ['#8cc95f', '90–99%'], ['#f0b43c', '70–89%'], ['#e8743b', '40–69%'], ['#d64541', 'below 40%']].map((x) => `<div><i style="background:${x[0]}"></i>${x[1]}</div>`).join('');
-    // ---------- renderer
-    const R = new T.WebGLRenderer({ canvas: cv, antialias: true, preserveDrawingBuffer: true });
-    R.shadowMap.enabled = true; R.shadowMap.type = T.PCFSoftShadowMap; R.outputColorSpace = T.SRGBColorSpace; R.toneMapping = T.ACESFilmicToneMapping; R.toneMappingExposure = 1.05;
+    const SC = buildScene(T, cv, D, V, BL), R = SC.R, S = SC.S, cam = SC.cam, pick = SC.pick;
     let quality = '2';
-    const S = new T.Scene();
-    { const c = document.createElement('canvas'); c.width = 2; c.height = 256; const g = c.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, 256);
-      gr.addColorStop(0, '#5d8fc9'); gr.addColorStop(0.55, '#a9c8e6'); gr.addColorStop(1, '#e9e3d6'); g.fillStyle = gr; g.fillRect(0, 0, 2, 256);
-      const tx = new T.CanvasTexture(c); tx.colorSpace = T.SRGBColorSpace; S.background = tx; }
-    S.fog = new T.Fog(0xdcd9cf, 3000, 9000);
-    const cam = new T.PerspectiveCamera(42, 16 / 9, 5, 30000);
-    S.add(new T.HemisphereLight(0xdfeaff, 0xb59d78, 1.15));
-    const sun = new T.DirectionalLight(0xfff1dc, 2.4); sun.position.set(2600, 1900, 2600); sun.target.position.set(1500, 0, 1200);
-    sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); Object.assign(sun.shadow.camera, { left: -1900, right: 1900, top: 1600, bottom: -1600, near: 100, far: 7000 }); sun.shadow.bias = -0.0004;
-    S.add(sun, sun.target);
-    // ---------- ground from the site plan
-    const PW = D.w, PH = D.h, K = 1.2, gc = document.createElement('canvas'); gc.width = PW * K; gc.height = PH * K;
-    const g = gc.getContext('2d'); g.scale(K, K); g.fillStyle = '#d9c7a2'; g.fillRect(0, 0, PW, PH);
-    const e1 = [1975, 55], e2 = [2955, 608], dx = e2[0] - e1[0], dy = e2[1] - e1[1], ln = Math.hypot(dx, dy), nx = dy / ln, ny = -dx / ln;
-    g.fillStyle = '#efe2c4'; g.beginPath(); g.moveTo(e1[0] - dx * 3 + nx * 40, e1[1] - dy * 3 + ny * 40); g.lineTo(e2[0] + dx * 3 + nx * 40, e2[1] + dy * 3 + ny * 40);
-    g.lineTo(e2[0] + dx * 3 + nx * 100, e2[1] + dy * 3 + ny * 100); g.lineTo(e1[0] - dx * 3 + nx * 100, e1[1] - dy * 3 + ny * 100); g.fill();
-    const bnd = new Path2D(D.boundary); g.fillStyle = '#cfcac0'; g.fill(bnd);
-    const L = D.land || {}, fp = (p, c) => { if (p) { g.fillStyle = c; g.fill(new Path2D(p)); } }, sp = (p, c, w) => { if (p) { g.strokeStyle = c; g.lineWidth = w; g.lineCap = g.lineJoin = 'round'; g.stroke(new Path2D(p)); } };
-    if (L.interlock) { fp(L.interlock[0], '#bfb3a0'); fp(L.interlock[1], '#c7bba6'); }
-    if (L.soft) { fp(L.soft[0], '#7fa05a'); fp(L.soft[1], '#9bab6e'); }
-    if (L.curb) sp(L.curb[2], '#8b8b88', 2);
-    if (L.bike) { sp(L.bike[2], '#b8735f', 4); sp(L.bike[3], '#b8735f', 4); }
-    g.strokeStyle = '#e8e2d4'; g.lineWidth = 14; g.stroke(bnd);
-    const gtx = new T.CanvasTexture(gc); gtx.colorSpace = T.SRGBColorSpace; gtx.anisotropy = R.capabilities.getMaxAnisotropy();
-    const ground = new T.Mesh(new T.PlaneGeometry(PW, PH), new T.MeshStandardMaterial({ map: gtx, roughness: 1 }));
-    ground.rotation.x = -Math.PI / 2; ground.position.set(PW / 2, 0, PH / 2); ground.receiveShadow = true; S.add(ground);
-    const desert = new T.Mesh(new T.PlaneGeometry(40000, 40000), new T.MeshStandardMaterial({ color: 0xd9c7a2, roughness: 1 }));
-    desert.rotation.x = -Math.PI / 2; desert.position.set(PW / 2, -0.6, PH / 2); desert.receiveShadow = true; S.add(desert);
-    const sea = new T.Mesh(new T.PlaneGeometry(40000, 12000), new T.MeshStandardMaterial({ color: 0x2f86a8, roughness: 0.25, metalness: 0.1 }));
-    sea.rotation.x = -Math.PI / 2; sea.rotation.z = -Math.atan2(dy, dx); sea.position.set((e1[0] + e2[0]) / 2 + nx * 6100, 0.4, (e1[1] + e2[1]) / 2 + ny * 6100); S.add(sea);
-    // ---------- materials and models
-    const M = { wall: new T.MeshStandardMaterial({ color: 0xf3eee4, roughness: 0.85 }), wall2: new T.MeshStandardMaterial({ color: 0xe6dccb, roughness: 0.85 }),
-      roof: new T.MeshStandardMaterial({ color: 0xfaf8f3, roughness: 0.9 }), glass: new T.MeshStandardMaterial({ color: 0x5b7a93, roughness: 0.15, metalness: 0.4 }),
-      wood: new T.MeshStandardMaterial({ color: 0x9b7a55, roughness: 0.8 }), gold: new T.MeshStandardMaterial({ color: 0xd8c79e, roughness: 0.4, metalness: 0.3 }),
-      pool: new T.MeshStandardMaterial({ color: 0x2fb6d6, roughness: 0.1, metalness: 0.1, emissive: 0x0a3a48, emissiveIntensity: 0.4 }),
-      grass: new T.MeshStandardMaterial({ color: 0x6f9a4a, roughness: 1 }), court: new T.MeshStandardMaterial({ color: 0x3f8f6a, roughness: 0.9 }),
-      trunk: new T.MeshStandardMaterial({ color: 0x8a6a48 }), leaf: new T.MeshStandardMaterial({ color: 0x4e7d3a, roughness: 0.9 }) };
-    const pmat = {}; const progMat = (x) => { const k = pcol(x); return pmat[k] || (pmat[k] = new T.MeshStandardMaterial({ color: k, roughness: 0.75 })); };
-    const pick = [], tint = [];
-    const box = (w, h, d, m, x, y, z, par) => { const o = new T.Mesh(new T.BoxGeometry(w, h, d), m); o.position.set(x, y + h / 2, z); o.castShadow = o.receiveShadow = true; par.add(o); return o; };
-    const grp = (x, z, r) => { const o = new T.Group(); o.position.set(x, 0, z); o.rotation.y = r; S.add(o); return o; };
-    V.forEach((v, i) => {
-      const G = grp(v.x, v.y, ROT + (i % 2 ? Math.PI : 0)), w = 34, d = 26;
-      const a = box(w, 11, d, M.wall, 0, 0, 0, G), b = box(w * 0.72, 10, d * 0.8, M.wall2, -w * 0.12, 11, -d * 0.05, G);
-      box(w + 1, 1.2, d + 1, M.roof, 0, 11, 0, G); box(w * 0.72 + 1, 1.4, d * 0.8 + 1, M.roof, -w * 0.12, 21, -d * 0.05, G);
-      for (const s of [-1, 1]) { box(8, 6, 0.6, M.glass, s * 8, 3, d / 2 + 0.1, G); box(6, 5, 0.6, M.glass, s * 7 - 3, 13, d * 0.35 + 0.2, G); }
-      box(10, 0.6, 8, M.wood, w * 0.32, 11.6, d * 0.25, G);
-      box(w + 14, 0.4, d + 16, M.grass, 0, -0.1, 4, G).castShadow = false;
-      box(9, 0.5, 6, M.pool, w * 0.3, 0, d / 2 + 6, G).castShadow = false;
-      a.userData.it = b.userData.it = v; pick.push(a, b); tint.push([a, M.wall, v], [b, M.wall2, v]);
-      v.G = G; v.hl = [38, 24, 30]; v.h = 26;
-    });
-    BL.forEach((b) => {
-      const [w, h, d] = SZ[b.c] || [100, 20, 70], G = grp(b.x, b.y, ROT);
-      const body = box(w, h, d, M.wall, 0, 0, 0, G); box(w + 3, 1.6, d + 3, M.roof, 0, h, 0, G); box(w + 0.6, 2.2, d + 0.6, M.wood, 0, h - 3, 0, G);
-      const n = Math.floor(w / 14); for (let i = 0; i < n; i++) box(7, h * 0.42, 0.8, M.glass, -w / 2 + 10 + i * (w - 16) / Math.max(1, n - 1), h * 0.28, d / 2 + 0.2, G);
-      let top = h + 4;
-      if (b.c === 'MQ') { const dm = new T.Mesh(new T.SphereGeometry(26, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), M.gold); dm.position.y = h + 1.6; dm.castShadow = true; G.add(dm);
-        const mi = new T.Mesh(new T.CylinderGeometry(4, 5, 82, 16), M.wall); mi.position.set(w / 2 + 10, 41, -d / 2 + 6); mi.castShadow = true; G.add(mi);
-        const mt = new T.Mesh(new T.ConeGeometry(5, 12, 16), M.gold); mt.position.set(w / 2 + 10, 88, -d / 2 + 6); G.add(mt); top = h + 30; }
-      if (b.c === 'SC' || b.c === 'HB') { box(b.c === 'SC' ? 90 : 50, 0.6, 40, M.pool, 0, 0, d / 2 + 34, G).castShadow = false; box(110, 0.3, 62, M.roof, 0, -0.1, d / 2 + 34, G).castShadow = false; }
-      if (b.c === 'IS') { box(70, 0.5, 40, M.court, -30, 0, d / 2 + 36, G).castShadow = false; box(w * 0.8, 6, d * 0.7, M.roof, 0, h, 0, G); }
-      if (b.c === 'CC') { box(40, 0.5, 40, M.court, -w / 2 - 30, 0, 0, G).castShadow = false; box(30, 0.6, 20, M.pool, w / 2 + 24, 0, 10, G).castShadow = false; }
-      if (b.c === 'PA') box(w + 40, 0.4, d + 30, M.wood, 0, -0.1, 0, G).castShadow = false;
-      body.userData.it = b; pick.push(body); tint.push([body, M.wall, b]);
-      b.G = G; b.hl = [w + 6, top, d + 6]; b.h = top; b.size = Math.max(w, d);
-    });
-    // palms
-    { let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-      const pts = [...V.map((v) => [v.x, v.y, 36]), ...BL.map((b) => [b.x, b.y, (SZ[b.c] || [100])[0] * 1.05 + 30])];
-      const bp = (D.boundary.match(/-?\d+(?:\.\d+)? -?\d+(?:\.\d+)?/g) || []).map((s) => s.split(' ').map(Number));
-      const inside = (x, y) => { let c = false; for (let i = 0, j = bp.length - 1; i < bp.length; j = i++) { const [a, b] = bp[i], [p, qq] = bp[j]; if ((b > y) !== (qq > y) && x < (p - a) * (y - b) / (qq - b) + a) c = !c; } return c; };
-      const NT = 900, ti = new T.InstancedMesh(new T.CylinderGeometry(1, 1.6, 16, 6), M.trunk, NT), li = new T.InstancedMesh(new T.IcosahedronGeometry(7, 0), M.leaf, NT);
-      ti.castShadow = li.castShadow = true; const m4 = new T.Matrix4(), qt = new T.Quaternion(); let nt = 0, guard = 0;
-      while (nt < NT && guard++ < 60000) { const x = rnd() * PW, y = rnd() * PH; if (!inside(x, y) || pts.some((p) => Math.hypot(p[0] - x, p[1] - y) < p[2])) continue;
-        const s = 0.5 + rnd() * 0.45; m4.compose(new T.Vector3(x, 8 * s, y), qt.identity(), new T.Vector3(s, s, s)); ti.setMatrixAt(nt, m4);
-        m4.compose(new T.Vector3(x, 17 * s, y), qt.setFromEuler(new T.Euler(rnd(), rnd(), 0)), new T.Vector3(s * 1.2, s * 0.7, s * 1.2)); li.setMatrixAt(nt, m4); nt++; }
-      ti.count = li.count = nt; S.add(ti, li); }
     // highlight box
     const hl = new T.Group(); S.add(hl);
-    const hlMat = new T.LineBasicMaterial({ color: 0x7fe8ff, transparent: true }), hlFill = new T.MeshBasicMaterial({ color: 0x37c8ff, transparent: true, opacity: 0.18, depthWrite: false });
+    const hlMat = new T.LineBasicMaterial({ color: 0x7fe8ff, transparent: true }), hlFill = new T.MeshBasicMaterial({ color: 0x37c8ff, transparent: true, opacity: 0.05, depthWrite: false });
     let sel = null;
     function select(it, fly) {
       sel = it; hl.clear();
       if (!it) { pop.hidden = true; return; }
       const [w, h, d] = it.hl, geo = new T.BoxGeometry(w, h, d), s = new T.Group();
-      s.add(new T.LineSegments(new T.EdgesGeometry(geo), hlMat), new T.Mesh(geo, hlFill)); s.position.set(it.x, h / 2, it.y); s.rotation.y = it.G.rotation.y; hl.add(s);
+      s.add(new T.LineSegments(new T.EdgesGeometry(geo), hlMat), new T.Mesh(geo, hlFill)); s.position.set(it.x, h / 2, it.y); s.rotation.y = it.rot; hl.add(s);
       const bar = (l, v) => `<div class="v3-row"><b>${l}</b><span class="v3-tr"><i style="width:${(v || 0) * 100}%"></i></span><em>${pc(v)}</em></div>`;
       const ops = (it.op || []).length ? '<div class="v3-op"><div style="color:#9fb0c2"><span>Open items</span><span style="color:#9fb0c2">done</span></div>' + it.op.slice(0, 6).map((a) => `<div><span>${esc(a[0])}</span><span>${a[1]}%</span></div>`).join('') + '</div>' : '';
       pop.innerHTML = it.kind === 'V'
@@ -10678,7 +10903,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     cv.addEventListener('wheel', (e) => { e.preventDefault(); tween = null; stopTour(); goal.r *= Math.exp(e.deltaY * 0.0012); lim(); lastUser = performance.now(); }, { passive: false });
     const ray = new T.Raycaster(), v2 = new T.Vector2();
     function clickAt(e) { const r = cv.getBoundingClientRect(); v2.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(v2, cam);
-      const h = ray.intersectObjects(pick, false)[0]; select(h ? h.object.userData.it : null, !!h); menuOn(h ? (h.object.userData.it.kind === 'V' ? 'vil' : h.object.userData.it.c) : ''); }
+      const h = ray.intersectObjects(pick, false)[0], it = h ? SC.itemFromHit(h) : null; select(it, !!it); menuOn(it ? (it.kind === 'V' ? 'vil' : it.c) : ''); }
     // ---------- menu, find, modes, quality, tour
     function menuOn(id) { el.querySelectorAll('.v3-mi').forEach((b) => b.classList.toggle('on', b.dataset.go === id || (id === 'SG' && b.dataset.go === 'RG'))); }
     let vilIx = 0;
@@ -10694,7 +10919,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       if (it) { stopTour(); select(it, true); menuOn(it.kind === 'V' ? 'vil' : it.c); e.target.blur(); } });
     el.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
       const prog = b.dataset.mode === 'prog'; el.querySelectorAll('[data-mode]').forEach((x) => x.classList.toggle('on', x === b));
-      tint.forEach(([m, base, it]) => { m.material = prog ? progMat(it.tot) : base; }); q('.v3-leg').style.display = prog ? 'block' : 'none'; }));
+      SC.setProgress(prog, pcol); q('.v3-leg').style.display = prog ? 'block' : 'none'; }));
     el.querySelectorAll('[data-q]').forEach((b) => b.addEventListener('click', () => { quality = b.dataset.q; el.querySelectorAll('[data-q]').forEach((x) => x.classList.toggle('on', x === b)); resize(); }));
     q('[data-act="fs"]').addEventListener('click', () => { if (document.fullscreenElement) document.exitFullscreen(); else if (el.requestFullscreen) el.requestFullscreen().catch(() => {}); });
     q('[data-act="shot"]').addEventListener('click', () => {
@@ -10730,9 +10955,10 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       if (tween) { const k = Math.min(1, (now - tween.t0) / tween.dur), e = ease(k); for (const key in C) C[key] = tween.from[key] + (tween.to[key] - tween.from[key]) * e;
         C.r += Math.sin(k * Math.PI) * Math.min(900, Math.hypot(tween.from.tx - tween.to.tx, tween.from.tz - tween.to.tz) * 0.35); if (k >= 1) tween = null; }
       else { if (now - lastUser > 9000 && !drag) goal.az += 0.0006; for (const key in C) C[key] += (goal[key] - C[key]) * 0.12; }
+      if (C.ty < 0) C.ty = 0;
       cam.position.set(C.tx + C.r * Math.sin(C.pol) * Math.cos(C.az), C.ty + C.r * Math.cos(C.pol), C.tz + C.r * Math.sin(C.pol) * Math.sin(C.az)); cam.lookAt(C.tx, C.ty, C.tz);
-      const p = 0.6 + 0.4 * Math.sin(now / 160); hlMat.opacity = p; hlFill.opacity = 0.12 + 0.1 * p;
-      R.render(S, cam);
+      const p = 0.6 + 0.4 * Math.sin(now / 160); hlMat.opacity = p; hlFill.opacity = 0.03 + 0.04 * p;
+      SC.fitShadow(C.tx, C.tz, C.r); R.render(S, cam);
       if (sel && !pop.hidden) { const [sx, sy, z] = proj(sel.x, sel.h + 4, sel.y); const W = el.clientWidth, pw = pop.offsetWidth, ph = pop.offsetHeight;
         pop.style.visibility = z < 1 ? 'visible' : 'hidden'; pop.style.left = Math.max(8, Math.min(W - pw - 8, sx + 30)) + 'px'; pop.style.top = Math.max(84, Math.min(el.clientHeight - ph - 96, sy - ph / 2)) + 'px'; }
       const far = C.r > 900; cl.forEach((c) => { if (!far) { c.d.style.display = 'none'; return; } const [sx, sy, z] = proj(c.x, 40, c.y); c.d.style.display = z < 1 ? 'block' : 'none'; c.d.style.left = sx + 'px'; c.d.style.top = sy + 'px'; });
