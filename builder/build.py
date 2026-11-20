@@ -317,6 +317,42 @@ def nov_data():
     return {'title': cfg['title'], 'start': cfg['start'], 'end': cfg['end'], 'weeks': cfg['weeks'], 'rate': cfg['rate'],
             'acts': [a[2] for a in NOV_ACTS], 'groups': NOV_GROUPS, 'clusters': out}
 
+V3D_FILE = os.path.join(B, 'v3d.json')
+def v3d_data(status):
+    """Live 3D progress tab: site geometry, villa and building progress (encrypted with the rest). None if the data is missing."""
+    try:
+        site = [r for r in blob_rows('exec', 'layouts') if r.get('kind') == 'site'][0]
+        vrows = {v['villa']: v for v in blob_rows('exec', 'villas')}
+        brows = {b['code']: b for b in blob_rows('exec', 'buildings')}
+    except Exception as e:
+        print('WARNING: Live 3D tab skipped:', e); return None
+    cfg = json.loads(rd(V3D_FILE)) if os.path.exists(V3D_FILE) else {'waves': {}}
+    wave = {c: (int(w), v['date']) for w, v in cfg['waves'].items() for c in v['codes']}
+    open_v = {}
+    for r in blob_rows('exec', 'villa_activities'):
+        if r['status'] in ('In progress', 'Not started'):
+            open_v.setdefault(r['villa'], []).append([r['activity'], r.get('pct') or 0])
+    r4 = lambda x: round(float(x), 4) if isinstance(x, (int, float)) else None
+    V = []
+    for t in site['villas'].split(';'):
+        c, x, y, cl = t.split(','); v = vrows.get(c, {})
+        V.append([c, int(x), int(y), cl, v.get('type', ''), r4(v.get('total')), r4(v.get('finishes')), r4(v.get('mep')), sorted(open_v.get(c, []), key=lambda a: -a[1])[:8]])
+    Bs = []
+    for t in site['buildings'].split(';'):
+        c, x, y = t.split(','); b = brows.get(c, {}); w, dte = wave.get(c, (0, ''))
+        op = []
+        for a in (b.get('acts') or '').split(';'):
+            f = a.split('|')
+            if len(f) >= 4 and f[2] in ('P', 'N'): op.append([f[1] + (' (' + f[0] + ')' if f[0] in ('Electrical', 'Plumbing', 'HVAC', 'Fire Fighting') else ''), int(f[3] or 0)])
+        Bs.append([c, b.get('name', c), int(x), int(y), r4(b.get('total')), r4(b.get('finishes')), r4(b.get('mep')), w, dte, sorted(op, key=lambda a: -a[1])[:8]])
+    land = {}
+    for r in blob_rows('exec', 'layouts'):
+        if r.get('kind') in ('area', 'track'):
+            land[r['id']] = [r.get('done_path', ''), r.get('other_path', ''), r.get('done_lines', ''), r.get('other_lines', '')]
+    cl = [[a, int(b), int(c)] for a, b, c, *_ in (t.split(',') for t in site['clusters'].split(';'))]
+    return {'status': status, 'w': int(site.get('plan_w') or 3370), 'h': int(site.get('plan_h') or 2384), 'boundary': site['boundary'],
+            'land': land, 'clusters': cl, 'V': V, 'B': Bs, 'vtarget': cfg.get('villa_target', '')}
+
 def dmy(iso):
     return f'{iso[8:10]}-{iso[5:7]}-{iso[0:4]}'
 
@@ -368,12 +404,17 @@ def build():
     if nov: tabs.append({'id': 'nov', 'title': 'November plan', 'native': True, 'pinned': True})
     an = an_data(p6, status)
     if an: tabs.insert(0, {'id': 'an', 'title': 'Analyser', 'native': True, 'pinned': True})
+    v3d = v3d_data(status)
+    if v3d: tabs.insert(1 if an else 0, {'id': 'v3d', 'title': 'Live 3D progress', 'native': True, 'pinned': True})
     payload = {'project': 'SBARC', 'dashboards': tabs, 'frames': site_frames, 'upload': {'email': EMAIL}, 'pdfs': pdf_list}
     if boq: payload['boq'] = boq
     if ipa: payload['ipa'] = ipa
     if nov: payload['nov'] = nov
     if cmp_: payload['cmp'] = cmp_
     if an: payload['an'] = an
+    if v3d:
+        payload['v3d'] = v3d
+        os.makedirs(f'{SITE}/vendor', exist_ok=True); shutil.copy(f'{B}/vendor/three.min.js', f'{SITE}/vendor/three.min.js')
     if p6:
         payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
         g = os.path.join(B, 'p6', 'gantt.bin')  # P6 schedule (.xer), encrypted; fetched by the browser when the Gantt opens
@@ -404,6 +445,7 @@ def build():
         '<!--VAULT-->': '<script type="text/plain" id="vault-SBARC">' + v['ct'] + '</script>',
         '<!--CRYPTOJS-->': '<script>' + rd(f'{B}/vendor/crypto-js.js').replace('</script', '<\\/script') + '</script>',
         '/*PROJECTS*/[]': json.dumps(projects),
+        '<!--V3DJS-->': '<script>' + rd(f'{T}/v3d.js').replace('</script', '<\\/script') + '</script>',
         '<!--PWAHEAD-->': pwa_head, '<!--PWABODY-->': rd(f'{T}/pwa_body.html') + ANDROID_TWEAK,
     }
     for k, val in reps.items():

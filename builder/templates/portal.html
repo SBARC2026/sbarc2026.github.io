@@ -1077,6 +1077,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     <div class="pv" id="cm" hidden><div class="pv-in" id="cm-in"></div></div>
     <div class="pv" id="nv" hidden><div class="pv-in" id="nv-in"></div></div>
     <div class="pv" id="bk" hidden><div class="pv-in" id="bk-in"></div></div>
+    <div class="v3" id="v3" hidden></div>
   </main>
   </div>
 </section>
@@ -1195,7 +1196,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const tabs = $('tabs'), tabsNov = $('tabs-nov'); tabs.replaceChildren(); tabsNov.replaceChildren(); $('nov-lab').hidden = !session.dashboards.some((d) => d.id === 'nov');
     [...session.dashboards].sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)).forEach((d) => {
       const b = document.createElement('button'); b.className = 'tab' + (d.pinned ? ' pinned' : ''); b.type = 'button'; b.setAttribute('role', 'tab'); b.dataset.id = d.id; b.title = d.title;
-      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', ipa: 'Last payment', nov: 'Nov plan', cmp: 'MAK vs PMC', an: 'Analyser' };
+      const ic = document.createElement('span'); ic.className = 'ico'; ic.innerHTML = TAB_ICONS[d.id] || TAB_ICONS.exec; b.append(ic); const SHORT = { exec: 'Summary', p02b: 'Tracking', explorer: 'Site explorer', week: 'This week', p6: 'Primavera', bk: 'P6 breakdown', boq: 'BOQ', ipa: 'Last payment', nov: 'Nov plan', cmp: 'MAK vs PMC', an: 'Analyser', v3d: 'Live 3D' };
       const fl = document.createElement('span'); fl.className = 'full'; fl.textContent = d.title; const sh = document.createElement('span'); sh.className = 'short'; sh.style.display = 'none'; sh.textContent = SHORT[d.id] || d.title; b.append(fl, sh); if (d.pinned) { const pn = document.createElement('span'); pn.className = 'pin'; pn.title = 'Pinned'; pn.setAttribute('aria-hidden', 'true'); pn.innerHTML = '<svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M14.5 3.5l6 6-2 .8-3.3 3.3.3 4.2-1.4 1.4-4-4-5.3 5.3-1-1 5.3-5.3-4-4 1.4-1.4 4.2.3 3.3-3.3z"/></svg>'; b.append(pn); }
       b.addEventListener('click', () => { show(d.id); drawer(false); }); (d.id === 'nov' ? tabsNov : tabs).append(b);
     });
@@ -1210,7 +1211,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
 
   function lock() {
     Object.values(frames).forEach((f) => f.remove()); Object.keys(frames).forEach((k) => delete frames[k]);
-    session = null; current = null; secret = ''; $('up').hidden = true;
+    if (window.V3D) V3D.reset(); session = null; current = null; secret = ''; $('up').hidden = true;
     xpReset(); wkReset(); pvReset(); bkReset(); bqReset(); ipReset(); nvReset(); cmReset(); azReset(); closeMenu(); Object.values(pdfCache).forEach((u) => URL.revokeObjectURL(u)); Object.keys(pdfCache).forEach((k) => delete pdfCache[k]);
     $('app').hidden = true; const g = $('gate'); g.hidden = false;
     g.querySelectorAll('.art .bd, .art .v, .art .b, .art .c, .art .glow, .gate-copy > *').forEach((el) => { el.style.animation = 'none'; void el.getBoundingClientRect(); el.style.animation = ''; });
@@ -1228,6 +1229,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     } catch (e) { /* not ready */ }
   }
   const TAB_ICONS = {
+    v3d: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 20 7.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5 12 12l8-4.5M12 12v9"/></svg>',
     an: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.2 5.6L20 11l-5.8 2.4L12 19l-2.2-5.6L4 11l5.8-2.4z"/><path d="M19 3v3M20.5 4.5h-3"/></svg>',
     cmp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"/><path d="M13 14l3-3 3 3"/></svg>',
     exec: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="8" rx="2"/><rect x="13.5" y="3.5" width="7" height="5" rx="2"/><rect x="13.5" y="11.5" width="7" height="9" rx="2"/><rect x="3.5" y="14.5" width="7" height="6" rx="2"/></svg>',
@@ -1267,6 +1269,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     $('nv').hidden = id !== 'nov';
     $('cm').hidden = id !== 'cmp';
     $('az').hidden = id !== 'an'; azTipHide();
+    $('v3').hidden = id !== 'v3d'; if (window.V3D) V3D.active(id === 'v3d');
     if (id === 'explorer') { $('loading').hidden = true; xpOpen(); return; }
     if (id === 'week') { $('loading').hidden = true; wkOpen(); kpiAnim($('wk-in')); return; }
     if (id === 'p6') { $('loading').hidden = true; pvOpen(); kpiAnim($('pv-in')); return; }
@@ -1276,6 +1279,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     if (id === 'nov') { $('loading').hidden = true; nvOpen(); kpiAnim($('nv-in')); return; }
     if (id === 'cmp') { $('loading').hidden = true; cmOpen(); kpiAnim($('cm-in')); return; }
     if (id === 'an') { $('loading').hidden = true; azOpen(); return; }
+    if (id === 'v3d') { $('loading').hidden = true; V3D.open($('v3'), session.v3d); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
   function makeFrame(id) {
@@ -3784,6 +3788,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
   $('g-project').focus();
 })();
 </script>
+<!--V3DJS-->
 <!--PWABODY-->
 </body>
 </html>

@@ -102,3 +102,9 @@ Artifact: https://claude.ai/artifact/3e73xLnZ2DMo6zJSHhTXD5 (private; the owner 
 3. Read the artifact first (Artifact action read), then publish with `url`, `root` = the scratch folder, `file_path` = `<scratch>/project/slides/progress.html` and the other five in `files` (only those; never send deck.json). If refused because the owner edited meanwhile, re-read the named files and publish again.
 4. Handover slide: edit `builder/deck_config.json` (steps, clusters, target dates, status note) when the plan changes; the user tells you the new dates. Commit that file only (no data).
 5. Never print the password or figures. Hand edits made in the editor on these six slides are overwritten by a rebuild; the user changes content through the data, the config, or by asking.
+
+## Live 3D progress tab
+The "Live 3D progress" tab (pinned) is an interactive 3D model of the site: villas and buildings placed from the `layouts` site plan, progress and open items
+from `villas`, `villa_activities` and `buildings`, all inside the encrypted payload (`v3d_data()` in `build.py`). Nothing to do on a daily update; it follows the data.
+Building handover waves and dates come from `builder/v3d.json` (edit only when the plan changes). The 3D engine is `builder/vendor/three.min.js`
+(three.js r160, MIT), copied to `docs/vendor/` and loaded only when the tab opens. The template code is `builder/templates/v3d.js`.

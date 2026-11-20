@@ -1,0 +1,7 @@
+{
+  "note": "Live 3D progress tab: building handover waves (major finish). Edit when the plan changes.",
+  "waves": {"1": {"date": "Tue 12 Jan 2027", "codes": ["CC", "MQ", "AD", "HB"]},
+            "2": {"date": "Tue 19 Jan 2027", "codes": ["CO", "BA", "SR", "PA", "WS"]},
+            "3": {"date": "Mon 25 Jan 2027", "codes": ["IS", "SC", "UT", "SG", "RG"]}},
+  "villa_target": "All villas: handover by 31 Jan 2027"
+}
