@@ -10578,17 +10578,34 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const detailTex = noiseTex(512, [128, 128, 128], 70, 1); detailTex.colorSpace = T.NoColorSpace;
     // ---------- materials
     const std = (o) => new T.MeshStandardMaterial(o);
+    // rough render: world-space (triplanar) plaster grain and bump, so big and small walls get the same texture
+    function plaster(mat, bump) {
+      mat.onBeforeCompile = (sh) => { sh.uniforms.detailMap = { value: detailTex };
+        sh.vertexShader = 'varying vec3 vPW; varying vec3 vPN;\n' + sh.vertexShader.replace('#include <worldpos_vertex>', '#include <worldpos_vertex>\n vec4 pw = vec4(transformed,1.0); vec3 pn = objectNormal;\n#ifdef USE_INSTANCING\n pw = instanceMatrix * pw; pn = mat3(instanceMatrix) * pn;\n#endif\n vPW = (modelMatrix * pw).xyz; vPN = normalize(mat3(modelMatrix) * pn);');
+        sh.fragmentShader = 'uniform sampler2D detailMap; varying vec3 vPW; varying vec3 vPN;\n' + sh.fragmentShader
+          .replace('#include <map_fragment>', '#include <map_fragment>\n vec3 bw = abs(vPN) + 1e-4; bw /= (bw.x + bw.y + bw.z);\n float n1 = texture2D(detailMap, vPW.yz*0.21).r*bw.x + texture2D(detailMap, vPW.xz*0.21).r*bw.y + texture2D(detailMap, vPW.xy*0.21).r*bw.z;\n float n2 = texture2D(detailMap, vPW.yz*0.017).r*bw.x + texture2D(detailMap, vPW.xz*0.017).r*bw.y + texture2D(detailMap, vPW.xy*0.017).r*bw.z;\n diffuseColor.rgb *= (0.9 + 0.2*n1) * (0.93 + 0.14*n2);')
+          .replace('#include <normal_fragment_maps>', '#include <normal_fragment_maps>\n { vec3 dpx = dFdx(-vViewPosition), dpy = dFdy(-vViewPosition); float hx = dFdx(n1), hy = dFdy(n1); vec3 r1 = cross(dpy, normal), r2 = cross(normal, dpx); float det = dot(dpx, r1); vec3 gr = sign(det) * (hx * r1 + hy * r2); normal = normalize(abs(det) * normal - ' + bump.toFixed(2) + ' * gr); }'); };
+      return mat;
+    }
+    function jaliTex() { const c = cnv(128, 128), x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, 128, 128); x.globalCompositeOperation = 'destination-out';
+      for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) { const cx = 16 + i * 32, cy = 16 + j * 32; x.beginPath(); for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4, r = k % 2 ? 6 : 12; x.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } x.fill(); }
+      const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(1.5, 2); return t; }
     const M = {
-      wall: std({ color: 0xf2ece0, map: plasterTex, roughness: 0.92, envMapIntensity: 0.6 }),
-      recess: std({ color: 0xe2d8c6, map: plasterTex, roughness: 0.95, envMapIntensity: 0.5 }),
+      wall: plaster(std({ color: 0xeee6d8, roughness: 0.95, envMapIntensity: 0.6 }), 0.5),
+      recess: plaster(std({ color: 0xe0d5c2, roughness: 0.97, envMapIntensity: 0.5 }), 0.5),
+      white: plaster(std({ color: 0xf6f3ee, roughness: 0.9, envMapIntensity: 0.7 }), 0.4),
+      sail: std({ color: 0xfbfaf6, roughness: 0.85, side: T.DoubleSide, envMapIntensity: 0.8 }),
+      jali: plaster(std({ color: 0xe6dccb, roughness: 0.95, alphaMap: jaliTex(), alphaTest: 0.5, side: T.DoubleSide }), 0.3),
+      lamp: std({ color: 0x3b2d22, roughness: 0.5, metalness: 0.6 }), lantern: std({ color: 0xffe2a8, emissive: 0xffb860, emissiveIntensity: 0.6, roughness: 0.4 }),
+      asph: std({ color: 0x77736d, roughness: 0.95 }), sand: std({ color: 0xeadfc6, roughness: 1 }),
       roof: std({ color: 0xd8cfbf, roughness: 0.95, envMapIntensity: 0.4 }),
       plinth: std({ color: 0x8c8378, roughness: 0.55 }),
-      frame: std({ color: 0x4e3326, roughness: 0.45, metalness: 0.35 }),
+      frame: std({ color: 0x6e4f36, roughness: 0.55, metalness: 0.15 }),
       glass: std({ color: 0x1c2730, roughness: 0.04, metalness: 0.85, envMapIntensity: 1.4 }),
-      wood: std({ color: 0x6a4331, roughness: 0.7 }),
+      wood: std({ color: 0x80603f, roughness: 0.75 }),
       turf: std({ color: 0x6c923c, roughness: 1 }),
       metal: std({ color: 0xa7adb2, roughness: 0.4, metalness: 0.6 }),
-      dome: std({ color: 0xf4efe4, map: plasterTex, roughness: 0.6, envMapIntensity: 0.8 }),
+      dome: plaster(std({ color: 0xf4efe4, roughness: 0.7, envMapIntensity: 0.8 }), 0.3),
       water: std({ color: 0x2aa8c9, roughness: 0.05, metalness: 0.2, envMapIntensity: 1.2, emissive: 0x063445, emissiveIntensity: 0.35 }),
       deck: std({ color: 0xe3dccd, roughness: 0.8 }),
       bark: std({ color: 0x7b6650, roughness: 1 }), leafA: std({ color: 0x66783b, roughness: 0.9 }), leafB: std({ color: 0x7c8c45, roughness: 0.9 }),
@@ -10629,38 +10646,50 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       onFace(K, b, side, u, y, 'frame', ext(sh(w + 0.6, h + 0.3), 0.18), 0.03);
       onFace(K, b, side, u, y + 0.15, 'glass', ext(sh(w - 0.2, h - 0.25), 0.1), 0.12);
       onFace(K, b, side, u, y + 0.15, 'frame', new T.BoxGeometry(0.35, h - (arched ? w / 2 : 0.3), 0.12).translate(0, (h - (arched ? w / 2 : 0.3)) / 2, 0.06), 0.18);
+      if (arched && w > 1.5) { const sy = y + 0.15 + h - w / 2; onFace(K, b, side, u, sy, 'frame', new T.BoxGeometry(w, 0.3, 0.12), 0.2);
+        for (let k = 1; k < 6; k++) { const a = k * Math.PI / 6, r = w / 2 - 0.2; onFace(K, b, side, u, sy, 'frame', new T.BoxGeometry(0.16, r, 0.1).translate(0, r / 2, 0).rotateZ(a - Math.PI / 2), 0.21); } }
+    }
+    function sail(K, x0, x1, z0, z1, y, up = 1.6) {
+      const g = new T.PlaneGeometry(x1 - x0, z1 - z0, 10, 10); g.rotateX(-Math.PI / 2); const p = g.attributes.position;
+      for (let i = 0; i < p.count; i++) { const u = (p.getX(i) - (-(x1 - x0) / 2)) / (x1 - x0), v = (p.getZ(i) + (z1 - z0) / 2) / (z1 - z0);
+        p.setY(i, up * ((1 - u) * (1 - v) + u * v) - up * 0.35 * ((1 - u) * v + u * (1 - v)) - 0.6 * Math.sin(u * Math.PI) * Math.sin(v * Math.PI)); }
+      g.computeVertexNormals(); K.add('sail', g, (x0 + x1) / 2, y, (z0 + z1) / 2);
     }
     const blind = (K, b, side, u, y, w, h) => onFace(K, b, side, u, y, 'recess', ext(shapeArch(w, h), 0.12), 0.01);
     // block with parapet, crenellations, plinth band and roof slab
-    function block(K, b, h, cren = true) {
-      K.box('wall', b.x0, 0.8, b.z0, b.x1, h - 2.6, b.z1);
+    function block(K, b, h, cren = true, mat = 'wall') {
+      K.box(mat, b.x0, 0.8, b.z0, b.x1, h - 2.6, b.z1);
       K.box('plinth', b.x0 - 0.15, 0, b.z0 - 0.15, b.x1 + 0.15, 0.8, b.z1 + 0.15);
       K.box('roof', b.x0 + 0.5, h - 2.6, b.z0 + 0.5, b.x1 - 0.5, h - 2.45, b.z1 - 0.5);
       const t = 0.6; // parapet walls
-      K.box('wall', b.x0, h - 2.6, b.z0, b.x1, h, b.z0 + t); K.box('wall', b.x0, h - 2.6, b.z1 - t, b.x1, h, b.z1);
-      K.box('wall', b.x0, h - 2.6, b.z0, b.x0 + t, h, b.z1); K.box('wall', b.x1 - t, h - 2.6, b.z0, b.x1, h, b.z1);
-      K.box('wall', b.x0 - 0.25, h - 4.2, b.z0 - 0.25, b.x1 + 0.25, h - 3.8, b.z1 + 0.25); // cornice line
+      K.box(mat, b.x0, h - 2.6, b.z0, b.x1, h, b.z0 + t); K.box(mat, b.x0, h - 2.6, b.z1 - t, b.x1, h, b.z1);
+      K.box(mat, b.x0, h - 2.6, b.z0, b.x0 + t, h, b.z1); K.box(mat, b.x1 - t, h - 2.6, b.z0, b.x1, h, b.z1);
+      K.box(mat, b.x0 - 0.25, h - 4.2, b.z0 - 0.25, b.x1 + 0.25, h - 3.8, b.z1 + 0.25); // cornice line
       if (!cren) return;
-      for (const side of ['f', 'k', 'l', 'r']) { const len = face(b, side)[3], n = Math.max(1, Math.floor(len / 6));
-        for (let i = 0; i < n; i++) { const u = -len / 2 + (i + 0.5) * len / n; if (i % 2 === 0) continue; onFace(K, b, side, u, h, 'wall', new T.BoxGeometry(2.2, 1.6, 0.6).translate(0, 0.8, -0.3), 0); onFace(K, b, side, u, h + 1.6, 'wall', new T.BoxGeometry(1.0, 0.8, 0.6).translate(0, 0.4, -0.3), 0); } }
+      for (const side of ['f', 'k', 'l', 'r']) { const len = face(b, side)[3], n = Math.max(1, Math.floor(len / 3.4));
+        for (let i = 0; i < n; i++) { const u = -len / 2 + (i + 0.5) * len / n; if (i % 2 === 0) continue; onFace(K, b, side, u, h, mat, new T.BoxGeometry(1.2, 1.7, 0.6).translate(0, 0.85, -0.3), 0); } }
     }
     function railing(K, x0, x1, z, y, alongX = true) {
       const n = Math.floor(Math.abs(x1 - x0) / 0.9);
-      for (let i = 0; i <= n; i++) { const p = x0 + (x1 - x0) * i / n; K.add('frame', new T.BoxGeometry(0.22, 2.1, 0.22), alongX ? p : z, y + 1.05, alongX ? z : p); }
-      K.add('frame', new T.BoxGeometry(alongX ? Math.abs(x1 - x0) : 0.35, 0.3, alongX ? 0.35 : Math.abs(x1 - x0)), alongX ? (x0 + x1) / 2 : z, y + 2.15, alongX ? z : (x0 + x1) / 2);
+      for (let i = 0; i <= n; i++) { const p = x0 + (x1 - x0) * i / n; K.add('wood', new T.BoxGeometry(0.34, 2.1, 0.34), alongX ? p : z, y + 1.05, alongX ? z : p); }
+      K.add('wood', new T.BoxGeometry(alongX ? Math.abs(x1 - x0) + 0.4 : 0.6, 0.4, alongX ? 0.6 : Math.abs(x1 - x0) + 0.4), alongX ? (x0 + x1) / 2 : z, y + 2.2, alongX ? z : (x0 + x1) / 2);
+      K.add('wood', new T.BoxGeometry(alongX ? Math.abs(x1 - x0) : 0.4, 0.3, alongX ? 0.4 : Math.abs(x1 - x0)), alongX ? (x0 + x1) / 2 : z, y + 0.25, alongX ? z : (x0 + x1) / 2);
     }
     function pergola(K, x0, x1, z0, z1, y) {
       for (const [px, pz] of [[x0, z0], [x1, z0], [x0, z1], [x1, z1]]) K.add('wood', new T.BoxGeometry(0.8, 6.2, 0.8), px, y + 3.1, pz);
       K.box('wood', x0 - 0.5, y + 6.2, z1 - 0.4, x1 + 0.5, y + 7.0, z1 + 0.4); K.box('wood', x0 - 0.5, y + 6.2, z0 - 0.4, x1 + 0.5, y + 7.0, z0 + 0.4);
       for (let x = x0; x <= x1 + 0.01; x += 1.1) K.add('wood', new T.BoxGeometry(0.35, 0.5, z1 - z0 + 1.2), x, y + 7.2, (z0 + z1) / 2);
     }
-    function arcade(K, x0, x1, z, h, n, d) { // front wall with arched openings, depth d back from z
+    function arcade(K, x0, x1, z, h, n, d, sailRoof = false, mat = 'wall') { // front wall with arched openings, depth d back from z
       const w = x1 - x0, s = new T.Shape(); s.moveTo(0, 0); s.lineTo(w, 0); s.lineTo(w, h); s.lineTo(0, h); s.lineTo(0, 0);
       const aw = Math.min(5.2, w / n - 1.4), ah = h - 2.2;
       for (let i = 0; i < n; i++) { const cx = (i + 0.5) * w / n, p = new T.Path(); p.moveTo(cx - aw / 2, 0.01); p.lineTo(cx - aw / 2, ah - aw / 2); p.absarc(cx, ah - aw / 2, aw / 2, Math.PI, 0, true); p.lineTo(cx + aw / 2, 0.01); p.lineTo(cx - aw / 2, 0.01); s.holes.push(p); }
-      K.add('wall', ext(s, 1.4), x0, 0, z - 1.4);
-      K.box('wall', x0, h - 0.1, z - d, x1, h + 0.9, z); K.box('roof', x0 + 0.4, h + 0.9, z - d + 0.4, x1 - 0.4, h + 1.0, z - 0.4);
-      K.box('wall', x0 - 0.2, h + 0.9, z - 0.6, x1 + 0.2, h + 2.0, z);
+      K.add(mat, ext(s, 1.4), x0, 0, z - 1.4);
+      if (sailRoof) { for (const x of [x0, x1 - 1.4]) K.box(mat, x, 0, z - d, x + 1.4, h + 0.9, z - d + 1.4);
+        K.box(mat, x0, h - 0.4, z - d, x0 + 1.4, h + 0.9, z); K.box(mat, x1 - 1.4, h - 0.4, z - d, x1, h + 0.9, z); K.box(mat, x0, h - 0.4, z - d, x1, h + 0.9, z - d + 1.2);
+        sail(K, x0 + 0.7, x1 - 0.7, z - d + 0.6, z - 0.7, h + 0.4); return; }
+      K.box(mat, x0, h - 0.1, z - d, x1, h + 0.9, z); K.box('roof', x0 + 0.4, h + 0.9, z - d + 0.4, x1 - 0.4, h + 1.0, z - 0.4);
+      K.box(mat, x0 - 0.2, h + 0.9, z - 0.6, x1 + 0.2, h + 2.0, z);
     }
     // ---------- villa templates (R1 / R2 / R3), front = +z
     function villaKit(type) {
@@ -10685,8 +10714,10 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       // first-floor balcony with pergola on the tower side
       K.box('wall', A.x0 + 2, 7.2, A.z1, A.x0 + 9, 7.8, A.z1 + 3.2); railing(K, A.x0 + 2.2, A.x0 + 8.8, A.z1 + 3.0, 7.8);
       // arched carport / entrance arcade in front of the wing
-      if (!small) arcade(K, Cw.x0 + 1, Cw.x1, Cw.z1 + 10, 7.5, big ? 3 : 2, 10);
-      else arcade(K, A.x0 + 2, A.x1 - 1, A.z1 + 8, 7.2, 2, 8);
+      if (!small) arcade(K, Cw.x0 + 1, Cw.x1, Cw.z1 + 10, 7.5, big ? 3 : 2, 10, true);
+      else arcade(K, A.x0 + 2, A.x1 - 1, A.z1 + 8, 7.2, 2, 8, true);
+      K.add('jali', new T.BoxGeometry(4.6, 6.6, 0.5), small ? A.x1 + 3 : Cw.x0 - 2.6, 3.3, (small ? A.z1 : Cw.z1) + 8.4);
+      for (const u of [-aw / 2 + 1.6, aw / 2 - 1.6]) { onFace(K, A, 'f', u, 5.2, 'lamp', new T.BoxGeometry(0.9, 1.4, 0.7), 0.4); onFace(K, A, 'f', u, 5.35, 'lantern', new T.BoxGeometry(0.6, 1.0, 0.6), 0.45); }
       // boundary wall with a gap for the gate, turf garden at the back
       const W0 = -23, W1 = 23, Z0 = -19, Z1 = 19, wh = 5, t = 0.6;
       K.box('wall', W0, 0, Z0, W1, wh, Z0 + t); K.box('wall', W0, 0, Z0, W0 + t, wh, Z1); K.box('wall', W1 - t, 0, Z0, W1, wh, Z1);
@@ -10702,12 +10733,16 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const pat = (size, draw) => { const c = cnv(size, size), x = c.getContext('2d'); draw(x, size); return g.createPattern(c, 'repeat'); };
     const sandP = pat(256, (x, s) => { x.fillStyle = '#d6c6a3'; x.fillRect(0, 0, s, s); for (let i = 0; i < 2600; i++) { x.fillStyle = `rgba(${rnd() < 0.5 ? '120,100,70' : '255,248,230'},${0.05 + rnd() * 0.08})`; x.fillRect(rnd() * s, rnd() * s, 1 + rnd() * 3, 1 + rnd() * 3); } });
     const baseP = pat(256, (x, s) => { x.fillStyle = '#d3ccbd'; x.fillRect(0, 0, s, s); for (let i = 0; i < 1800; i++) { x.fillStyle = `rgba(${rnd() < 0.5 ? '110,100,85' : '250,246,236'},${0.05 + rnd() * 0.07})`; x.fillRect(rnd() * s, rnd() * s, 1 + rnd() * 4, 1 + rnd() * 2); } });
-    const stampP = pat(128, (x, s) => { x.fillStyle = '#cdc9c1'; x.fillRect(0, 0, s, s); x.strokeStyle = 'rgba(95,90,82,.45)'; x.lineWidth = 0.6;
+    const stampP = pat(128, (x, s) => { x.fillStyle = '#d8c8aa'; x.fillRect(0, 0, s, s); x.strokeStyle = 'rgba(120,98,70,.5)'; x.lineWidth = 0.8;
       for (let i = 0; i < 140; i++) { const cx = rnd() * s, cy = rnd() * s, r = 3 + rnd() * 4; x.beginPath(); for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2 + rnd() * 0.5; x.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); } x.closePath(); x.stroke(); }
       for (let i = 0; i < 300; i++) { x.fillStyle = `rgba(255,255,255,${rnd() * 0.08})`; x.fillRect(rnd() * s, rnd() * s, 1, 1); } });
     const turfP = pat(64, (x, s) => { x.fillStyle = '#6b9139'; x.fillRect(0, 0, s, s); for (let i = 0; i < 900; i++) { x.fillStyle = `rgba(${rnd() < 0.5 ? '40,70,20' : '160,190,90'},${0.12 + rnd() * 0.15})`; x.fillRect(rnd() * s, rnd() * s, 1, 1 + rnd() * 2); } });
     stampP.setTransform(new DOMMatrix().scale(0.12)); turfP.setTransform(new DOMMatrix().scale(0.25)); baseP.setTransform(new DOMMatrix().scale(0.5));
     g.fillStyle = sandP; g.fillRect(-PW, -PH, PW * 3, PH * 3);
+    // beach along the north-east edge (the sea is beyond it)
+    const e1 = [1975, 55], e2 = [2955, 608], edx = e2[0] - e1[0], edy = e2[1] - e1[1], eln = Math.hypot(edx, edy), nx = edy / eln, ny = -edx / eln;
+    const band = (o0, o1, st) => { g.fillStyle = st; g.beginPath(); g.moveTo(e1[0] - edx * 3 + nx * o0, e1[1] - edy * 3 + ny * o0); g.lineTo(e2[0] + edx * 3 + nx * o0, e2[1] + edy * 3 + ny * o0); g.lineTo(e2[0] + edx * 3 + nx * o1, e2[1] + edy * 3 + ny * o1); g.lineTo(e1[0] - edx * 3 + nx * o1, e1[1] - edy * 3 + ny * o1); g.fill(); };
+    band(10, 200, '#efe5cd'); band(150, 200, '#e2d4b4');
     const bnd = new Path2D(D.boundary); g.fillStyle = baseP; g.fill(bnd);
     const L = D.land || {}, fill = (p, st) => { if (p) { g.fillStyle = st; g.fill(new Path2D(p)); } }, line = (p, c, w) => { if (p) { g.strokeStyle = c; g.lineWidth = w; g.lineCap = g.lineJoin = 'round'; g.stroke(new Path2D(p)); } };
     if (L.interlock) { fill(L.interlock[0], stampP); fill(L.interlock[1], stampP); }
@@ -10722,6 +10757,15 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const ground = new T.Mesh(new T.PlaneGeometry(PW * 3, PH * 3), groundMat); ground.rotation.x = -Math.PI / 2; ground.position.set(PW / 2, 0, PH / 2); ground.receiveShadow = true;
     { const uv = ground.geometry.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 3 - 1, uv.getY(i) * 3 - 1); }
     gtx.wrapS = gtx.wrapT = T.ClampToEdgeWrapping; S.add(ground);
+    // sea: reflective water with moving ripples
+    const wn = (() => { const n = 256, c = cnv(n, n), x = c.getContext('2d'), im = x.createImageData(n, n), hgt = new Float32Array(n * n);
+      for (let k = 0; k < 40; k++) { const fx = 1 + Math.floor(rnd() * 8), fy = Math.floor(rnd() * 8) - 4, ph = rnd() * 6.28, a = 1 / (1 + Math.hypot(fx, fy)); for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) hgt[j * n + i] += a * Math.sin(2 * Math.PI * (fx * i + fy * j) / n + ph); }
+      for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const dx = hgt[j * n + (i + 1) % n] - hgt[j * n + (i + n - 1) % n], dy = hgt[((j + 1) % n) * n + i] - hgt[((j + n - 1) % n) * n + i], o = (j * n + i) * 4; im.data[o] = 128 - dx * 60; im.data[o + 1] = 128 - dy * 60; im.data[o + 2] = 255; im.data[o + 3] = 255; }
+      x.putImageData(im, 0, 0); const t = new T.CanvasTexture(c); t.wrapS = t.wrapT = T.RepeatWrapping; t.repeat.set(160, 50); t.colorSpace = T.NoColorSpace; return t; })();
+    const seaMat = std({ color: 0x1f6f8f, roughness: 0.06, metalness: 0.15, envMapIntensity: 1.25, normalMap: wn, normalScale: new T.Vector2(0.35, 0.35) });
+    const sea = new T.Mesh(new T.PlaneGeometry(40000, 12000), seaMat); sea.rotation.x = -Math.PI / 2; sea.rotation.z = -Math.atan2(edy, edx);
+    sea.position.set((e1[0] + e2[0]) / 2 + nx * (185 + 6000), 0.35, (e1[1] + e2[1]) / 2 + ny * (185 + 6000)); sea.receiveShadow = true; S.add(sea);
+    const tick = (t) => { wn.offset.set(t * 0.004, t * 0.0025); };
     const desert = new T.Mesh(new T.CircleGeometry(60000, 64), std({ color: 0xcdbd9c, roughness: 1 })); desert.rotation.x = -Math.PI / 2; desert.position.set(PW / 2, -0.8, PH / 2); S.add(desert);
     // perimeter wall along the site boundary
     const bp = (D.boundary.match(/-?\d+(?:\.\d+)? -?\d+(?:\.\d+)?/g) || []).map((s) => s.split(' ').map(Number));
@@ -10754,25 +10798,73 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       }
     }
     // ---------- community buildings
-    const SPEC = { AD: [120, 80, 3, 'civic'], BA: [150, 70, 3, 'civic'], CC: [150, 110, 3, 'civic'], CO: [160, 90, 2, 'shed'], HB: [130, 90, 4, 'civic'], IS: [170, 120, 3, 'shed'],
-      MQ: [90, 90, 2, 'mosque'], PA: [90, 60, 1, 'pav'], RG: [55, 30, 1, 'gate'], SC: [110, 70, 2, 'pool'], SG: [55, 30, 1, 'gate'], SR: [80, 55, 2, 'civic'], UT: [90, 60, 2, 'shed'], WS: [140, 90, 2, 'shed'] };
+    const SPEC = { AD: [150, 110, 4, 'admin'], BA: [130, 90, 2, 'bach'], CC: [150, 110, 3, 'civic'], CO: [160, 90, 2, 'shed'], HB: [130, 90, 4, 'civic'], IS: [170, 120, 3, 'shed'],
+      MQ: [90, 90, 2, 'mosque'], PA: [100, 50, 1, 'pav'], RG: [60, 26, 1, 'gate2'], SC: [120, 100, 1, 'swim'], SG: [60, 26, 1, 'gate2'], SR: [80, 50, 2, 'gateSR'], UT: [90, 60, 2, 'shed'], WS: [140, 90, 2, 'shed'] };
+    const SEA = { PA: 1, SC: 1 }; // these face the sea (local +z toward the beach)
     const FH = 8.4;
-    function civicFacade(K, b, floors, h) {
-      for (const side of ['f', 'k', 'l', 'r']) { const len = face(b, side)[3], n = Math.max(2, Math.floor((len - 8) / 9));
+    function civicFacade(K, b, floors, h, sides = ['f', 'k', 'l', 'r']) {
+      for (const side of sides) { const len = face(b, side)[3], n = Math.max(2, Math.floor((len - 8) / 9));
         for (let i = 0; i < n; i++) { const u = -len / 2 + 4 + (i + 0.5) * (len - 8) / n;
           for (let f = 0; f < floors; f++) { const y = 1.4 + f * FH;
-            if (f === floors - 1 && floors > 1) win(K, b, side, u, y + 0.4, 3.4, 6.2, true);
+            if (f === floors - 1 && floors > 1) win(K, b, side, u, y + 0.4, 3.6, 6.4, true);
             else if (f === 0 && side === 'f') win(K, b, side, u, y, 4.4, 6.0, false);
             else { win(K, b, side, u - 1.3, y + 0.8, 1.6, 4.6, false); win(K, b, side, u + 1.3, y + 0.8, 1.6, 4.6, false); } } }
         for (const s2 of [-1, 1]) onFace(K, b, side, s2 * (len / 2 - 1.5), 0.8, 'wall', new T.BoxGeometry(3, h - 3.4, 0.7).translate(0, (h - 3.4) / 2, 0.35), 0); }
     }
+    function parking(K, x0, x1, z0, z1) { // asphalt bays under rows of white shade sails
+      K.box('asph', x0, 0, z0, x1, 0.12, z1); const rows = Math.max(1, Math.floor((z1 - z0) / 22));
+      for (let r = 0; r < rows; r++) { const zz = z0 + 4 + r * 22; for (let x = x0 + 2; x < x1 - 9; x += 10) { K.box('metal', x + 4.6, 0, zz + 5.5, x + 5.2, 6.5, zz + 6.1); sail(K, x, x + 9.6, zz, zz + 11, 6.2, 1.2); } }
+    }
+    function twinArch(K, x0, z, w, h, d, mat) { // monumental gate with two arches (security reception)
+      const s = new T.Shape(); s.moveTo(0, 0); s.lineTo(w, 0); s.lineTo(w, h); s.lineTo(0, h); s.lineTo(0, 0);
+      const aw = w * 0.36, ah = h * 0.78;
+      for (const cx of [w * 0.25, w * 0.75]) { const p = new T.Path(); p.moveTo(cx - aw / 2, 0.01); p.lineTo(cx - aw / 2, ah - aw / 2); p.absarc(cx, ah - aw / 2, aw / 2, Math.PI, 0, true); p.lineTo(cx + aw / 2, 0.01); p.lineTo(cx - aw / 2, 0.01); s.holes.push(p); }
+      K.add(mat, ext(s, d), x0, 0, z - d);
+      const b = { x0, x1: x0 + w, z0: z - d, z1: z }; for (let i = 0; i < Math.floor(w / 3.4); i += 2) { K.box(mat, x0 + 1 + i * 3.4, h, z - 0.6, x0 + 2.2 + i * 3.4, h + 1.8, z); K.box(mat, x0 + 1 + i * 3.4, h, z - d, x0 + 2.2 + i * 3.4, h + 1.8, z - d + 0.6); }
+      for (const cx of [w * 0.25, w * 0.75]) for (let k = 0; k < 18; k++) { const a = Math.PI * (k + 0.5) / 18, r = aw / 2 - 0.4; K.add('wood', new T.BoxGeometry(0.4, 0.4, d - 1.2), x0 + cx + Math.cos(a) * r, ah - aw / 2 + Math.sin(a) * r, z - d / 2); }
+      return b;
+    }
     BL.forEach((bd) => {
       const [w, d, floors, kind] = SPEC[bd.c] || [100, 70, 2, 'civic'], K = new Kit(), b = { x0: -w / 2, x1: w / 2, z0: -d / 2, z1: d / 2 };
       let h = floors * FH + 3.5, top = h;
-      if (kind === 'civic' || kind === 'pool' || kind === 'pav') { block(K, b, h); civicFacade(K, b, floors, h);
-        if (floors >= 3) { const c = { x0: -w / 2 + 10, x1: w / 2 - 10, z0: -d / 2 + 8, z1: d / 2 - 8 }; K.box('wall', c.x0 + 6, h - 2.5, c.z0 + 6, c.x0 + 26, h + 8, c.z0 + 20); } }
-      if (kind === 'pav') { pergola(K, -w / 2 - 6, w / 2 + 6, d / 2 + 2, d / 2 + 18, 0); K.box('deck', -w / 2 - 14, 0, -d / 2 - 10, w / 2 + 14, 0.25, d / 2 + 24); }
-      if (kind === 'pool') { K.box('deck', -w / 2 - 6, 0, d / 2, w / 2 + 6, 0.3, d / 2 + 52); K.box('water', -w / 2 + 6, 0, d / 2 + 10, w / 2 - 6, 0.42, d / 2 + 44); pergola(K, w / 2 - 30, w / 2 - 2, d / 2 + 2, d / 2 + 10, 0.3); }
+      if (kind === 'civic') { block(K, b, h); civicFacade(K, b, floors, h);
+        const c = { x0: -w / 2 + 16, z0: -d / 2 + 14 }; block(K, { x0: c.x0, x1: c.x0 + 24, z0: c.z0, z1: c.z0 + 16 }, h + 9); top = h + 9;
+        if (bd.c === 'CC') { for (let i = 0; i < 6; i++) for (let j = 0; j < 3; j++) K.add('white', new T.CylinderGeometry(0.9, 1.1, 16, 12), -30 + i * 12, 8, d / 2 + 16 + j * 12); // plaza canopy columns
+          K.box('deck', -40, 0, d / 2 + 4, 40, 0.2, d / 2 + 46); parking(K, -w / 2 - 70, -w / 2 - 6, -d / 2, d / 2); } }
+      if (kind === 'admin') { // four-storey ring around a planted courtyard, colonnade with sails, shaded parking
+        const t = 24, blocks = [{ x0: -w / 2, x1: w / 2, z0: d / 2 - t, z1: d / 2 }, { x0: -w / 2, x1: w / 2, z0: -d / 2, z1: -d / 2 + t }, { x0: -w / 2, x1: -w / 2 + t, z0: -d / 2 + t, z1: d / 2 - t }, { x0: w / 2 - t, x1: w / 2, z0: -d / 2 + t, z1: d / 2 - t }];
+        blocks.forEach((bb, i) => { block(K, bb, h); civicFacade(K, bb, floors, h, i === 0 ? ['f', 'k', 'l', 'r'] : i === 1 ? ['k', 'f', 'l', 'r'] : i === 2 ? ['l', 'r'] : ['r', 'l']); });
+        block(K, { x0: -w / 2 - 4, x1: -w / 2 + 34, z0: d / 2 - 30, z1: d / 2 + 2 }, h + 6); top = h + 6;
+        K.box('turf', -w / 2 + t, 0, -d / 2 + t, w / 2 - t, 0.2, d / 2 - t);
+        arcade(K, -w / 2, w / 2, d / 2 + 14, 9, 12, 12, true); parking(K, -w / 2, w / 2, d / 2 + 26, d / 2 + 72); }
+      if (kind === 'bach') { // U-shaped two-storey blocks round a courtyard, gallery with pergola
+        const L = { x0: -w / 2, x1: -w / 2 + 34, z0: -d / 2, z1: d / 2 - 10 }, Rr = { x0: w / 2 - 30, x1: w / 2, z0: -d / 2, z1: d / 2 }, Bk = { x0: -w / 2 + 34, x1: w / 2 - 30, z0: -d / 2, z1: -d / 2 + 18 };
+        block(K, L, 11.5); block(K, Rr, h); block(K, Bk, h); civicFacade(K, Rr, floors, h, ['r', 'f']); civicFacade(K, Bk, floors, h, ['k']); win(K, L, 'f', -8, 1.4, 4.4, 5, false); win(K, L, 'f', 8, 1.4, 4.4, 5, false); win(K, L, 'l', 0, 1.4, 4.4, 5, false);
+        for (let z = Bk.z1 + 4; z < Rr.z1 - 4; z += 8) win(K, Rr, 'l', z - (Rr.z0 + Rr.z1) / 2, 1.4, 3.4, 6, true);
+        K.box('wall', Rr.x0 - 6, FH, Bk.z1, Rr.x0, FH + 0.6, Rr.z1 - 4); railing(K, Bk.z1 + 1, Rr.z1 - 5, Rr.x0 - 5.8, FH + 0.6, false); pergola(K, Rr.x0 - 6, Rr.x0 - 0.5, Bk.z1 + 1, Rr.z1 - 5, FH + 0.6);
+        arcade(K, L.x1, Rr.x0, d / 2, 8.5, 3, 2); K.box('deck', L.x1, 0, Bk.z1, Rr.x0, 0.2, d / 2); parking(K, w / 2 + 6, w / 2 + 36, -d / 2, d / 2); }
+      if (kind === 'pav') { // white beach pavilion: open arcade, raised clerestory, timber louvre canopy
+        block(K, b, 11.5, false, 'white'); arcade(K, -w / 2, w / 2 - 22, d / 2 + 12, 10.5, 5, 12, false, 'white');
+        K.box('white', -w / 2 + 20, 11.5, -d / 2 + 10, w / 2 - 20, 15, d / 2 - 10);
+        for (let x = -w / 2; x <= w / 2 - 22; x += 1.6) K.box('wood', x, 11.4, d / 2 + 12, x + 0.5, 11.9, d / 2 + 21);
+        for (let x = -w / 2 + 4; x <= w / 2 - 22; x += 16) { K.box('wood', x, 11.0, d / 2 + 12, x + 0.6, 11.4, d / 2 + 21); K.add('wood', new T.BoxGeometry(0.5, 5, 0.5), x + 0.3, 9.2, d / 2 + 13.6, 0, 0.6); }
+        K.box('deck', -w / 2 - 20, 0, -d / 2 - 12, w / 2 + 20, 0.25, d / 2 + 40); top = 15; }
+      if (kind === 'swim') { // pool courtyard framed by arcades, main block with crenellated parapet
+        const back = { x0: -w / 2, x1: w / 2, z0: -d / 2, z1: -d / 2 + 26 }; block(K, back, 17); civicFacade(K, back, 2, 17, ['k', 'l', 'r']);
+        for (let x = -w / 2 + 10; x < w / 2 - 6; x += 12) win(K, back, 'f', x - 0, 1.4, 5, 8, true);
+        const sideL = { x0: -w / 2, x1: -w / 2 + 14, z0: -d / 2 + 26, z1: d / 2 }, sideR = { x0: w / 2 - 14, x1: w / 2, z0: -d / 2 + 26, z1: d / 2 };
+        block(K, sideL, 10); block(K, sideR, 10); for (let z = -d / 2 + 34; z < d / 2 - 4; z += 10) { win(K, sideL, 'r', z - (sideL.z0 + sideL.z1) / 2, 1.0, 4.6, 7, true); win(K, sideR, 'l', -(z - (sideR.z0 + sideR.z1) / 2), 1.0, 4.6, 7, true); }
+        arcade(K, -w / 2 + 14, w / 2 - 14, d / 2, 9, 6, 1.4, false); for (let x = -w / 2 + 18; x < w / 2 - 18; x += 15) sail(K, x, x + 14, d / 2 - 12, d / 2 - 1.4, 9.4, 1.0);
+        K.box('deck', -w / 2 + 14, 0, -d / 2 + 26, w / 2 - 14, 0.3, d / 2); K.box('water', -w / 2 + 22, 0, -d / 2 + 34, w / 2 - 22, 0.42, d / 2 - 16); top = 19; }
+      if (kind === 'gateSR') { // security reception block and the monumental twin-arch gate
+        block(K, b, h); civicFacade(K, b, floors, h, ['f', 'k', 'l']); const g = twinArch(K, w / 2, d / 2, 74, 34, 14, 'wall'); top = 36;
+        K.box('wall', -w / 2 - 40, 0, d / 2 - 1, -w / 2, 6, d / 2); K.box('wall', w / 2 + 74, 0, d / 2 - 1, w / 2 + 120, 6, d / 2);
+        for (let x = 0; x < 40; x += 1.2) K.box('wood', w / 2 + 4 + x, 0, d / 2 + 2, w / 2 + 4.5 + x, 4.5, d / 2 + 2.5); bd.wide = w + 74; }
+      if (kind === 'gate2') { // secondary gatehouse: two crenellated portal frames, glazed booth with timber, slatted timber fence
+        for (const [x0, span] of [[-34, 26], [6, 30]]) { K.box('wall', x0, 0, -3, x0 + 5, 18, 3); K.box('wall', x0 + span, 0, -3, x0 + span + 5, 18, 3); K.box('wall', x0, 18, -3, x0 + span + 5, 22, 3);
+          for (let x = x0 + 2; x < x0 + span + 3; x += 3.4) K.box('wall', x, 22, -0.5, x + 0.9, 23.4, 0.5); for (let x = x0 + 6; x < x0 + span; x += 1.4) K.box('wood', x, 16.4, -2.8, x + 0.5, 17.6, 2.8); }
+        K.box('glass', -6, 0, -4, 4, 14, 4); K.box('wood', -6.3, 7, -4.3, 4.3, 9, 4.3); K.box('wall', -6.5, 14, -4.5, 4.5, 15, 4.5);
+        for (let x = -60; x < 60; x += 1.1) { if (x > -38 && x < 40) continue; K.box('wood', x, 0, 10, x + 0.55, 6 + ((x * 7) % 3), 10.6); } top = 24; }
       if (kind === 'shed') { const hb = floors * FH + 8; h = hb; block(K, b, hb, false);
         for (let x = -w / 2 + 8; x < w / 2 - 4; x += 10) onFace(K, b, 'k', x, 4, 'recess', new T.BoxGeometry(6, hb - 9, 0.15), 0.02);
         const a = { x0: -w / 2 + 8, x1: w / 2 - 8, z0: d / 2, z1: d / 2 + 16 }; block(K, a, 13.5); const len = a.x1 - a.x0, n = Math.floor(len / 9);
@@ -10786,11 +10878,9 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
         K.add('wall', new T.CylinderGeometry(5, 5, 1.2, 24), mx, 46, mz); K.add('dome', new T.ConeGeometry(3.4, 9, 24), mx, 62.5, mz); K.add('wall', new T.CylinderGeometry(3, 3, 12, 24), mx, 52, mz);
         for (let i = -1; i <= 1; i++) win(K, { x0: mx - 4.5, x1: mx + 4.5, z0: mz - 4.5, z1: mz + 4.5 }, 'f', 0, 6 + (i + 1) * 7, 1.6, 4, true);
         top = 46; h = 17; }
-      if (kind === 'gate') { block(K, b, 11); win(K, b, 'f', -8, 1.4, 3, 5.6, true); win(K, b, 'f', 8, 1.4, 3, 5.6, true);
-        K.box('wall', -w / 2 - 30, 9.5, d / 2 + 4, w / 2 + 30, 12, d / 2 + 18); for (const x of [-w / 2 - 28, -10, 10, w / 2 + 28]) K.box('wall', x - 1.2, 0, d / 2 + 15, x + 1.2, 9.5, d / 2 + 17.4); top = 14; }
-      const G = new T.Group(); G.position.set(bd.x, 0, bd.y); G.rotation.y = ROT; S.add(G);
-      const gs = K.build(false); for (const k in gs) { const m = new T.Mesh(gs[k], M[k]); m.castShadow = k !== 'deck' && k !== 'water'; m.receiveShadow = true; G.add(m); if (k === 'wall') { m.userData.it = bd; pick.push(m); bd.wallMesh = m; } }
-      bd.kind = 'B'; bd.rot = ROT; bd.hl = [w + 8, top + 3, d + 8]; bd.h = top; bd.size = Math.max(w, d);
+      const G = new T.Group(); G.position.set(bd.x, 0, bd.y); G.rotation.y = ROT + (SEA[bd.c] ? Math.PI : 0); S.add(G);
+      const gs = K.build(false); for (const k in gs) { const m = new T.Mesh(gs[k], M[k]); m.castShadow = !['deck', 'water', 'asph', 'turf'].includes(k); m.receiveShadow = true; G.add(m); if (k === 'wall' || (k === 'white' && !gs.wall)) { m.userData.it = bd; pick.push(m); bd.wallMesh = m; bd.wallBase = M[k]; } }
+      bd.kind = 'B'; bd.rot = G.rotation.y; bd.hl = [w + 8, top + 3, d + 8]; bd.h = top; bd.size = Math.max(w, d);
     });
     // ---------- trees along the streets, palms near the community buildings, a few parked cars
     const blockers = [...V.map((v) => [v.x, v.y, 31]), ...BL.map((b) => [b.x, b.y, (SPEC[b.c] || [100])[0] * 0.75 + 14])];
@@ -10804,7 +10894,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       const KL = new Kit(); for (let i = 0; i < 10; i++) { const a = i * 2.4, r = 0.6 + (i % 4) * 0.5; KL.add('leafA', new T.IcosahedronGeometry(1.1 + (i % 3) * 0.35, 1), Math.cos(a) * r, 6.6 + (i % 5) * 0.6, Math.sin(a) * r); }
       const gt = K.build(false).bark, gl = KL.build(false).leafA, n = treePos.length;
       const it = new T.InstancedMesh(gt, M.bark, n), il = new T.InstancedMesh(gl, std({ color: 0xffffff, roughness: 0.9 }), n); it.castShadow = il.castShadow = true; il.receiveShadow = true;
-      const col = new T.Color(); treePos.forEach((p, i) => { const s = p[2]; m4.compose(new T.Vector3(p[0], 0, p[1]), q4.setFromAxisAngle(yAx, rnd() * 6.28), new T.Vector3(s, s * (0.9 + rnd() * 0.3), s)); it.setMatrixAt(i, m4); il.setMatrixAt(i, m4); il.setColorAt(i, col.setHSL(0.2 + rnd() * 0.06, 0.38 + rnd() * 0.15, 0.17 + rnd() * 0.08)); });
+      const col = new T.Color(); treePos.forEach((p, i) => { const s = p[2]; m4.compose(new T.Vector3(p[0], 0, p[1]), q4.setFromAxisAngle(yAx, rnd() * 6.28), new T.Vector3(s, s * (0.9 + rnd() * 0.3), s)); it.setMatrixAt(i, m4); il.setMatrixAt(i, m4); il.setColorAt(i, rnd() < 0.12 ? col.setHSL(0.93 + rnd() * 0.03, 0.55, 0.5) : col.setHSL(0.2 + rnd() * 0.06, 0.38 + rnd() * 0.15, 0.17 + rnd() * 0.08)); });
       S.add(it, il);
     }
     { // date palm: tall trunk and drooping fronds (alpha-textured leaf blades)
@@ -10818,6 +10908,15 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       const pt = new T.InstancedMesh(trunkG, M.bark, n), pf = new T.InstancedMesh(gc2, frondMat, n); pt.castShadow = pf.castShadow = true;
       palmPos.forEach((p, i) => { const s = p[2] * 1.1; m4.compose(new T.Vector3(p[0], 0, p[1]), q4.setFromAxisAngle(yAx, rnd() * 6.28), new T.Vector3(s, s, s)); pt.setMatrixAt(i, m4); pf.setMatrixAt(i, m4); });
       S.add(pt, pf);
+    }
+    { // shrubs (lavender and green) at the tree pits, lantern street lamps along the curbs
+      const sh = [], col = new T.Color(); treePos.forEach((p) => { if (rnd() < 0.55) for (let k = 0; k < 3; k++) sh.push([p[0] + (rnd() - 0.5) * 7, p[1] + (rnd() - 0.5) * 7, 0.6 + rnd() * 0.7]); });
+      const ims = new T.InstancedMesh(new T.IcosahedronGeometry(1.1, 1), std({ color: 0xffffff, roughness: 0.95 }), sh.length); ims.castShadow = true; ims.receiveShadow = true;
+      sh.forEach((p, i) => { ims.setMatrixAt(i, m4.compose(new T.Vector3(p[0], p[2] * 0.6, p[1]), q4.identity(), new T.Vector3(p[2] * 1.4, p[2], p[2] * 1.4))); ims.setColorAt(i, rnd() < 0.45 ? col.setHSL(0.74, 0.32, 0.45) : col.setHSL(0.24, 0.35, 0.22 + rnd() * 0.08)); }); S.add(ims);
+      const KL = new Kit(); KL.add('lamp', new T.CylinderGeometry(0.22, 0.32, 10, 8), 0, 5, 0); KL.add('lamp', new T.BoxGeometry(2.6, 0.22, 0.22), 1.2, 9.8, 0); KL.add('lamp', new T.BoxGeometry(1.1, 0.25, 1.1), 2.4, 9.55, 0);
+      KL.add('lantern', new T.CylinderGeometry(0.5, 0.35, 1.6, 6), 2.4, 8.6, 0); KL.add('lamp', new T.ConeGeometry(0.75, 0.6, 6), 2.4, 9.75, 0);
+      const lp = []; curbPts.forEach((p, i) => { if (i % 9 !== 4) return; const off = -2.4, x = p[0] + Math.sin(p[2]) * off, y = p[1] - Math.cos(p[2]) * off; if (free(x, y)) lp.push([x, y, -p[2] + Math.PI / 2]); });
+      const gl = KL.build(false); for (const k in gl) { const im = new T.InstancedMesh(gl[k], M[k], lp.length); im.castShadow = k === 'lamp'; lp.forEach((p, i) => im.setMatrixAt(i, m4.compose(new T.Vector3(p[0], 0, p[1]), q4.setFromAxisAngle(yAx, p[2]), one))); S.add(im); }
     }
     { // cars: parked in front of the community buildings and here and there along villa streets
       const K = new Kit(); K.box('paint', -4.6, 0.7, -1.9, 4.6, 2.4, 1.9); K.box('paint', -2.4, 2.4, -1.75, 1.6, 3.7, 1.75); K.box('glass', -2.3, 2.5, -1.8, 1.5, 3.55, 1.8); K.box('glass', 1.55, 2.5, -1.6, 1.75, 3.5, 1.6);
@@ -10833,10 +10932,10 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     const pmats = {};
     function setProgress(on, pcol) {
       wallMeshes.forEach((im) => { im.userData.list.forEach((v, i) => im.setColorAt(i, on ? new T.Color(pcol(v.tot)).lerp(white, im.material === M.recess ? 0.25 : 0.1) : white)); im.instanceColor.needsUpdate = true; });
-      BL.forEach((b) => { if (!b.wallMesh) return; if (on) { const k = pcol(b.tot); b.wallMesh.material = pmats[k] || (pmats[k] = std({ color: k, map: plasterTex, roughness: 0.85 })); } else b.wallMesh.material = M.wall; });
+      BL.forEach((b) => { if (!b.wallMesh) return; if (on) { const k = pcol(b.tot); b.wallMesh.material = pmats[k] || (pmats[k] = std({ color: k, map: plasterTex, roughness: 0.85 })); } else b.wallMesh.material = b.wallBase || M.wall; });
     }
     const itemFromHit = (h) => (h.object.isInstancedMesh ? h.object.userData.list[h.instanceId] : h.object.userData.it);
-    return { R, S, cam, pick, itemFromHit, setProgress, fitShadow };
+    return { R, S, cam, pick, itemFromHit, setProgress, fitShadow, tick };
   }
 
   function build(el, D) {
@@ -10884,7 +10983,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     let tween = null;
     function flyTo(it) {
       const r = it === 'all' ? 2200 : it.kind === 'B' ? Math.max(220, it.size * 2.4) : 150;
-      const to = it === 'all' ? { tx: 1520, ty: 0, tz: 1220, az: 1.05, pol: 0.95, r } : { tx: it.x, ty: it.kind === 'B' ? 10 : 8, tz: it.y, az: goal.az + 0.35, pol: it.kind === 'B' ? 1.08 : 1.12, r };
+      const to = it === 'all' ? { tx: 1520, ty: 0, tz: 1220, az: 1.05, pol: 0.95, r } : { tx: it.x, ty: it.kind === 'B' ? 10 : 8, tz: it.y, az: (() => { const f = Math.atan2(Math.cos(it.rot || 0), Math.sin(it.rot || 0)) + 0.55; return goal.az + Math.atan2(Math.sin(f - goal.az), Math.cos(f - goal.az)); })(), pol: it.kind === 'B' ? 1.08 : 1.12, r };
       tween = { from: { ...C }, to, t0: performance.now(), dur: 1800 }; goal = { ...to };
     }
     const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
@@ -10958,7 +11057,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
       if (C.ty < 0) C.ty = 0;
       cam.position.set(C.tx + C.r * Math.sin(C.pol) * Math.cos(C.az), C.ty + C.r * Math.cos(C.pol), C.tz + C.r * Math.sin(C.pol) * Math.sin(C.az)); cam.lookAt(C.tx, C.ty, C.tz);
       const p = 0.6 + 0.4 * Math.sin(now / 160); hlMat.opacity = p; hlFill.opacity = 0.03 + 0.04 * p;
-      SC.fitShadow(C.tx, C.tz, C.r); R.render(S, cam);
+      SC.fitShadow(C.tx, C.tz, C.r); SC.tick(now / 1000); R.render(S, cam);
       if (sel && !pop.hidden) { const [sx, sy, z] = proj(sel.x, sel.h + 4, sel.y); const W = el.clientWidth, pw = pop.offsetWidth, ph = pop.offsetHeight;
         pop.style.visibility = z < 1 ? 'visible' : 'hidden'; pop.style.left = Math.max(8, Math.min(W - pw - 8, sx + 30)) + 'px'; pop.style.top = Math.max(84, Math.min(el.clientHeight - ph - 96, sy - ph / 2)) + 'px'; }
       const far = C.r > 900; cl.forEach((c) => { if (!far) { c.d.style.display = 'none'; return; } const [sx, sy, z] = proj(c.x, 40, c.y); c.d.style.display = z < 1 ? 'block' : 'none'; c.d.style.left = sx + 'px'; c.d.style.top = sy + 'px'; });
