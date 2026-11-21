@@ -271,6 +271,14 @@
         pergola(K, -1, 9, -12, -3, 15.5 - 2.45); railing(K, -1, 9, -2.6, 15.5);
         arcade(K, -2, 17, 13, 7.6, 3, 12); arcadeSide(K, 17 - 1.4, 1, 12.6, 7.6, 2); railing(K, -1.6, 16.6, 12.6, 8.6);
         K.add('jali', new T.BoxGeometry(4.6, 6.6, 0.5), -6, 3.3, 12.5);
+      } else if (type === 'XV') { // Executive villa: white render, big tower with three sunburst arches over three tall windows, balcony block, arched carport with sail
+        const Tw = { x0: -6, x1: 12, z0: -8, z1: 8 }, Md = { x0: -16, x1: -6, z0: -10, z1: 5 }, Lw = { x0: -22, x1: -16, z0: -12, z1: 2 }, Bk = { x0: -22, x1: 18, z0: -16, z1: -8 };
+        block(K, Tw, 21, true, 'white'); block(K, Md, 17, false, 'white'); block(K, Lw, 18, true, 'white'); block(K, Bk, 15, true, 'white');
+        for (let i = -1; i <= 1; i++) { win(K, Tw, 'f', i * 5, 1.2, 3, 7, false); win(K, Tw, 'f', i * 5, 11, 3, 6, true); onFace(K, Tw, 'f', i * 5, 8.6, 'recess', new T.BoxGeometry(3.6, 1.4, 0.12), 0.02); }
+        win(K, Tw, 'r', -3, 11, 2.4, 5.6, true); win(K, Tw, 'r', 3, 11, 2.4, 5.6, true); win(K, Tw, 'r', 0, 1.2, 3, 7, false);
+        win(K, Md, 'f', 0, 1.2, 3.2, 6.4, true); win(K, Md, 'f', 0, 9.6, 4, 5, false); K.box('white', Md.x0 + 0.5, 8.4, Md.z1, Md.x1 - 0.5, 9, Md.z1 + 2.6); railing(K, Md.x0 + 1, Md.x1 - 1, Md.z1 + 2.4, 9);
+        win(K, Lw, 'f', 0, 11, 2.2, 5, true); lantern(K, Md, 'f', -3.4, 4.5); lantern(K, Md, 'f', 3.4, 4.5);
+        portal(K, -24, -8, 7, 20, 8.2); arcadeSide(K, -8 - 1.4, 7, 18.6, 7.6, 2);
       } else if (type === 'R3') { // Prototype 3: large tower with three blind arches, second slim tower, carport with sail and arched side
         const Tw = { x0: -20, x1: -2, z0: -8, z1: 8 }, T2 = { x0: -2, x1: 8, z0: -7, z1: 3 }, W = { x0: 8, x1: 16, z0: -14, z1: 0 }, Bk = { x0: -20, x1: 8, z0: -15, z1: -8 };
         block(K, Tw, 20); block(K, T2, 22.5); block(K, W, 15); block(K, Bk, 15);
@@ -352,7 +360,7 @@
     const nearest = (x, y) => { let b = null, bd = 1e9; for (const p of curbPts) { const d = (p[0] - x) ** 2 + (p[1] - y) ** 2; if (d < bd) { bd = d; b = p; } } return b; };
     const kits = {}, groups = {};
     V.forEach((v, i) => {
-      const t = ['R1', 'R2', 'R3'].includes(v.t) ? v.t : 'R2', mir = i % 2 === 1, key = t + (mir ? 'm' : '');
+      const t = ['R1', 'R2', 'R3', 'XV'].includes(v.t) ? v.t : v.t === 'R6' || v.t === 'XY' ? 'R1' : v.t === 'R5' ? 'R3' : 'R2', mir = i % 2 === 1, key = t + (mir ? 'm' : '');
       const n = nearest(v.x, v.y); let rot = ROT;
       if (n) { const a = Math.atan2(n[0] - v.x, n[1] - v.y); let best = 0, bd = 9; for (let k = 0; k < 4; k++) { const r = ROT + k * Math.PI / 2; let dd = Math.abs(((a - r) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI); if (dd < bd) { bd = dd; best = r; } } rot = best; }
       v.rot = rot; v.hl = [48, 22, 40]; v.h = 22; v.kind = 'V';
@@ -370,7 +378,7 @@
     }
     // ---------- community buildings
     const SPEC = { AD: [150, 110, 4, 'admin'], BA: [130, 90, 2, 'bach'], CC: [150, 110, 3, 'civic'], CO: [160, 90, 2, 'shed'], HB: [130, 90, 4, 'civic'], IS: [170, 120, 3, 'shed'],
-      MQ: [90, 90, 2, 'mosque'], PA: [100, 50, 1, 'pav'], RG: [60, 26, 1, 'gate2'], SC: [120, 100, 1, 'swim'], SG: [60, 26, 1, 'gate2'], SR: [80, 50, 2, 'gateSR'], UT: [90, 60, 2, 'shed'], WS: [140, 90, 2, 'shed'] };
+      MQ: [80, 50, 1, 'mosque'], PA: [100, 50, 1, 'pav'], RG: [60, 26, 1, 'gate2'], SC: [120, 100, 1, 'swim'], SG: [60, 26, 1, 'gate2'], SR: [80, 50, 2, 'gateSR'], UT: [90, 70, 2, 'util'], WS: [190, 70, 2, 'works'] };
     const SEA = { PA: 1, SC: 1 }; // these face the sea (local +z toward the beach)
     const FH = 8.4;
     function civicFacade(K, b, floors, h, sides = ['f', 'k', 'l', 'r']) {
@@ -442,13 +450,31 @@
         for (let i = 0; i < n; i++) { win(K, a, 'f', -len / 2 + (i + 0.5) * len / n, 1.0, 3.6, 7.6, true); }
         for (let i = 0; i < 10; i++) K.box('metal', -w / 2 + 10 + (i % 5) * (w - 20) / 5, hb - 2.45, -d / 2 + 12 + Math.floor(i / 5) * 24, -w / 2 + 16 + (i % 5) * (w - 20) / 5, hb + 1.5, -d / 2 + 18 + Math.floor(i / 5) * 24);
         top = hb; }
-      if (kind === 'mosque') { block(K, b, 17); for (const side of ['f', 'k', 'l', 'r']) for (let i = -2; i <= 2; i++) win(K, b, side, i * 14, 2.2, 3.4, 9.5, true);
-        K.add('dome', new T.CylinderGeometry(21, 21, 4, 48), 0, 16.5, 0); K.add('dome', new T.SphereGeometry(21, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2), 0, 18.5, 0);
-        K.add('frame', new T.CylinderGeometry(0.5, 0.5, 6, 8), 0, 42, 0); K.add('dome', new T.SphereGeometry(1.2, 12, 8), 0, 45.5, 0);
-        const mx = w / 2 + 9, mz = -d / 2 + 9; K.box('wall', mx - 4.5, 0, mz - 4.5, mx + 4.5, 28, mz + 4.5); K.add('wall', new T.CylinderGeometry(3.2, 3.6, 30, 24), mx, 43, mz);
-        K.add('wall', new T.CylinderGeometry(5, 5, 1.2, 24), mx, 46, mz); K.add('dome', new T.ConeGeometry(3.4, 9, 24), mx, 62.5, mz); K.add('wall', new T.CylinderGeometry(3, 3, 12, 24), mx, 52, mz);
-        for (let i = -1; i <= 1; i++) win(K, { x0: mx - 4.5, x1: mx + 4.5, z0: mz - 4.5, z1: mz + 4.5 }, 'f', 0, 6 + (i + 1) * 7, 1.6, 4, true);
-        top = 46; h = 17; }
+      if (kind === 'mosque') { // flat-roofed prayer hall with pointed-arch portico, raised clerestory, white minaret with timber balcony, courtyard with timber pergola
+        block(K, b, 13, false); K.box('wall', -w / 2 + 12, 13, -d / 2 + 8, w / 2 - 12, 17, d / 2 - 8);
+        const pz = d / 2 + 10; K.box('wall', -w / 2, 0, d / 2, w / 2, 11, pz); // portico block, front cut by pointed arches
+        const sh = new T.Shape(); sh.moveTo(0, 0); sh.lineTo(w, 0); sh.lineTo(w, 11); sh.lineTo(0, 11); sh.lineTo(0, 0);
+        for (let i = 0; i < 5; i++) { const cx = (i + 0.5) * w / 5, aw = w / 5 - 3, p = new T.Path(); p.moveTo(cx - aw / 2, 0.01); p.lineTo(cx - aw / 2, 5); p.quadraticCurveTo(cx - aw / 2, 9, cx, 9.8); p.quadraticCurveTo(cx + aw / 2, 9, cx + aw / 2, 5); p.lineTo(cx + aw / 2, 0.01); p.lineTo(cx - aw / 2, 0.01); sh.holes.push(p); }
+        K.p.wall.pop(); K.add('wall', ext(sh, 1.2), -w / 2, 0, pz - 1.2); K.box('wall', -w / 2, 9.8, d / 2, w / 2, 11, pz); K.box('wall', -w / 2, 0, d / 2, -w / 2 + 1.2, 11, pz); K.box('wall', w / 2 - 1.2, 0, d / 2, w / 2, 11, pz);
+        onFace(K, b, 'f', 0, 0, 'wood', ext(shapeArch(3.6, 6.4), 0.2), 0.05);
+        const mx = w / 2 + 6, mz = -d / 2 + 6; K.add('wall', new T.CylinderGeometry(2.6, 3.2, 36, 20), mx, 18, mz); K.add('wood', new T.CylinderGeometry(4.2, 4.2, 3, 20, 1, true), mx, 37.5, mz);
+        K.add('wood', new T.CylinderGeometry(4.3, 4.3, 0.5, 20), mx, 36, mz); K.add('wall', new T.CylinderGeometry(2.2, 2.4, 8, 20), mx, 40, mz); K.add('wall', new T.SphereGeometry(2.2, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), mx, 44, mz);
+        K.add('lamp', new T.TorusGeometry(0.8, 0.15, 6, 12, 4.4), mx, 47.2, mz);
+        K.box('deck', -w / 2 - 10, 0, d / 2, w / 2 + 14, 0.2, d / 2 + 34); pergola(K, -w / 2 - 8, -w / 2 + 14, pz + 2, pz + 20, 0.2);
+        for (let x = -w / 2 - 12; x < w / 2 + 16; x += 1.1) K.box('wood', x, 0, d / 2 + 36, x + 0.55, 6.5, d / 2 + 36.6);
+        top = 48; h = 13; }
+      if (kind === 'works') { // long workshop: notched parapet, high jali strip, roller doors, PV roof, sail-shaded parking along the front
+        block(K, b, 15, false); for (let x = -w / 2 + 4; x < w / 2 - 2; x += 11) { onFace(K, b, 'f', x, 15, 'wall', new T.BoxGeometry(1.2, 1.6, 0.6).translate(0, 0.8, -0.3), 0); onFace(K, b, 'k', x, 15, 'wall', new T.BoxGeometry(1.2, 1.6, 0.6).translate(0, 0.8, -0.3), 0); onFace(K, b, 'k', x + 5.5, 9.5, 'jali', new T.BoxGeometry(8, 2.6, 0.2), 0.1); onFace(K, b, 'k', x + 5.5, 0.4, 'metal', new T.BoxGeometry(6.4, 7, 0.2), 0.1); }
+        for (let x = -w / 2 + 8; x < w / 2 - 4; x += 13) win(K, b, 'f', x, 1.2, 3.4, 7, true);
+        const pv = std({ color: 0x232c58, roughness: 0.25, metalness: 0.5, envMapIntensity: 1.3 }); M.pv = M.pv || pv;
+        for (let z = -d / 2 + 4; z < d / 2 - 6; z += 5.2) K.add('pv', new T.BoxGeometry(w - 10, 0.25, 4.4), 0, 13.6, z + 2.2, 0, -0.25);
+        K.box('asph', -w / 2, 0, d / 2, w / 2, 0.12, d / 2 + 30); for (let x = -w / 2 + 2; x < w / 2 - 10; x += 12) { K.box('metal', x, 0, d / 2 + 13, x + 0.5, 7.5, d / 2 + 13.5); sail(K, x, x + 11.5, d / 2 + 1, d / 2 + 13, 7.2, 1.4); }
+        K.box('asph', -w / 2, 0, -d / 2 - 34, w / 2, 0.12, -d / 2); top = 17; }
+      if (kind === 'util') { // plain utility block with recessed panels, lower annex with timber louvre roof, service yard wall
+        block(K, b, 19, false); for (const side of ['f', 'k', 'l', 'r']) { const len = face(b, side)[3]; for (let x = -len / 2 + 6; x < len / 2 - 4; x += 11) { onFace(K, b, side, x, 13, 'recess', new T.BoxGeometry(8, 2.2, 0.15), 0.02); onFace(K, b, side, x - 4.6, 1, 'wall', new T.BoxGeometry(0.8, 17, 0.5).translate(0, 8.5, 0.25), 0); } }
+        onFace(K, b, 'f', -10, 0.4, 'metal', new T.BoxGeometry(6, 7.4, 0.2), 0.1); const an = { x0: w / 2 - 30, x1: w / 2, z0: d / 2, z1: d / 2 + 24 }; block(K, an, 9, false);
+        for (let x = an.x0 + 6; x < an.x1 - 2; x += 1.2) K.box('wood', x, 9, an.z0 + 4, x + 0.6, 9.5, an.z1 - 4);
+        K.box('wall', -w / 2 - 30, 0, d / 2 + 40, w / 2 + 10, 6, d / 2 + 40.8); K.box('asph', -w / 2 - 30, 0, -d / 2 - 10, w / 2 + 10, 0.12, d / 2 + 40); top = 21; }
       const G = new T.Group(); G.position.set(bd.x, 0, bd.y); G.rotation.y = ROT + (SEA[bd.c] ? Math.PI : 0); S.add(G);
       const gs = K.build(false); for (const k in gs) { const m = new T.Mesh(gs[k], M[k]); m.castShadow = !['deck', 'water', 'asph', 'turf'].includes(k); m.receiveShadow = true; G.add(m); if (k === 'wall' || (k === 'white' && !gs.wall)) { m.userData.it = bd; pick.push(m); bd.wallMesh = m; bd.wallBase = M[k]; } }
       bd.kind = 'B'; bd.rot = G.rotation.y; bd.hl = [w + 8, top + 3, d + 8]; bd.h = top; bd.size = Math.max(w, d);
@@ -554,6 +580,14 @@
           .catch(() => { box.querySelector('.h2').textContent = 'Renders could not be loaded'; }); }
       if (fly) flyTo(it);
     }
+    let siteShown = false;
+    function showSite() { if (siteShown || !D.renders || !fetchBin) return; siteShown = true;
+      if (!rendersP) rendersP = fetchBin(D.renders).then((b) => JSON.parse(new TextDecoder().decode(b)).items);
+      rendersP.then((items) => { const list = items.filter((x) => x.k.includes('SITE')); if (!list.length) return;
+        const box = document.createElement('div'); box.className = 'v3-pop'; box.style.cssText = 'left:16px;top:84px;min-width:0;max-width:320px';
+        box.innerHTML = '<button class="x" aria-label="Close">✕</button><div class="n" style="font-size:14px">Master plan renders</div><div class="v3-rd" style="border:0;margin:0"><div class="th"></div></div>';
+        list.forEach((x, i) => { const im = new Image(); im.src = x.src; im.title = x.t; im.style.cssText = 'width:92px;height:56px'; im.onclick = () => lightbox(list, i); box.querySelector('.th').append(im); });
+        box.querySelector('.x').onclick = () => { box.remove(); siteShown = false; }; el.append(box); }).catch(() => { siteShown = false; }); }
     function lightbox(list, i) {
       const lb = document.createElement('div'); lb.className = 'v3-lb'; lb.innerHTML = '<img alt=""><div class="cap"></div><button class="c" aria-label="Close">✕</button><button class="p" aria-label="Previous">‹</button><button class="n" aria-label="Next">›</button>';
       const show = (k) => { i = (k + list.length) % list.length; lb.querySelector('img').src = list[i].src; lb.querySelector('.cap').textContent = list[i].t + '  ·  ' + (i + 1) + ' / ' + list.length; };
@@ -593,7 +627,7 @@
     el.querySelector('.v3-menu').addEventListener('click', (e) => {
       const b = e.target.closest('.v3-mi'); if (!b) return; const go = b.dataset.go; stopTour();
       if (go === 'tour') { startTour(); return; }
-      menuOn(go); if (go === 'all') { select(null); flyTo('all'); return; }
+      menuOn(go); if (go === 'all') { select(null); flyTo('all'); showSite(); return; }
       if (go === 'vil') { select(best[vilIx++ % best.length], true); return; }
       const it = BL.find((x) => x.c === go); if (it) select(it, true);
     });
