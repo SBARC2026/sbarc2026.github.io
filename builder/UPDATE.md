@@ -108,3 +108,5 @@ The "Live 3D progress" tab (pinned) is an interactive 3D model of the site: vill
 from `villas`, `villa_activities` and `buildings`, all inside the encrypted payload (`v3d_data()` in `build.py`). Nothing to do on a daily update; it follows the data.
 Building handover waves and dates come from `builder/v3d.json` (edit only when the plan changes). The 3D engine is `builder/vendor/three.min.js`
 (three.js r160, MIT), copied to `docs/vendor/` and loaded only when the tab opens. The template code is `builder/templates/v3d.js`.
+Design renders and site photos shown in the 3D pop-ups come from `builder/v3d/renders.bin` (encrypted). To change them, put the JPEGs and an `index.json`
+(`[["<codes or villa types>", "<caption>", "<file.jpg>"], ...]`) in a scratch folder and run `SBARC_PASSWORD=... python3 builder/tools/v3d_renders.py <folder>`; commit only the .bin.

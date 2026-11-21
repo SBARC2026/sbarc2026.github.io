@@ -415,6 +415,10 @@ def build():
     if v3d:
         payload['v3d'] = v3d
         os.makedirs(f'{SITE}/vendor', exist_ok=True); shutil.copy(f'{B}/vendor/three.min.js', f'{SITE}/vendor/three.min.js')
+        rb = os.path.join(B, 'v3d', 'renders.bin')  # design renders and site photos (encrypted), fetched when a pop-up opens
+        if os.path.exists(rb):
+            os.makedirs(f'{SITE}/v3d', exist_ok=True); shutil.copy(rb, f'{SITE}/v3d/renders.bin')
+            payload['v3d']['renders'] = {'file': 'v3d/renders.bin', 'v': hashlib.sha256(rd(rb, 'rb')).hexdigest()[:10]}
     if p6:
         payload['p6'] = {k: v for k, v in p6.items() if k != 'actuals'}
         g = os.path.join(B, 'p6', 'gantt.bin')  # P6 schedule (.xer), encrypted; fetched by the browser when the Gantt opens

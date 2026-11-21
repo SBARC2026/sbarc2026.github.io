@@ -1279,7 +1279,7 @@ Previews in email, WhatsApp or the Files app don't run the portal.<br>Save the f
     if (id === 'nov') { $('loading').hidden = true; nvOpen(); kpiAnim($('nv-in')); return; }
     if (id === 'cmp') { $('loading').hidden = true; cmOpen(); kpiAnim($('cm-in')); return; }
     if (id === 'an') { $('loading').hidden = true; azOpen(); return; }
-    if (id === 'v3d') { $('loading').hidden = true; V3D.open($('v3'), session.v3d); return; }
+    if (id === 'v3d') { $('loading').hidden = true; V3D.open($('v3'), session.v3d, pdfBytes); return; }
     if (!frames[id]) { $('loading').hidden = false; makeFrame(id); } else $('loading').hidden = true;
   }
   function makeFrame(id) {
